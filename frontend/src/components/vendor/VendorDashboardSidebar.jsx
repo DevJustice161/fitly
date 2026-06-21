@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const menuItems = [
   { title: "Dashboard", url: "/vendor", icon: LayoutDashboard },

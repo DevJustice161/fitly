@@ -1,4 +1,4 @@
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 //const { user } = useAuth();
 const userd = JSON.parse(localStorage.getItem("user"));
 

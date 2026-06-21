@@ -36,7 +36,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const menuItems = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },

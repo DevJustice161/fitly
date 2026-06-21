@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,

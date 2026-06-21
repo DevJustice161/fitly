@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const storeCategories = [
   "Men's fashion",

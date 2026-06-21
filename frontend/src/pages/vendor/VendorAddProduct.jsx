@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const API_URL = "http://localhost:5000/api";
 

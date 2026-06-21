@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { mockOrders } from "@/data/dashboardData";
 //import { products } from "@/data/products";
 import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const STORAGE_KEY = "fitly_reviews_v1";
 const HELPFUL_KEY = "fitly_reviews_helpful_v1";

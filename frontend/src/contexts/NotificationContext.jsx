@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 import { toast } from "sonner";
 
 const NotificationContext = createContext();

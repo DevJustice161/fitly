@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useState, useEffect } from "react";
 import {
   ShoppingBag,

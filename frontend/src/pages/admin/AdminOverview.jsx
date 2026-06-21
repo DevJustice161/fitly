@@ -15,7 +15,7 @@ import {
   vendorApplications,
   adminWithdrawalRequests,
 } from "@/data/vendorData";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const statCards = [
   {
