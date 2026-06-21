@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 100% 97%;
+    --foreground: 20 10% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 10% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 10% 12%;
+
+    --primary: 43 72% 52%;
+    --primary-foreground: 30 100% 97%;
+
+    --secondary: 345 60% 88%;
+    --secondary-foreground: 20 10% 12%;
+
+    --muted: 30 30% 93%;
+    --muted-foreground: 20 10% 45%;
+
+    --accent: 345 60% 88%;
+    --accent-foreground: 20 10% 12%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 88%;
+    --input: 30 20% 88%;
+    --ring: 43 72% 52%;
+
+    --radius: 0.75rem;
+
+    --gold: 43 72% 52%;
+    --gold-light: 43 72% 70%;
+    --gold-dark: 43 72% 40%;
+    --pink: 345 60% 88%;
+    --pink-dark: 345 40% 70%;
+    --cream: 30 100% 97%;
+    --cream-dark: 30 30% 90%;
+
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Poppins', sans-serif;
+
+    --shadow-soft: 0 4px 20px -4px hsl(20 10% 12% / 0.08);
+    --shadow-card: 0 2px 12px -2px hsl(20 10% 12% / 0.06);
+    --shadow-elevated: 0 8px 30px -6px hsl(20 10% 12% / 0.12);
+    --shadow-gold: 0 4px 20px -4px hsl(43 72% 52% / 0.3);
+
+    --sidebar-background: 30 100% 97%;
+    --sidebar-foreground: 20 10% 20%;
+    --sidebar-primary: 43 72% 52%;
+    --sidebar-primary-foreground: 30 100% 97%;
+    --sidebar-accent: 345 60% 93%;
+    --sidebar-accent-foreground: 20 10% 12%;
+    --sidebar-border: 30 20% 88%;
+    --sidebar-ring: 43 72% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-primary text-primary-foreground font-body font-medium tracking-wide
+      px-8 py-3 rounded-lg transition-all duration-300
+      hover:shadow-gold hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .btn-outline-gold {
+    @apply border-2 border-primary text-primary font-body font-medium tracking-wide
+      px-8 py-3 rounded-lg transition-all duration-300
+      hover:bg-primary hover:text-primary-foreground hover:shadow-gold;
+  }
+
+  .btn-pink {
+    @apply bg-secondary text-secondary-foreground font-body font-medium tracking-wide
+      px-8 py-3 rounded-lg transition-all duration-300
+      hover:opacity-90 hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .card-premium {
+    @apply bg-card rounded-xl overflow-hidden transition-all duration-500
+      hover:shadow-elevated hover:-translate-y-1;
+  }
+
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 100%);
+  }
+
+  .gradient-pink-cream {
+    background: linear-gradient(135deg, hsl(var(--pink)) 0%, hsl(var(--cream)) 100%);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold-dark)), hsl(var(--gold)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .premium-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 100%);
+    color: hsl(var(--cream));
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+}
