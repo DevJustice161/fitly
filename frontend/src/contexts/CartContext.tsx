@@ -21,14 +21,11 @@ export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // =========================
-  // FETCH CART (SOURCE OF TRUTH)
-  // =========================
   const fetchCart = useCallback(async () => {
     if (!user?.id) return;
 
     try {
-      //setLoading(true);
+      setLoading(true);
 
       const response = await fetch(`${API_URL}/${user.id}`);
       const data = await response.json();
@@ -50,9 +47,6 @@ export const CartProvider = ({ children }) => {
     fetchCart();
   }, [fetchCart]);
 
-  // =========================
-  // ADD TO CART
-  // =========================
   const addToCart = useCallback(
     async (product, size = null, color = null, quantity = 1) => {
       if (!user?.id) {
@@ -80,7 +74,9 @@ export const CartProvider = ({ children }) => {
         }
 
         await fetchCart();
-        toast.success(`${product.name} added to cart`);
+        if (product.name) {
+          toast.success(`${product.name}  added to cart`);
+        }
       } catch (error) {
         console.error("Add to cart error:", error);
         toast.error(error.message || "Failed to add to cart");
@@ -89,9 +85,6 @@ export const CartProvider = ({ children }) => {
     [user?.id, fetchCart],
   );
 
-  // =========================
-  // REMOVE FROM CART
-  // =========================
   const removeFromCart = useCallback(
     async (cartItemId) => {
       try {
@@ -115,9 +108,6 @@ export const CartProvider = ({ children }) => {
     [fetchCart],
   );
 
-  // =========================
-  // UPDATE QUANTITY
-  // =========================
   const updateQuantity = useCallback(
     async (cartItemId, quantity) => {
       try {
@@ -172,9 +162,6 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // =========================
-  // CLEAR CART
-  // =========================
   const clearCart = useCallback(async () => {
     if (!user?.id) return;
 
@@ -190,16 +177,12 @@ export const CartProvider = ({ children }) => {
       }
 
       setItems([]);
-      toast.success("Cart cleared");
     } catch (error) {
       console.error("Clear cart error:", error);
       toast.error(error.message || "Failed to clear cart");
     }
   }, [user?.id]);
 
-  // =========================
-  // TOTALS
-  // =========================
   const totalItems = items.reduce(
     (sum, item) => sum + Number(item.quantity),
     0,

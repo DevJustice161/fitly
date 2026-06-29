@@ -110,7 +110,9 @@ const VendorDashboardSidebar = () => {
               <p className="text-xs text-muted-foreground">
                 Vendor since{" "}
                 {vendorProfile.created_at &&
-                  new Date(vendorProfile.created_at).toLocaleDateString()}
+                  new Date(vendorProfile.created_at).toLocaleDateString(
+                    "en-NG",
+                  )}
               </p>
               {vendorProfile.is_premium === 1 && (
                 <Badge className="mt-1 bg-primary text-primary-foreground text-[10px] px-2 py-0">

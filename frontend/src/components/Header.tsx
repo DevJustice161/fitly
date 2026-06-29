@@ -52,7 +52,6 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
-      {/* Top bar */}
       <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-body tracking-wider">
         FREE DELIVERY ON ORDERS OVER ₦50,000 | Use code: FITLY10
       </div>
@@ -68,7 +67,6 @@ const Header = () => {
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Logo */}
           <Link
             to="/"
             className="font-heading text-2xl lg:text-3xl font-bold tracking-tight"
@@ -90,7 +88,6 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={() => setSearchOpen((v) => !v)}
@@ -100,7 +97,6 @@ const Header = () => {
               <Search size={20} />
             </button>
 
-            {/* Account dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger
                 className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
@@ -129,32 +125,9 @@ const Header = () => {
                     </Link>
                   </DropdownMenuItem>
                 )}
-
-                {/* <DropdownMenuItem asChild>
-                  <Link to="/login" className="cursor-pointer">
-                    <LogIn className="h-4 w-4 mr-2" /> Login
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/register" className="cursor-pointer">
-                    <UserPlus className="h-4 w-4 mr-2" /> Register
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="cursor-pointer">
-                    <LayoutDashboard className="h-4 w-4 mr-2" /> My Dashboard
-                  </Link>
-                </DropdownMenuItem> */}
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* <button
-              className="hidden sm:block text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Wishlist"
-            >
-              <Heart size={20} />
-            </button> */}
             <Link
               to="/dashboard/wishlist"
               className="relative text-muted-foreground hover:text-foreground transition-colors"
@@ -276,24 +249,6 @@ const Header = () => {
                 </Link>
               )
             ) : null}
-
-            {/* <Link
-              to={
-                !user
-                  ? "/register"
-                  : user.role === "vendor"
-                    ? "/dashboard"
-                    : "/vendor/apply"
-              }
-              onClick={() => setMobileOpen(false)}
-              className="btn-gold text-center mt-2"
-            >
-              {user
-                ? user.role === "vendor"
-                  ? "My Dashboard"
-                  : "Become a Vendor"
-                : "Become a Vendor"}
-            </Link> */}
           </nav>
         </div>
       )}

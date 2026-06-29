@@ -27,7 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { io } from "socket.io-client";
 
@@ -56,66 +56,14 @@ const NotificationsPage = () => {
     deleteOne,
     clearAll,
   } = useNotifications();
-  //const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState("all");
-  //const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const filtered = useMemo(() => {
     if (filter === "unread") return notifications.filter((n) => !n.is_read);
     if (filter === "read") return notifications.filter((n) => n.is_read);
     return notifications;
   }, [notifications, filter]);
-  // useEffect(() => {
-  //   if (!user?.id) return;
 
-  //   const handleConnect = () => {
-  //     socket.emit("join", user.id);
-  //     console.log("Joined room:", user.id);
-  //   };
-
-  //   socket.on("connect", handleConnect);
-
-  //   if (socket.connected) {
-  //     handleConnect();
-  //   }
-
-  //   return () => {
-  //     socket.off("connect", handleConnect);
-  //   };
-  // }, [user]);
-  // useEffect(() => {
-  //   socket.on("new-notification", (notification) => {
-  //     setNotifications((prev) => [notification, ...prev]);
-  //   });
-
-  //   return () => {
-  //     socket.off("new-notification");
-  //   };
-  // }, []);
-  // const fetchNotifications = async () => {
-  //   try {
-  //     const res = await fetch(
-  //       `http://localhost:5000/api/notification/${user.id}`,
-  //     );
-  //     const data = await res.json();
-  //     if (!res.ok) {
-  //       throw new Error(data.message || "Failed to fetch notifications");
-  //     }
-  //     setNotifications(data);
-  //   } catch (error) {
-  //     console.error("Failed to fetch notifications:", error);
-  //     toast({
-  //       title: "Error",
-  //       description:
-  //         "Failed to load your notifications. Please try again later.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchNotifications();
-  // }, []);
   return (
     <div className="space-y-6 max-w-5xl">
       <div className="flex flex-wrap items-center justify-between gap-3">

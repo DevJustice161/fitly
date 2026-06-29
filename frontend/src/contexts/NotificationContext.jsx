@@ -16,10 +16,8 @@ export const NotificationProvider = ({ children }) => {
     const pastDate = new Date(pastDateString);
     const currentDate = new Date(); // Uses your local current time
 
-    // Calculate difference in milliseconds
     const diffInMs = currentDate - pastDate;
 
-    // Convert milliseconds to hours
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
     const diffInWeeks = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 7));
@@ -30,7 +28,6 @@ export const NotificationProvider = ({ children }) => {
 
     const years = parts[0];
     const months = parts[1] ? parts[1].charAt(0) : 0;
-    // Handle pluralization
 
     if (yearsRatio === 1) return "1 year ago";
     if (yearsRatio > 1) {
@@ -54,18 +51,20 @@ export const NotificationProvider = ({ children }) => {
       }
       return "1 week ago";
     }
-    if (diffInHours <= 0) return "Less than an hour ago";
     if (diffInDays >= 1) {
       if (diffInDays > 1) {
         return `${diffInDays} days ago`;
       }
       return "1 day ago";
     }
+    if (diffInHours == 1) {
+      return "1 hour ago";
+    }
+    if (diffInHours <= 0) return "Less than an hour ago";
 
     return `${diffInHours} hours ago`;
   };
 
-  // initial fetch
   const fetchNotifications = async () => {
     if (!user?.id) return;
 
@@ -80,7 +79,6 @@ export const NotificationProvider = ({ children }) => {
     fetchNotifications();
   }, [user]);
 
-  // socket join + listener
   useEffect(() => {
     if (!user?.id) return;
 

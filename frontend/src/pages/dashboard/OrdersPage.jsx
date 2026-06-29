@@ -25,7 +25,6 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { mockOrders } from "@/data/dashboardData";
 import { useAuth } from "@/contexts/AuthContext";
 
 const statusFilters = [
@@ -69,29 +68,16 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Product Info */}
           <div className="flex gap-4">
-            <img
-              src={`http://localhost:5000/uploads/products/${order.thumbnail}`}
-              alt={order.product_name}
-              className="h-20 w-20 rounded-lg object-cover bg-muted"
-            />
             <div className="flex-1">
-              <p className="font-medium text-foreground">
-                {order.product_name}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                by {order.store_name}
-              </p>
               <p className="font-heading font-semibold text-foreground mt-1">
-                ₦{order.price.toLocaleString()}
+                ₦{order.total.toLocaleString()}
               </p>
             </div>
           </div>
 
           <Separator />
 
-          {/* Order Info */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <span className="text-muted-foreground">Order ID:</span>
@@ -100,20 +86,8 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
             <div>
               <span className="text-muted-foreground">Date:</span>
               <p className="font-medium">
-                {new Date(order.created_at).toLocaleDateString()}
+                {new Date(order.created_at).toLocaleDateString("en-NG")}
               </p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Size:</span>
-              <p className="font-medium">{order.size}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Color:</span>
-              <p className="font-medium">{order.color}</p>
-            </div>
-            <div>
-              <span className="text-muted-foreground">Quantity:</span>
-              <p className="font-medium">{order.quantity}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Status:</span>
@@ -127,7 +101,6 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
 
           <Separator />
 
-          {/* Tracking Progress */}
           {order.status !== "Cancelled" && (
             <div>
               <p className="text-sm font-medium text-foreground mb-3">
@@ -183,12 +156,11 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
 
           <Separator />
 
-          {/* Price Breakdown */}
           <div className="space-y-2 text-sm">
             <p className="font-medium text-foreground">Price Summary</p>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₦{order.price.toLocaleString()}</span>
+              <span>₦{order.total.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
@@ -200,7 +172,7 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
               <span>
                 ₦
                 {(
-                  parseInt(order.price) + parseInt(order.delivery_fee)
+                  parseInt(order.total) + parseInt(order.delivery_fee)
                 ).toLocaleString()}
               </span>
             </div>
@@ -239,32 +211,19 @@ const InvoiceDialog = ({ order, open, onClose }) => {
             <div>
               <span className="text-muted-foreground">Date:</span>
               <p className="font-medium">
-                {new Date(order.created_at).toLocaleDateString()}
+                {new Date(order.created_at).toLocaleDateString("en-NG")}
               </p>
             </div>
           </div>
 
           <Separator />
 
-          <div>
-            <p className="font-medium mb-2">Items</p>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{order.product}</p>
-                <p className="text-xs text-muted-foreground">
-                  {order.size} · {order.color} · Qty: {order.quantity}
-                </p>
-              </div>
-              <p className="font-medium">₦{order.price.toLocaleString()}</p>
-            </div>
-          </div>
-
           <Separator />
 
           <div className="space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₦{order.price.toLocaleString()}</span>
+              <span>₦{order.total.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
@@ -280,7 +239,7 @@ const InvoiceDialog = ({ order, open, onClose }) => {
               <span>
                 ₦
                 {(
-                  parseInt(order.price) + parseInt(order.delivery_fee)
+                  parseInt(order.total) + parseInt(order.delivery_fee)
                 ).toLocaleString()}
               </span>
             </div>
@@ -318,7 +277,9 @@ const OrdersPage = () => {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
+  const [selectedOrderD, setSelectedOrderD] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderItems, setSelectedOrderItems] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -351,10 +312,37 @@ const OrdersPage = () => {
     fetchOrders();
   }, [user.id]);
 
+  const fetchOrderItems = async (orderId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_URL}/order-items/${orderId}`);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch orders items");
+      }
+      setSelectedOrderItems(data);
+    } catch (error) {
+      console.error("Failed to fetch order items:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load your order items. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedOrder) return;
+    fetchOrderItems(selectedOrder.id);
+  }, [selectedOrder]);
+
   const statusNameChange = (status) => {
     const map = {
       pending_payment: "Pending",
       paid: "Processing",
+      processing: "Processing",
       shipped: "Shipped",
       delivered: "Delivered",
       cancelled: "Cancelled",
@@ -363,26 +351,49 @@ const OrdersPage = () => {
     return map[status] || status;
   };
 
+  const methodNameChange = (method) => {
+    const map = {
+      paystack: "Paystack",
+      flutterwave: "Flutterwave",
+      transfer: "Bank Transfer",
+      ussd: "USSD",
+    };
+    return map[method] || method;
+  };
+
   const ordersWithNames = orders.map((o) => ({
     ...o,
     status: statusNameChange(o.status),
+    payment_method: methodNameChange(o.payment_method),
   }));
 
   const filtered = ordersWithNames.filter((o) => {
     const matchFilter = filter === "All" || o.status === filter;
     const matchSearch =
-      o.product_name.toLowerCase().includes(search.toLowerCase()) ||
+      o.payment_method.toLowerCase().includes(search.toLowerCase()) ||
       o.order_id.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
 
+  const formatDate = (d) => {
+    const dateObj = new Date(d.replace(" ", "T"));
+
+    const formattedDate = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(dateObj);
+
+    return formattedDate;
+  };
+
   const handleViewDetails = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrderD(order);
     setDetailsOpen(true);
   };
 
   const handleInvoice = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrderD(order);
     setInvoiceOpen(true);
   };
 
@@ -402,13 +413,94 @@ const OrdersPage = () => {
     navigate("/cart");
   };
 
+  if (selectedOrder) {
+    return (
+      <div className="space-y-6">
+        <Button
+          variant="ghost"
+          className="mb-4"
+          onClick={() => setSelectedOrder(null)}
+        >
+          ← Back to Orders
+        </Button>
+
+        <Card className="mb-4">
+          <CardContent className="p-4 space-y-2">
+            <h2 className="font-bold text-xl">
+              Order #{selectedOrder.order_id}
+            </h2>
+
+            <p>Status: {statusNameChange(selectedOrder.status)}</p>
+
+            {selectedOrder.status === "Delivered" && (
+              <div className="flex gap-3">
+                <CheckCircle />{" "}
+                <p>Delivered on {formatDate(selectedOrder.delivered_at)}</p>
+              </div>
+            )}
+
+            <p>Total: ₦{Number(selectedOrder.total).toLocaleString()}</p>
+
+            <p>Payment Method: {selectedOrder.payment_method}</p>
+
+            <p>
+              Date Ordered:{" "}
+              {new Date(selectedOrder.created_at).toLocaleDateString("en-NG")}
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4">
+          {selectedOrderItems?.map((item) => (
+            <Card key={item.id}>
+              <CardContent className="p-4">
+                <div className="flex gap-4">
+                  <img
+                    src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                    className=" rounded-lg object-cover"
+                    style={{ width: "450px", height: "400px" }}
+                  />
+
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{item.product_name}</h3>
+
+                    <p className="text-sm text-muted-foreground">
+                      Vendor: {item.store_name}
+                    </p>
+
+                    <p className="text-sm">Size: {item.size}</p>
+
+                    <p className="text-sm">Color: {item.color}</p>
+
+                    <p className="text-sm">Quantity: {item.quantity}</p>
+
+                    <p className="font-semibold mt-2">
+                      ₦{Number(item.price).toLocaleString()}
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full text-xs border-border"
+                      onClick={() => handleReorder(item)}
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" /> Buy this again
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-5xl">
       <h1 className="font-heading text-2xl font-bold text-foreground mb-2">
         My Orders
       </h1>
 
-      {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -434,7 +526,6 @@ const OrdersPage = () => {
         </div>
       </div>
 
-      {/* Orders List */}
       {filtered.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-muted-foreground">No orders found.</p>
@@ -442,64 +533,66 @@ const OrdersPage = () => {
       ) : (
         <div className="space-y-3">
           {filtered.map((order) => (
-            <Card
-              key={order.order_item_id}
-              className="border border-border shadow-sm hover:shadow-md transition-shadow"
-            >
+            <Card>
               <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <img
-                    src={`http://localhost:5000/uploads/products/${order.thumbnail}`}
-                    alt={order.product_name}
-                    className="h-20 w-20 rounded-lg object-cover bg-muted flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {order.product_name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          by {order.store_name}
-                        </p>
-                      </div>
-                      <Badge
-                        className={`${statusColor(order.status)} border-0 text-xs`}
-                      >
-                        {order.status}
-                      </Badge>
+                <div
+                  key={order.id}
+                  className="cursor-pointer hover:shadow-md transition-all mb-4"
+                  onClick={() => setSelectedOrder(order)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">Order #{order.order_id}</h3>
+
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(order.created_at).toLocaleDateString("en-NG")}
+                      </p>
                     </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                      <span>Order: {order.order_id}</span>
-                      <span>
-                        Date: {new Date(order.created_at).toLocaleDateString()}
-                      </span>
-                      <span>Size: {order.size}</span>
-                      <span>Color: {order.color}</span>
-                      <span>Qty: {order.quantity}</span>
+
+                    <Badge className={statusColor(order.status)}>
+                      {statusNameChange(order.status)}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Total</p>
+                      <p className="font-semibold">
+                        ₦{Number(order.total).toLocaleString()}
+                      </p>
                     </div>
-                    <p className="font-heading font-semibold text-foreground">
-                      ₦{order.price.toLocaleString()}
-                    </p>
+
+                    <div>
+                      <p className="text-muted-foreground">Payment Method</p>
+                      <p>{order.payment_method}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-muted-foreground">Items</p>
+                      <p>{order.item_count}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-muted-foreground">Status</p>
+                      <p>{statusNameChange(order.status)}</p>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border">
-                  {(order.status === "Shipped" ||
-                    order.status === "Processing" ||
-                    order.status === "Pending") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full text-xs border-primary text-primary"
-                      onClick={() =>
-                        navigate(
-                          `/dashboard/orders/${order.order_item_id}/track`,
-                        )
-                      }
-                    >
-                      <MapPin className="h-3 w-3 mr-1" /> Track Order
-                    </Button>
-                  )}
+                  {order.status != "Failed" &&
+                    order.status != "Cancelled" &&
+                    order.status != "Pending" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full text-xs border-primary text-primary"
+                        onClick={() =>
+                          navigate(`/dashboard/orders/${order.order_id}/track`)
+                        }
+                      >
+                        <MapPin className="h-3 w-3 mr-1" /> Track Order
+                      </Button>
+                    )}
                   <Button
                     size="sm"
                     variant="outline"
@@ -507,14 +600,6 @@ const OrdersPage = () => {
                     onClick={() => handleViewDetails(order)}
                   >
                     <Eye className="h-3 w-3 mr-1" /> View Details
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-full text-xs border-border"
-                    onClick={() => handleReorder(order)}
-                  >
-                    <RotateCcw className="h-3 w-3 mr-1" /> Reorder
                   </Button>
                   <Button
                     size="sm"
@@ -531,14 +616,13 @@ const OrdersPage = () => {
         </div>
       )}
 
-      {/* Dialogs */}
       <OrderDetailsDialog
-        order={selectedOrder}
+        order={selectedOrderD}
         open={detailsOpen}
         onClose={setDetailsOpen}
       />
       <InvoiceDialog
-        order={selectedOrder}
+        order={selectedOrderD}
         open={invoiceOpen}
         onClose={setInvoiceOpen}
       />

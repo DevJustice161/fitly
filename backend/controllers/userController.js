@@ -42,7 +42,6 @@ exports.updateUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    //let oldAvatarPath = user.avatar;
     if (req.file) {
       if (user.avatar) {
         const oldAvatarPath = path.join(

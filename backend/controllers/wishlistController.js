@@ -53,62 +53,63 @@ exports.getWishlists = async (req, res) => {
     const [items] = await db.query(
       `
       SELECT
-  wl.id AS wishlist_id,
-  wl.user_id,
-  wl.product_id AS id,
-  wl.created_at,
+        wl.id AS wishlist_id,
+        wl.user_id,
+        wl.product_id AS id,
+        wl.created_at,
 
-  p.id AS product_id,
-  p.name,
-  p.price,
-  p.discount_price,
-  p.thumbnail,
-  p.stock_quantity,
+        p.id AS product_id,
+        p.name,
+        p.price,
+        p.slug,
+        p.discount_price,
+        p.thumbnail,
+        p.stock_quantity,
 
-  v.id AS vendor_id,
-  v.store_name AS vendor_name,
-  v.is_premium,
-  v.store_logo,
-  v.store_description,
+        v.user_id AS vendor_id,
+        v.store_name AS vendor_name,
+        v.is_premium,
+        v.store_logo,
+        v.store_description,
 
-  AVG(r.rating) AS average_rating,
-  COUNT(r.id) AS review_count,
+        AVG(r.rating) AS average_rating,
+        COUNT(r.id) AS review_count,
 
-  GROUP_CONCAT(DISTINCT pv.size) AS sizes,
-  GROUP_CONCAT(DISTINCT pv.color) AS colors
+        GROUP_CONCAT(DISTINCT pv.size) AS sizes,
+        GROUP_CONCAT(DISTINCT pv.color) AS colors
 
-FROM wishlists wl
+      FROM wishlists wl
 
-JOIN products p
-  ON p.id = wl.product_id
+      JOIN products p
+        ON p.id = wl.product_id
 
-JOIN vendors v
-  ON v.user_id = p.vendor_id
+      JOIN vendors v
+        ON v.user_id = p.vendor_id
 
-LEFT JOIN reviews r
-  ON r.product_id = p.id
+      LEFT JOIN reviews r
+        ON r.product_id = p.id
 
-LEFT JOIN product_variants pv
-  ON pv.product_id = p.id
+      LEFT JOIN product_variants pv
+        ON pv.product_id = p.id
 
-WHERE wl.user_id = ?
+      WHERE wl.user_id = ?
 
-GROUP BY
-  wl.id,
-  wl.user_id,
-  wl.product_id,
-  wl.created_at,
-  p.id,
-  p.name,
-  p.price,
-  p.discount_price,
-  p.thumbnail,
-  p.stock_quantity,
-  v.id,
-  v.store_name,
-  v.is_premium,
-  v.store_logo,
-  v.store_description;
+      GROUP BY
+        wl.id,
+        wl.user_id,
+        wl.product_id,
+        wl.created_at,
+        p.id,
+        p.name,
+        p.price,
+        p.discount_price,
+        p.thumbnail,
+        p.stock_quantity,
+        v.user_id,
+        v.store_name,
+        v.is_premium,
+        v.store_logo,
+        v.store_description;
       `,
       [userId],
     );

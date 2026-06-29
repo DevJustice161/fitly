@@ -57,7 +57,6 @@ const AboutPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
       <section className="gradient-gold py-20 lg:py-28">
         <div className="section-padding text-center max-w-3xl mx-auto">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary-foreground/15 text-primary-foreground font-body text-xs tracking-widest uppercase mb-6">
@@ -73,7 +72,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Story */}
       <section className="section-padding py-16 lg:py-24">
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div>
@@ -109,7 +107,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Values */}
       <section className="bg-muted/30 py-16 lg:py-24">
         <div className="section-padding">
           <div className="text-center mb-12">
@@ -141,7 +138,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="section-padding py-16 lg:py-24">
         <div className="max-w-4xl mx-auto bg-foreground text-primary-foreground rounded-2xl p-10 lg:p-14 text-center">
           <h2 className="font-heading text-3xl lg:text-4xl font-bold mb-4">

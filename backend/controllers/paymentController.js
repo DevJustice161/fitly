@@ -90,6 +90,7 @@ exports.initializeFlutterwave = async (req, res) => {
             `;
 
     await db.query(sql, [insertOrderItemsDetails]);
+
     const vendorId = order_items.find((item) => item.vendor_id)?.vendor_id;
     await createNotification({
       userId: user_id,
@@ -105,6 +106,7 @@ exports.initializeFlutterwave = async (req, res) => {
       message: `${name} placed a new order, check it out.`,
       referenceId: orderQuery.insertId,
     });
+
     res.json(response.data.data);
   } catch (error) {
     console.error(error.response?.data || error.message);
@@ -159,7 +161,7 @@ exports.verifyFlutterwave = async (req, res) => {
 
 exports.initializePaystack = async (req, res) => {
   try {
-    const { tx_ref, email, amount } = req.body.payload;
+    const { tx_ref, email, amount, name, phone } = req.body.payload;
     const {
       user_id,
       status,
@@ -373,11 +375,120 @@ exports.initializeTransfer = async (req, res) => {
       message: "Order Created",
     });
   } catch (error) {
-    console.error("Add to cart error:", error);
+    console.error("Add to order error:", error);
 
     res.status(500).json({
       success: false,
       message: error.message,
     });
+  }
+};
+
+exports.getPaymentMethods = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const [methods] = await db.query(
+      `SELECT * from payment_methods WHERE user_id=?`,
+      [userId],
+    );
+
+    res.json(methods);
+  } catch {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch methods",
+    });
+  }
+};
+
+exports.addPaymentMethod = async (req, res) => {
+  const {
+    user_id,
+    type,
+    label,
+    bank_name,
+    account_number,
+    provider,
+    details,
+    is_default,
+  } = req.body;
+  try {
+    const [existing] = await db.query(
+      "SELECT * FROM payment_methods WHERE label = ? AND user_id = ?",
+      [label, user_id],
+    );
+
+    if (existing.length > 0) {
+      await db.query(
+        `UPDATE payment_methods
+        SET 
+          type = ?,
+          bank_name=?,
+          account_number=?,
+          provider=?,
+          details=?
+        WHERE user_id = ? AND label =?`,
+        [type, bank_name, account_number, provider, details, user_id, label],
+      );
+      return res.json({ message: "Payment Method updated" });
+    }
+    const [method] = await db.query(
+      "INSERT INTO payment_methods (user_id, type, label, bank_name, account_number, provider, details, is_default) VALUES (?,?, ?, ?, ?, ?, ?, ?)",
+      [
+        user_id,
+        type,
+        label,
+        bank_name,
+        account_number,
+        provider,
+        details,
+        is_default,
+      ],
+    );
+    res.status(201).json({
+      message: "Method created successfully",
+    });
+  } catch (error) {
+    console.error("Error creating payment method:", error);
+    res.status(500).json({ message: "Error creating payment method" });
+  }
+};
+
+exports.setDefaultMethod = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+  try {
+    const [alreadyDefault] = await db.query(
+      "SELECT * FROM payment_methods WHERE user_id = ? AND is_default=1",
+      [userId],
+    );
+
+    const [method] = await db.query(
+      "UPDATE payment_methods set is_default=? WHERE id=?",
+      [1, id],
+    );
+    await db.query("UPDATE payment_methods set is_default=? WHERE id=?", [
+      0,
+      alreadyDefault[0].id,
+    ]);
+    res.status(201).json({
+      message: "Method updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating payment method:", error);
+    res.status(500).json({ message: "Error updating payment method" });
+  }
+};
+
+exports.deletePaymentMethod = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query("DELETE FROM payment_methods WHERE id = ?", [id]);
+
+    res.json({ message: "Payment method deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting payment method:", error);
+    res.status(500).json({ message: "Error deleting payment method" });
   }
 };

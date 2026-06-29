@@ -95,7 +95,6 @@ const CheckoutPage = () => {
 
       const person = data[0];
 
-      //console.log("The details are", data[0]);
       setUserDetails({
         name: person.name,
         email: person.email,
@@ -123,10 +122,6 @@ const CheckoutPage = () => {
     fetchUserDetails();
   }, [user?.id]);
 
-  // =========================
-  // EMPTY CART
-  // =========================
-
   if (!items.length) {
     return (
       <div className="min-h-screen bg-background">
@@ -151,20 +146,12 @@ const CheckoutPage = () => {
     );
   }
 
-  // =========================
-  // HANDLE INPUTS
-  // =========================
-
   const handleShippingChange = (e) => {
     setShipping((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
-
-  // =========================
-  // VALIDATE SHIPPING
-  // =========================
 
   const handleShippingSubmit = (e) => {
     e.preventDefault();
@@ -193,10 +180,6 @@ const CheckoutPage = () => {
       behavior: "smooth",
     });
   };
-
-  // =========================
-  // PLACE ORDER
-  // =========================
 
   const handlePlaceOrder = async () => {
     try {
@@ -230,14 +213,6 @@ const CheckoutPage = () => {
         order_items: orderItems,
       };
 
-      // console.log("Orders are:", orderItems);
-      // console.log("Items are:", items);
-      //return;
-
-      // =========================
-      // FLUTTERWAVE
-      // =========================
-
       if (selectedPayment === "flutterwave") {
         const response = await fetch(
           "http://localhost:5000/api/payments/flutterwave",
@@ -261,10 +236,6 @@ const CheckoutPage = () => {
 
         return;
       }
-
-      // =========================
-      // PAYSTACK
-      // =========================
 
       if (selectedPayment === "paystack") {
         const response = await fetch(
@@ -290,25 +261,10 @@ const CheckoutPage = () => {
         return;
       }
 
-      // =========================
-      // BANK TRANSFER
-      // =========================
-
       if (selectedPayment === "transfer") {
-        // toast.success(
-        //   "Transfer ₦" +
-        //     total.toLocaleString() +
-        //     " to:\nFitly Bank\n1234567890\nGTBank",
-        // );
-
-        // return;
         setShowTransferModal(true);
         return;
       }
-
-      // =========================
-      // USSD
-      // =========================
 
       if (selectedPayment === "ussd") {
         toast.success("Dial *737*50*Amount# to complete payment");
@@ -355,7 +311,6 @@ const CheckoutPage = () => {
         order_items: orderItems,
       };
 
-      // Save order as awaiting transfer confirmation
       const response = await fetch(
         "http://localhost:5000/api/payments/transfer",
         {
@@ -377,7 +332,6 @@ const CheckoutPage = () => {
 
       toast.success("Order placed. Awaiting payment verification by admin.");
 
-      //navigate(`/order-confirmation/${data.order_id}`);
       navigate(`/order-confirmation?orderId=${payload.tx_ref}`, {
         state: payload.tx_ref,
       });
@@ -428,8 +382,6 @@ const CheckoutPage = () => {
           </span>
         </div>
 
-        {/* STEP INDICATOR */}
-
         <div className="flex items-center gap-0 mb-10 max-w-md">
           {[1, 2].map((s) => (
             <div key={s} className="flex-1 flex items-center">
@@ -455,11 +407,7 @@ const CheckoutPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* MAIN CONTENT */}
-
           <div className="lg:col-span-2">
-            {/* SHIPPING */}
-
             {step === 1 && (
               <Card className="border shadow-sm mb-4">
                 <CardHeader>
@@ -484,19 +432,6 @@ const CheckoutPage = () => {
                           className={inputClass}
                         />
                       </div>
-
-                      {/* <div>
-                        <label className="text-sm mb-1 block">
-                          Last Name *
-                        </label>
-
-                        <input
-                          name="lastName"
-                          value={shipping.lastName}
-                          onChange={handleShippingChange}
-                          className={inputClass}
-                        />
-                      </div> */}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -582,13 +517,8 @@ const CheckoutPage = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* PAYMENT */}
-
             {step === 2 && (
               <div className="space-y-6">
-                {/* SHIPPING SUMMARY */}
-
                 <Card className="border shadow-sm p-4 mb-2">
                   <CardContent className="p-5 ">
                     <div className="flex items-center justify-between ">
@@ -618,8 +548,6 @@ const CheckoutPage = () => {
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* PAYMENT METHODS */}
 
                 <Card className="border shadow-sm mb-4">
                   <CardHeader>
@@ -662,8 +590,6 @@ const CheckoutPage = () => {
                   </CardContent>
                 </Card>
 
-                {/* PAY BUTTON */}
-
                 <Button
                   onClick={handlePlaceOrder}
                   disabled={processing}
@@ -690,8 +616,6 @@ const CheckoutPage = () => {
             )}
           </div>
 
-          {/* ORDER SUMMARY */}
-
           <div>
             <Card className="border shadow-sm mb-4 sticky top-28">
               <CardHeader>
@@ -699,8 +623,6 @@ const CheckoutPage = () => {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                {/* ITEMS */}
-
                 <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
                   {items.map((item) => {
                     const itemPrice = Number(item.discount_price || item.price);
@@ -736,8 +658,6 @@ const CheckoutPage = () => {
                     );
                   })}
                 </div>
-
-                {/* TOTALS */}
 
                 <div className="border-t pt-3 space-y-2">
                   <div className="flex justify-between text-sm">

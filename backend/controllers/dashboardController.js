@@ -4,22 +4,19 @@ exports.getDashboardData = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Total Orders
     const [totalOrders] = await db.query(
       `SELECT COUNT(*) AS total FROM orders
        WHERE user_id = ?`,
       [userId],
     );
 
-    // Pending Orders
     const [pendingOrders] = await db.query(
       `SELECT COUNT(*) AS total FROM orders
        WHERE user_id = ?
-       AND status IN ('pending','processing','pending_payment')`,
+       AND status IN ('pending_payment', 'processing', 'paid')`,
       [userId],
     );
 
-    // Wishlist
     const [wishlistItems] = await db.query(
       `SELECT COUNT(*) AS total
        FROM wishlists
@@ -27,7 +24,6 @@ exports.getDashboardData = async (req, res) => {
       [userId],
     );
 
-    // Recent Orders
     const [recentOrders] = await db.query(
       `
       SELECT
@@ -58,33 +54,33 @@ exports.getDashboardData = async (req, res) => {
       [userId],
     );
 
-    // Recently Viewed
-    // const [recentlyViewed] = await db.query(
-    //   `
-    //   SELECT
-    //     p.id,
-    //     p.name,
-    //     p.price,
-    //     p.thumbnail,
+    const [recentlyViewed] = await db.query(
+      `
+      SELECT
+        p.id,
+        p.name,
+        p.slug,
+        p.price,
+        p.thumbnail,
 
-    //     v.business_name AS vendor
+        v.store_name AS vendor
 
-    //   FROM recently_viewed rv
+      FROM recently_viewed rv
 
-    //   JOIN products p
-    //   ON p.id = rv.product_id
+      JOIN products p
+      ON p.id = rv.product_id
 
-    //   LEFT JOIN vendors v
-    //   ON v.id = p.vendor_id
+      LEFT JOIN vendors v
+      ON v.user_id = p.vendor_id
 
-    //   WHERE rv.user_id = ?
+      WHERE rv.user_id = ?
 
-    //   ORDER BY rv.created_at DESC
+      ORDER BY rv.viewed_at DESC
 
-    //   LIMIT 4
-    // `,
-    //   [userId],
-    // );
+      LIMIT 4
+    `,
+      [userId],
+    );
 
     res.json({
       stats: {
@@ -95,7 +91,7 @@ exports.getDashboardData = async (req, res) => {
 
       recentOrders,
 
-      // recentlyViewed,
+      recentlyViewed,
     });
   } catch (error) {
     console.error(error);

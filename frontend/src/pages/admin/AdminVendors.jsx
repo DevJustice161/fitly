@@ -362,7 +362,7 @@ const AdminVendors = () => {
                 <div>
                   <p className="text-muted-foreground text-xs">Joined</p>
                   <p className="font-medium">
-                    {new Date(view.created_at).toLocaleDateString()}
+                    {new Date(view.created_at).toLocaleDateString("en-NG")}
                   </p>
                 </div>
                 <div>

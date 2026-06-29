@@ -16,7 +16,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useReviews } from "@/contexts/ReviewsContext";
-//import { products } from "@/data/products";
 import StarRating from "@/components/reviews/StarRating";
 import WriteReviewModal from "@/components/reviews/WriteReviewModal";
 import { toast } from "sonner";
@@ -64,7 +63,6 @@ const ReviewsPage = () => {
   }, [products]);
 
   const myReviews = getUserReviews();
-  //console.log(reviewableItems);
   const toReview = reviewableItems.filter((i) => !i.reviewed);
 
   const [modal, setModal] = useState({

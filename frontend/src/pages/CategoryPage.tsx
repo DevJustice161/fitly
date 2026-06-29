@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
-import { products, categories } from "@/data/products";
+import { categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,7 +11,6 @@ const CategoryPage = () => {
   const [sortBy, setSortBy] = useState("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
-  //const [vendors, setVendors] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,20 +24,8 @@ const CategoryPage = () => {
         console.error("Error fetching products:", error);
       }
     };
-    // const fetchVendors = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       "http://localhost:5000/api/vendors/vendors",
-    //     );
-    //     const data = await response.json();
-    //     setVendors(data);
-    //   } catch (error) {
-    //     console.error("Error fetching vendors:", error);
-    //   }
-    // };
 
     fetchProducts();
-    //fetchVendors();
   }, []);
 
   let categoryName = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "";
@@ -69,7 +56,6 @@ const CategoryPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Breadcrumb */}
       <div className="section-padding py-4 border-b border-border">
         <div className="flex items-center gap-2 font-body text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground transition-colors">
@@ -80,7 +66,6 @@ const CategoryPage = () => {
         </div>
       </div>
 
-      {/* Title */}
       <div className="section-padding py-10 text-center">
         <h1 className="font-heading text-3xl lg:text-5xl font-bold text-foreground mb-3">
           {categoryName}
@@ -99,28 +84,17 @@ const CategoryPage = () => {
         )}
       </div>
 
-      {/* Toolbar */}
       <div className="section-padding pb-4">
         <div className="flex items-center justify-between">
-          {/* <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 font-body text-sm font-medium text-foreground px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors"
-          >
-            <SlidersHorizontal size={16} /> Filters
-          </button> */}
           <div className="flex items-center gap-2">
             <span className="font-body text-sm text-muted-foreground">
               {filteredProducts.length}{" "}
               {filteredProducts.length < 2 ? "item" : "items"}
             </span>
-            {/* <button className="flex items-center gap-1 font-body text-sm font-medium text-foreground px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors">
-              Sort by <ChevronDown size={16} />
-            </button> */}
           </div>
         </div>
       </div>
 
-      {/* Filters panel */}
       {showFilters && (
         <div className="section-padding pb-6 animate-fade-in-up">
           <div className="bg-card rounded-xl p-6 border border-border grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -177,7 +151,6 @@ const CategoryPage = () => {
                   <button
                     key={c.name}
                     className="w-8 h-8 rounded-full border-2 border-border hover:border-primary transition-colors"
-                    //style={{ backgroundColor: c.color }}
                     title={c.name}
                     type="button"
                     aria-label={c.name}
@@ -210,7 +183,6 @@ const CategoryPage = () => {
         </div>
       )}
 
-      {/* Products */}
       <div className="section-padding pb-20">
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">

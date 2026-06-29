@@ -237,6 +237,13 @@ exports.deleteReview = async (req, res) => {
   const { id } = req.params;
   try {
     const [review] = await db.query("SELECT * FROM reviews WHERE id = ?", [id]);
+    const [reviewReplies] = await db.query(
+      "SELECT * FROM review_replies WHERE review_id = ?",
+      [id],
+    );
+    if (reviewReplies.length > 0) {
+      await db.query("DELETE FROM review_replies WHERE review_id = ?", [id]);
+    }
     const [images] = await db.query(
       "SELECT * FROM review_images WHERE review_id = ?",
       [id],

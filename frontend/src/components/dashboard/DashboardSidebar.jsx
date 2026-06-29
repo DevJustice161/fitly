@@ -48,13 +48,12 @@ const menuItems = [
   { title: "My Orders", url: "/dashboard/orders", icon: ShoppingBag },
   { title: "Wishlist", url: "/dashboard/wishlist", icon: Heart },
   { title: "Messages", url: "/dashboard/messages", icon: MessageCircle },
-  //{ title: "Vouchers & Coupons", url: "/dashboard/vouchers", icon: Ticket },
+  { title: "Vouchers & Coupons", url: "/dashboard/vouchers", icon: Ticket },
   { title: "My Reviews", url: "/dashboard/reviews", icon: Star },
-  //{ title: "Delivery Addresses", url: "/dashboard/addresses", icon: MapPin },
-  //{ title: "Payment Methods", url: "/dashboard/payments", icon: CreditCard },
+  { title: "Payment Methods", url: "/dashboard/payments", icon: CreditCard },
   { title: "Notifications", url: "/dashboard/notifications", icon: Bell },
   { title: "Account Settings", url: "/dashboard/settings", icon: Settings },
-  //{ title: "Recently Viewed", url: "/dashboard/recently-viewed", icon: Clock },
+  { title: "Recently Viewed", url: "/dashboard/recently-viewed", icon: Clock },
 ];
 
 const DashboardSidebar = () => {
@@ -116,7 +115,7 @@ const DashboardSidebar = () => {
               <p className="text-xs text-muted-foreground">
                 Member since{" "}
                 {user.created_at
-                  ? new Date(user.created_at).toLocaleDateString()
+                  ? new Date(user.created_at).toLocaleDateString("en-NG")
                   : "N/A"}
               </p>
               {userDetails && userDetails.is_premium && (

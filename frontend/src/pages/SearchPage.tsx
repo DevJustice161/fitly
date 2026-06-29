@@ -4,7 +4,6 @@ import { SearchX } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-//import { products } from "@/data/products";
 
 interface Product {
   id: string | number;
@@ -31,20 +30,8 @@ const SearchPage = () => {
         console.error("Error fetching products:", error);
       }
     };
-    // const fetchVendors = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       "http://localhost:5000/api/vendors/vendors",
-    //     );
-    //     const data = await response.json();
-    //     setVendors(data);
-    //   } catch (error) {
-    //     console.error("Error fetching vendors:", error);
-    //   }
-    // };
 
     fetchProducts();
-    //fetchVendors();
   }, []);
 
   const results = useMemo(() => {

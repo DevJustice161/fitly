@@ -18,8 +18,8 @@ const WishlistPage = () => {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="font-heading text-2xl font-bold text-foreground">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+        <h1 className="font-heading text-2xl font-bold text-foreground ">
           My Wishlist
         </h1>
         {items.length > 0 && (
@@ -51,7 +51,7 @@ const WishlistPage = () => {
             >
               <CardContent className="p-3">
                 <div className="relative">
-                  <Link to={`/product/${item.id}`}>
+                  <Link to={`/product/${item.slug}`}>
                     <img
                       src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
                       alt={item.name}
@@ -68,8 +68,8 @@ const WishlistPage = () => {
                   </Button>
                 </div>
                 <div className="mt-3 space-y-1">
-                  <Link to={`/product/${item.id}`}>
-                    <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                  <Link to={`/product/${item.slug}`}>
+                    <p className="mt-2 font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
                       {item.name}
                     </p>
                   </Link>

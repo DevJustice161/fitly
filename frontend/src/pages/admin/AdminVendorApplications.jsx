@@ -231,7 +231,9 @@ const AdminVendorApplications = () => {
                   <div className="flex gap-4 mt-1 text-xs text-muted-foreground flex-wrap">
                     <span>{app.phone}</span>
                     <span>{app.city}</span>
-                    <span>{new Date(app.created_at).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(app.created_at).toLocaleDateString("en-NG")}
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -341,7 +343,7 @@ const AdminVendorApplications = () => {
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground col-span-2">
                   <Calendar className="h-4 w-4" /> Applied on{" "}
-                  {new Date(viewApp.created_at).toLocaleDateString()}
+                  {new Date(viewApp.created_at).toLocaleDateString("en-NG")}
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <bold>Government ID</bold>

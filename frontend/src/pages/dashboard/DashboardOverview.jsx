@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
 import { useState, useEffect } from "react";
 import {
   ShoppingBag,
@@ -14,12 +15,6 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  mockUser,
-  mockStats,
-  mockOrders,
-  mockRecentlyViewed,
-} from "@/data/dashboardData";
 
 const DashboardOverview = () => {
   const { user } = useAuth();
@@ -72,8 +67,6 @@ const DashboardOverview = () => {
         setOrders(data.recentOrders);
 
         setRecentlyViewed(data.recentlyViewed);
-
-        console.log("Dashboard data:", orders, recentlyViewed);
       } catch (error) {
         console.error(error);
       } finally {
@@ -99,13 +92,10 @@ const DashboardOverview = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-20">Loading dashboard...</div>
-    );
+    return <SkeletonLoader type="dashboard" count={4} />;
   }
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Welcome */}
       <div className="bg-gradient-to-r from-secondary to-card rounded-2xl p-6 md:p-8 shadow-sm border border-border mb-10">
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
           Welcome back, {user.name.split(" ")[0]} 👋
@@ -143,7 +133,6 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <Card
@@ -165,9 +154,8 @@ const DashboardOverview = () => {
         ))}
       </div>
 
-      {/* Recent Orders */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 mt-4">
           <h2 className="font-heading text-lg font-semibold text-foreground">
             Recent Orders
           </h2>
@@ -202,7 +190,7 @@ const DashboardOverview = () => {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {order.order_id} •{" "}
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {new Date(order.created_at).toLocaleDateString("en-NG")}
                     </p>
                   </div>
                   <div className="text-right">
@@ -230,9 +218,8 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Recently Viewed */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 mt-4">
           <h2 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" /> Recently Viewed
           </h2>
@@ -244,20 +231,25 @@ const DashboardOverview = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {mockRecentlyViewed.map((item) => (
+          {recentlyViewed.map((item) => (
             <Card
               key={item.id}
               className="border border-border shadow-sm hover:shadow-md transition-shadow group cursor-pointer"
             >
               <CardContent className="p-3">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full aspect-square rounded-lg object-cover bg-muted mb-2"
-                />
-                <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
-                  {item.name}
-                </p>
+                <Link to={`/product/${item.slug}`}>
+                  <img
+                    src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                    alt={item.name}
+                    className="w-full aspect-square rounded-lg object-cover bg-muted mb-2"
+                  />
+                </Link>
+                <Link to={`/product/${item.slug}`}>
+                  <p className="font-medium text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                    {item.name}
+                  </p>
+                </Link>
+
                 <p className="text-xs text-muted-foreground">{item.vendor}</p>
                 <p className="font-heading font-semibold text-sm text-foreground mt-1">
                   ₦{Number(item.price).toLocaleString()}
@@ -268,7 +260,6 @@ const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Become a Vendor */}
       <Card className="border border-primary/30 shadow-sm bg-gradient-to-r from-primary/5 to-secondary/30 mt-10">
         <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-4">
           <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">

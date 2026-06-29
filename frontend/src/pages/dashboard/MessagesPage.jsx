@@ -179,7 +179,7 @@ const MessagesPage = () => {
                         <span className="text-xs text-muted-foreground">
                           {new Date(
                             conversation.last_message_at,
-                          ).toLocaleDateString()}
+                          ).toLocaleDateString("en-NG")}
                         </span>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -316,8 +316,6 @@ const MessagesPage = () => {
                           </DropdownMenu>
                         )}
 
-                        {/* Image */}
-
                         {msg.image && (
                           <img
                             src={`http://localhost:5000/uploads/messages/${msg.image}`}
@@ -325,8 +323,6 @@ const MessagesPage = () => {
                             style={{ width: "250px", height: "250px" }}
                           />
                         )}
-
-                        {/* Text */}
 
                         {editingMessage === msg.id ? (
                           <div className="space-y-2">
@@ -366,8 +362,6 @@ const MessagesPage = () => {
                           )
                         )}
 
-                        {/* Time */}
-
                         <div className="flex justify-end mt-1">
                           <span className="text-[10px] opacity-70">
                             {new Date(msg.created_at).toLocaleTimeString([], {
@@ -383,17 +377,6 @@ const MessagesPage = () => {
               </CardContent>
 
               <div className="border-t p-3 flex gap-2">
-                {/* Hidden Input file */}
-                {/* <input
-                  type="file"
-                  ref={fileInputRef}
-                  hidden
-                  onChange={(e) => {
-                    const selected = e.target.files[0];
-                    if (selected) setFile(selected);
-                  }}
-                /> */}
-
                 <input
                   type="file"
                   accept="image/*"
@@ -405,15 +388,6 @@ const MessagesPage = () => {
                   }}
                 />
 
-                {/* BUTTONS */}
-
-                {/* <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  <Paperclip size={18} />
-                </Button> */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -460,7 +434,6 @@ const MessagesPage = () => {
         </Card>
       )}
 
-      {/* Delete Confirm */}
       <AlertDialog
         open={openDeleteConvoDialog}
         onOpenChange={setOpenDeleteConvoDialog}

@@ -6,7 +6,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -17,7 +16,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Login function
   const login = (userData, token) => {
     localStorage.setItem("token", token);
 
@@ -26,7 +24,6 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
-  // Logout function
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");

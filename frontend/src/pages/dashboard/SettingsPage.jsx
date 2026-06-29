@@ -28,7 +28,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { mockUser } from "@/data/dashboardData";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -219,13 +218,6 @@ const SettingsPage = () => {
                   )}
                 </AvatarFallback>
               </Avatar>
-
-              {/* <Button
-                size="icon"
-                className="-bottom-1 -right-1 h-7 w-7 rounded-full bg-primary text-primary-foreground mb-4"
-              >
-                <Camera className="h-3 w-3" />
-              </Button> */}
             </div>
 
             <div>
@@ -233,7 +225,6 @@ const SettingsPage = () => {
               <p className="text-sm text-muted-foreground">{user.email}</p>
             </div>
           </div>
-          {/* UPLOAD AVATAR */}
           <div className="p-4 ml-2 border border-border rounded-md relative w-full">
             <input
               type="file"
@@ -320,7 +311,6 @@ const SettingsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Password */}
       <Card className="border border-border shadow-sm mb-4">
         <CardHeader>
           <CardTitle className="font-heading text-lg flex items-center gap-2">
@@ -329,7 +319,6 @@ const SettingsPage = () => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Current Password */}
           <div>
             <Label className="text-xs text-muted-foreground">
               Current Password
@@ -358,7 +347,6 @@ const SettingsPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* New Password */}
             <div>
               <Label className="text-xs text-muted-foreground">
                 New Password
@@ -386,7 +374,6 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div>
               <Label className="text-xs text-muted-foreground">
                 Confirm Password
@@ -425,7 +412,6 @@ const SettingsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Notifications */}
       <Card className="border border-border shadow-sm mb-4">
         <CardHeader>
           <CardTitle className="font-heading text-lg flex items-center gap-2">
@@ -459,7 +445,6 @@ const SettingsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Danger Zone */}
       <Card className="border border-destructive/30 shadow-sm p-4 mb-4">
         <CardContent className="p-5 flex items-center justify-between">
           <div>

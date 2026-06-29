@@ -19,14 +19,6 @@ const Index = () => {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [vendors, setVendors] = useState([]);
-  // const categories = [
-  //   "Women's fashion",
-  //   "Men's fashion",
-  //   "Shoes",
-  //   "Bags",
-  //   "Accessories",
-  //   "Beauty products",
-  // ];
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -62,7 +54,6 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero */}
       <section className="relative h-[85vh] lg:h-[90vh] overflow-hidden">
         <img
           src={heroImage}
@@ -110,7 +101,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="section-padding py-16 lg:py-24">
         <div className="text-center mb-12">
           <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground mb-3">
@@ -151,7 +141,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Trending */}
       <section className="gradient-pink-cream py-16 lg:py-24">
         <div className="section-padding">
           <div className="flex items-end justify-between mb-10">
@@ -191,7 +180,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Premium Vendors */}
       <section className="section-padding py-16 lg:py-24">
         <div className="text-center mb-12">
           <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground mb-3">
@@ -234,7 +222,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* New Arrivals */}
       <section className="bg-muted py-16 lg:py-24">
         <div className="section-padding">
           <div className="flex items-end justify-between mb-10">
@@ -261,7 +248,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Banner */}
       <section className="gradient-gold py-16 lg:py-20">
         <div className="section-padding text-center">
           <h2 className="font-heading text-3xl lg:text-4xl font-bold text-primary-foreground mb-4">

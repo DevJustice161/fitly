@@ -23,6 +23,8 @@ app.use("/api/wishlists", require("./routes/wishlistRoutes"));
 app.use("/api/reviews", require("./routes/reviewsRoutes"));
 app.use("/api/notification", require("./routes/notificationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
+app.use("/api/vouchers", require("./routes/voucherRoutes"));
+app.use("/api/recently-viewed", require("./routes/recentlyViewedRoutes"));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

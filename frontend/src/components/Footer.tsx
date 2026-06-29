@@ -30,7 +30,6 @@ const Footer = () => {
 
   return (
     <footer className="bg-foreground text-primary-foreground">
-      {/* Newsletter */}
       <div className="gradient-gold py-12">
         <div className="section-padding text-center">
           <h3 className="font-heading text-2xl lg:text-3xl font-bold text-primary-foreground mb-2">

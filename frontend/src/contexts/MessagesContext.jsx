@@ -14,7 +14,6 @@ export const MessagesProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
 
-  // Fetch conversations
   const fetchConversations = async () => {
     if (!user?.id) return;
 
@@ -35,7 +34,6 @@ export const MessagesProvider = ({ children }) => {
     }
   };
 
-  // Fetch messages
   const fetchMessages = async (conversationId) => {
     try {
       const res = await fetch(
@@ -67,11 +65,10 @@ export const MessagesProvider = ({ children }) => {
     return await res.json();
   };
 
-  // Send message
   const sendMessage = async (formData) => {
     const res = await fetch("http://localhost:5000/api/messages", {
       method: "POST",
-      body: formData, // IMPORTANT: no JSON headers
+      body: formData,
     });
 
     const data = await res.json();
@@ -93,7 +90,6 @@ export const MessagesProvider = ({ children }) => {
     }
   };
 
-  // Mark conversation read
   const markConversationRead = async (conversationId, userId) => {
     try {
       await fetch(`http://localhost:5000/api/messages/read/${conversationId}`, {
@@ -140,19 +136,16 @@ export const MessagesProvider = ({ children }) => {
     }
   };
 
-  // Socket setup
   useEffect(() => {
     if (!user?.id) return;
 
     socket.emit("join", user.id);
 
     socket.on("new-message", (message) => {
-      // Add to open chat
       if (message.conversation_id === activeConversation) {
         setMessages((prev) => [...prev, message]);
       }
 
-      // Update conversation list
       setConversations((prev) =>
         prev.map((c) =>
           c.id === message.conversation_id

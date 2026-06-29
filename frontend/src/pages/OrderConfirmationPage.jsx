@@ -30,9 +30,6 @@ const OrderConfirmationPage = () => {
 
   const [params] = useSearchParams();
   const orderId = params.get("orderId");
-  console.log(params.get("name"));
-
-  //const { orderId: paramsOrderId } = useParams();
 
   const [order, setOrder] = useState(state || null);
 
@@ -40,14 +37,9 @@ const OrderConfirmationPage = () => {
 
   const [error, setError] = useState("");
 
-  // =========================
-  // FETCH ORDER
-  // =========================
-
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        // if order already exists from navigate state
         if (state?.orderId) return;
 
         setLoading(true);
@@ -73,19 +65,11 @@ const OrderConfirmationPage = () => {
     fetchOrder();
   }, [orderId, state]);
 
-  // =========================
-  // COPY ORDER ID
-  // =========================
-
   const copyOrderId = () => {
     navigator.clipboard.writeText(order.order_id);
 
     toast.success("Order ID copied!");
   };
-
-  // =========================
-  // LOADING
-  // =========================
 
   if (loading) {
     return (
@@ -100,10 +84,6 @@ const OrderConfirmationPage = () => {
       </div>
     );
   }
-
-  // =========================
-  // ERROR
-  // =========================
 
   if (error || !order) {
     return (
@@ -132,8 +112,6 @@ const OrderConfirmationPage = () => {
       <Header />
 
       <div className="section-padding py-16 max-w-2xl mx-auto text-center">
-        {/* SUCCESS ICON */}
-
         <div className="mb-6">
           <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             {order.status === "failed" ? (
@@ -160,8 +138,6 @@ const OrderConfirmationPage = () => {
             {order.shipping?.name || "Customer"}!
           </p>
         </div>
-
-        {/* ORDER DETAILS */}
 
         <Card className="border border-border shadow-sm mb-8 text-left">
           <CardContent className="p-6 space-y-4">
@@ -230,8 +206,6 @@ const OrderConfirmationPage = () => {
           </CardContent>
         </Card>
 
-        {/* ORDER ITEMS */}
-
         <Card className="border border-border shadow-sm mb-8 text-left">
           <CardContent className="p-6">
             <h3 className="font-heading text-base font-semibold mb-4">
@@ -272,8 +246,6 @@ const OrderConfirmationPage = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* TIMELINE */}
 
         <Card className="border border-border shadow-sm mb-8 text-left">
           <CardContent className="p-6">
@@ -356,8 +328,6 @@ const OrderConfirmationPage = () => {
           </CardContent>
         </Card>
 
-        {/* ACTION BUTTONS */}
-
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link to="/dashboard/orders">
             <Button className="rounded-xl px-8">View My Orders</Button>
@@ -370,8 +340,6 @@ const OrderConfirmationPage = () => {
             </Button>
           </Link>
         </div>
-
-        {/* EMAIL */}
 
         <p className="text-xs text-muted-foreground mt-8">
           A confirmation email has been sent to{" "}

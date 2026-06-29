@@ -17,14 +17,6 @@ import { useReviews } from "@/contexts/ReviewsContext";
 
 const MAX_IMAGES = 5;
 
-// const fileToDataUrl = (file) =>
-//   new Promise((resolve, reject) => {
-//     const fr = new FileReader();
-//     fr.onload = () => resolve(fr.result);
-//     fr.onerror = reject;
-//     fr.readAsDataURL(file);
-//   });
-
 const WriteReviewModal = ({
   open,
   onOpenChange,

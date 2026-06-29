@@ -78,7 +78,7 @@ exports.getCart = async (req, res) => {
   p.thumbnail,
   p.stock_quantity,
 
-  v.id AS vendor_id,
+  v.user_id AS vendor_id,
   v.store_name AS vendor_name,
   v.is_premium,
   v.store_logo,
@@ -117,7 +117,7 @@ GROUP BY
   p.discount_price,
   p.thumbnail,
   p.stock_quantity,
-  v.id,
+  v.user_id,
   v.store_name,
   v.is_premium,
   v.store_logo,

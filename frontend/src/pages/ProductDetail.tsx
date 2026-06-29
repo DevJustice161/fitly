@@ -9,7 +9,6 @@ import {
   RotateCcw,
   ChevronRight,
 } from "lucide-react";
-//import { products } from "@/data/products";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +23,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductReviewsSection from "@/components/reviews/ProductReviewsSection";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useRecentlyViewed } from "@/contexts/RecentlyViewedContext";
 
 const formatPrice = (price) =>
   new Intl.NumberFormat("en-NG", {
@@ -106,6 +106,15 @@ const ProductDetail = () => {
     }
   }, [slug]);
 
+  const { addRecentlyViewed } = useRecentlyViewed();
+
+  useEffect(() => {
+    console.log(product);
+    if (product?.id) {
+      addRecentlyViewed(product.id);
+    }
+  }, [product, addRecentlyViewed]);
+
   if (!product) {
     return (
       <div className="min-h-screen bg-background">
@@ -123,10 +132,9 @@ const ProductDetail = () => {
     );
   }
 
-  const relatedProducts = products.filter(
-    (p) => p.category === product.category && p.id !== product.id,
-  );
-  //.slice(0, 4);
+  const relatedProducts = products
+    .filter((p) => p.category === product.category && p.id !== product.id)
+    .slice(0, 4);
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -152,7 +160,6 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Breadcrumb */}
       <div className="section-padding py-4 border-b border-border">
         <div className="flex items-center gap-2 font-body text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground transition-colors">
@@ -172,7 +179,6 @@ const ProductDetail = () => {
 
       <div className="section-padding py-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-          {/* Image */}
           <div className="flex gap-5">
             <div className="flex flex-col gap-3">
               {productImages.map((img, index) => (
@@ -266,7 +272,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Size selector */}
             {sizes && (
               <div className="mb-6">
                 <h4 className="font-body text-sm font-semibold text-foreground mb-3">
@@ -290,7 +295,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Color selector */}
             {colors && (
               <div className="mb-8">
                 <h4 className="font-body text-sm font-semibold text-foreground mb-3">
@@ -313,8 +317,6 @@ const ProductDetail = () => {
                 </div>
               </div>
             )}
-
-            {/* Quantity */}
 
             <div className="mb-6">
               <h4 className="font-semibold mb-2">Quantity</h4>
@@ -341,7 +343,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3 mb-8">
               <button
                 onClick={() =>
@@ -370,11 +371,9 @@ const ProductDetail = () => {
                   size={22}
                   className={isWishlisted(product.id) ? "fill-destructive" : ""}
                 />
-                {/* <Heart size={16} className={wished ? "fill-destructive" : ""} /> */}
               </button>
             </div>
 
-            {/* Trust badges */}
             <div className="grid grid-cols-3 gap-4 pt-6 border-t border-border">
               {[
                 { icon: Truck, label: "Fast Delivery" },
@@ -392,7 +391,6 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="mt-12">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="grid w-full sm:w-auto sm:inline-grid grid-cols-3">
@@ -454,7 +452,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Related */}
       {relatedProducts.length > 0 && (
         <section className="section-padding py-16 border-t border-border">
           <h2 className="font-heading text-2xl font-bold text-foreground mb-8">
@@ -468,7 +465,6 @@ const ProductDetail = () => {
         </section>
       )}
 
-      {/* People also viewed */}
       <section className="section-padding py-16 mt-12">
         <h2 className="font-heading text-2xl font-bold mb-6">
           People Also Viewed

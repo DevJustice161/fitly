@@ -81,14 +81,6 @@ export const WishlistProvider = ({ children }) => {
     [user?.id, fetchWishlists],
   );
 
-  //   const addToWishlist = useCallback((product) => {
-  //     setItems((prev) => {
-  //       if (prev.some((i) => String(i.id) === String(product.id))) return prev;
-  //       return [...prev, product];
-  //     });
-  //     toast.success("Added to wishlist");
-  //   }, []);
-
   const removeFromWishlist = useCallback(
     async (wishlistItemId) => {
       try {
@@ -117,7 +109,7 @@ export const WishlistProvider = ({ children }) => {
       if (!user?.id) {
         toast.error("Please login first");
         return;
-      } // Check if product already exists in wishlist
+      }
       const existingItem = items.find(
         (item) => String(item.product_id) === String(product.id),
       );

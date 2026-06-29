@@ -4,17 +4,14 @@ import { useAuth } from "../contexts/AuthContext";
 function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
 
-  // Still loading auth state
   if (loading) {
-    return <div className="margin-auto">Loading...</div>;
+    return <div className="margin-auto"></div>;
   }
 
-  // Not logged in
   if (!user) {
     return <Navigate to="/login" />;
   }
 
-  // Role not allowed
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     if (user.role === "admin") {
       return <Navigate to="/admin" />;
@@ -23,7 +20,6 @@ function ProtectedRoute({ children, allowedRoles }) {
     } else {
       return <Navigate to="/dashboard" />;
     }
-    //return <Navigate to="/" />;
   }
 
   return children;

@@ -326,7 +326,6 @@ const ProductReviewsSection = ({ product }) => {
                               {new Date(
                                 r.replies[0].created_at.replace(" ", "T"),
                               ).toLocaleString(undefined, dateOptions)}
-                              {/* {r.replies[0].created_at.toLocaleDateString()} */}
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">

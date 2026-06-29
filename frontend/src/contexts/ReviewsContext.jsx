@@ -1,6 +1,4 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { mockOrders } from "@/data/dashboardData";
-//import { products } from "@/data/products";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
@@ -11,83 +9,6 @@ export const CURRENT_USER = () => {
   const { user } = useAuth();
   return { id: user.id, name: user.name, avatar: user.avatar };
 };
-
-// Seed reviews — tied to real product ids
-const seedReviews = () => [
-  {
-    id: "r-seed-1",
-    productId: "1",
-    userId: "u-chiamaka",
-    userName: "Chiamaka E.",
-    userAvatar: null,
-    orderItemId: "seed-o1",
-    rating: 5,
-    title: "Absolutely stunning gown",
-    review:
-      "The material is premium and delivery was fast. Got so many compliments at the wedding!",
-    images: [],
-    helpful: 23,
-    verified: true,
-    reply: {
-      text: "Thank you so much! We are thrilled you loved it.",
-      date: "2026-06-02",
-    },
-    createdAt: "2026-05-28",
-    updatedAt: "2026-05-28",
-  },
-  {
-    id: "r-seed-2",
-    productId: "1",
-    userId: "u-tunde",
-    userName: "Tunde A.",
-    userAvatar: null,
-    orderItemId: "seed-o2",
-    rating: 4,
-    title: "Great quality, runs slightly large",
-    review:
-      "Beautiful gown. Sizing runs slightly large but still elegant. Vendor was responsive.",
-    images: [],
-    helpful: 8,
-    verified: true,
-    reply: null,
-    createdAt: "2026-05-15",
-    updatedAt: "2026-05-15",
-  },
-  {
-    id: "r-seed-3",
-    productId: "2",
-    userId: "u-ade",
-    userName: "Ade O.",
-    userAvatar: null,
-    orderItemId: "seed-o3",
-    rating: 5,
-    title: "Perfect Agbada",
-    review: "Tailoring is on point. Worth every naira.",
-    images: [],
-    helpful: 14,
-    verified: true,
-    reply: null,
-    createdAt: "2026-04-20",
-    updatedAt: "2026-04-20",
-  },
-  {
-    id: "r-seed-4",
-    productId: "3",
-    userId: "u-blessing",
-    userName: "Blessing N.",
-    userAvatar: null,
-    orderItemId: "seed-o4",
-    rating: 3,
-    title: "Nice but smaller than expected",
-    review: "Bag is cute but smaller than the photos suggest.",
-    images: [],
-    helpful: 4,
-    verified: true,
-    reply: null,
-    createdAt: "2026-04-10",
-    updatedAt: "2026-04-10",
-  },
-];
 
 const ReviewsContext = createContext(null);
 
@@ -102,7 +23,6 @@ export const ReviewsProvider = ({ children }) => {
       const raw = localStorage.getItem(HELPFUL_KEY);
       if (raw) return JSON.parse(raw);
     } catch {}
-    //return {};
   });
 
   const getProducts = async () => {
@@ -112,7 +32,6 @@ export const ReviewsProvider = ({ children }) => {
       );
       const data = await response.json();
       setProducts(data);
-      //localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
     } catch (error) {
       console.log("Can't fetch prducts", error);
     }
@@ -270,7 +189,6 @@ export const ReviewsProvider = ({ children }) => {
     );
   };
 
-  // Helpers
   const getProductReviews = (productId) =>
     reviews.filter((r) => String(r.productId) === String(productId));
 
@@ -304,24 +222,35 @@ export const ReviewsProvider = ({ children }) => {
     );
   };
 
-  // Reviewable items: delivered orders for current user, not yet reviewed
   const reviewableItems = useMemo(() => {
     const delivered = orders.filter((o) => o.status === "delivered");
-    return delivered.map((o) => {
-      // Map order.product (name) to a real product id when possible
+
+    // Track seen product IDs to prevent duplicates
+    const seenProductIds = new Set();
+    const uniqueItems = [];
+
+    for (const o of delivered) {
       const match =
         products.find(
           (p) => p.name.toLowerCase() === String(o.product_name).toLowerCase(),
         ) || products.find((p) => p.vendor_name === o.store_name);
+
       const productId = match ? match.id : o.product_id;
-      const orderItemId = o.order_item_id;
+
+      if (seenProductIds.has(productId)) {
+        continue;
+      }
+
       const existing = reviews.find(
         (r) =>
           String(r.userId) === String(user?.id) &&
-          String(r.order_item_id) === String(orderItemId),
+          String(r.productId) === String(productId),
       );
-      return {
-        orderItemId,
+
+      seenProductIds.add(productId);
+
+      uniqueItems.push({
+        orderItemId: o.order_item_id,
         productId,
         productName: o.product_name,
         productImage: match ? match.thumbnail : o.thumbnail,
@@ -329,9 +258,11 @@ export const ReviewsProvider = ({ children }) => {
         date: o.created_at,
         reviewed: !!existing,
         existingReviewId: existing?.id || null,
-      };
-    });
-  }, [reviews, products, orders]);
+      });
+    }
+
+    return uniqueItems;
+  }, [reviews, products, orders, user?.id]);
 
   const canReview = (productId, orderItemId) => {
     if (!orderItemId) return false;
