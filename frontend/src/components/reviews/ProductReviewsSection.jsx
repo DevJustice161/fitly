@@ -61,7 +61,6 @@ const ProductReviewsSection = ({ product }) => {
   const all = getProductReviews(product.id);
   const stats = getProductStats(product.id);
 
-  // Find a reviewable order item for this product
   const reviewableForThis = reviewableItems.find(
     (i) => String(i.productId) === String(product.id) && !i.reviewed,
   );
@@ -234,7 +233,6 @@ const ProductReviewsSection = ({ product }) => {
                         alt=""
                         className="w-full h-full object-cover"
                       />
-                      {/* <AvatarFallback>{r.userName.charAt(0)}</AvatarFallback> */}
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">

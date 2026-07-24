@@ -33,7 +33,7 @@ const ProductCard = ({ product }) => {
           </button>
         </div>
         <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.is_new && (
+          {product.is_new != 0 && (
             <span className="bg-foreground text-primary-foreground text-[10px] font-body font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
               New
             </span>

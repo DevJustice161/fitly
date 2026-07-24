@@ -303,7 +303,7 @@ const DeliveryMap = ({ progress }) => (
 );
 
 const OrderTrackingPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { createNewConversation, sendMessage } = useMessages();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -316,7 +316,9 @@ const OrderTrackingPage = () => {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/track/${id}`);
+        const res = await fetch(`${API_URL}/track/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to fetch order");
         setOrder(data);

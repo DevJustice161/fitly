@@ -2,6 +2,10 @@ const Flutterwave = require("flutterwave-node-v3");
 const axios = require("axios");
 const db = require("../config/db");
 const createNotification = require("../utils/createNotification");
+const {
+  buildSubscriptionPayload,
+  buildPremiumPaymentCallbackUrl,
+} = require("../utils/premiumUtils");
 
 exports.initializeFlutterwave = async (req, res) => {
   try {
@@ -15,6 +19,7 @@ exports.initializeFlutterwave = async (req, res) => {
       payment_method,
       payment_reference,
       order_items,
+      courier_id,
     } = req.body.order;
 
     const response = await axios.post(
@@ -57,11 +62,12 @@ exports.initializeFlutterwave = async (req, res) => {
             status,
             subtotal,
             delivery_fee,
+            courier_id,
             total,
             payment_method,
             payment_reference
           )
-          VALUES(?, ?, ?, ?, ?, ? , ? ,? )
+          VALUES(?, ?, ?, ?, ?, ?, ? , ? ,? )
           `,
       [
         user_id,
@@ -69,6 +75,7 @@ exports.initializeFlutterwave = async (req, res) => {
         status,
         subtotal,
         delivery_fee,
+        courier_id,
         total,
         payment_method,
         payment_reference,
@@ -78,6 +85,7 @@ exports.initializeFlutterwave = async (req, res) => {
       orderQuery.insertId,
       item.product_id,
       item.vendor_id,
+      item.default_courier,
       item.quantity,
       item.size,
       item.color,
@@ -85,7 +93,7 @@ exports.initializeFlutterwave = async (req, res) => {
     ]);
     const sql = `
             INSERT INTO order_items
-            (order_id, product_id, vendor_id, quantity, size, color, price)
+            (order_id, product_id, vendor_id, default_courier, quantity, size, color, price)
             VALUES ?
             `;
 
@@ -380,6 +388,400 @@ exports.initializeTransfer = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+exports.verifyPremiumFlutterwave = async (req, res) => {
+  try {
+    const {
+      transaction_id,
+      tx_ref,
+      vendorId,
+      planId,
+      billingCycle,
+      status = "active",
+      autoRenew,
+      amount,
+      method,
+      startedAt,
+      nextBillingAt,
+      paymentReference,
+    } = req.query;
+
+    const paymentMethod =
+      method === "card"
+        ? {
+            type: "card",
+            // last4: digits.slice(-4),
+            // brand: digits.startsWith("4") ? "Visa" : "Mastercard",
+          }
+        : { type: method };
+
+    const response = await axios.get(
+      `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+        },
+      },
+    );
+
+    const [vendorSubRow] = await db.query(
+      `SELECT * FROM vendor_subscriptions WHERE vendor_id = ?`,
+      [vendorId],
+    );
+
+    if (vendorSubRow.length > 0) {
+      const now = new Date();
+      const vendorSub = vendorSubRow[0];
+      const history = JSON.parse(vendorSub.history);
+      const latestHistory = {
+        id: `INV-${Date.now()}`,
+        date: now.toISOString(),
+        amount,
+        plan: "Premium Vendor",
+        status: "Paid",
+        method: method,
+      };
+      history.unshift(latestHistory);
+
+      await db.query("UPDATE vendors SET is_premium = ? WHERE user_id = ?", [
+        1,
+        vendorId,
+      ]);
+
+      const payload = buildSubscriptionPayload({
+        vendorId,
+        planId,
+        billingCycle,
+        status,
+        autoRenew,
+        amount,
+        paymentMethod,
+        history,
+        startedAt,
+        nextBillingAt,
+        paymentReference,
+      });
+
+      await db.query(
+        `
+      INSERT INTO vendor_subscriptions (
+        vendor_id,
+        plan_id,
+        billing_cycle,
+        status,
+        auto_renew,
+        amount,
+        payment_method,
+        history,
+        started_at,
+        next_billing_at,
+        last_payment_reference
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        plan_id = VALUES(plan_id),
+        billing_cycle = VALUES(billing_cycle),
+        status = VALUES(status),
+        auto_renew = VALUES(auto_renew),
+        amount = VALUES(amount),
+        payment_method = VALUES(payment_method),
+        history = VALUES(history),
+        started_at = VALUES(started_at),
+        next_billing_at = VALUES(next_billing_at),
+        last_payment_reference = VALUES(last_payment_reference)
+      `,
+        [
+          payload.vendor_id,
+          payload.plan_id,
+          payload.billing_cycle,
+          payload.status,
+          payload.auto_renew,
+          payload.amount,
+          payload.payment_method,
+          payload.history,
+          payload.started_at,
+          payload.next_billing_at,
+          payload.last_payment_reference,
+        ],
+      );
+    } else {
+      await db.query("UPDATE vendors SET is_premium = ? WHERE user_id = ?", [
+        1,
+        vendorId,
+      ]);
+
+      const payload = buildSubscriptionPayload({
+        vendorId,
+        planId,
+        billingCycle,
+        status,
+        autoRenew,
+        amount,
+        paymentMethod,
+        history,
+        startedAt,
+        nextBillingAt,
+        paymentReference,
+      });
+
+      await db.query(
+        `
+      INSERT INTO vendor_subscriptions (
+        vendor_id,
+        plan_id,
+        billing_cycle,
+        status,
+        auto_renew,
+        amount,
+        payment_method,
+        history,
+        started_at,
+        next_billing_at,
+        last_payment_reference
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        plan_id = VALUES(plan_id),
+        billing_cycle = VALUES(billing_cycle),
+        status = VALUES(status),
+        auto_renew = VALUES(auto_renew),
+        amount = VALUES(amount),
+        payment_method = VALUES(payment_method),
+        history = VALUES(history),
+        started_at = VALUES(started_at),
+        next_billing_at = VALUES(next_billing_at),
+        last_payment_reference = VALUES(last_payment_reference)
+      `,
+        [
+          payload.vendor_id,
+          payload.plan_id,
+          payload.billing_cycle,
+          payload.status,
+          payload.auto_renew,
+          payload.amount,
+          payload.payment_method,
+          payload.history,
+          payload.started_at,
+          payload.next_billing_at,
+          payload.last_payment_reference,
+        ],
+      );
+    }
+
+    if (response.data.data.status === "successful") {
+      return res.json({
+        success: true,
+        data: response.data.data,
+        redirect_url: true,
+      });
+    }
+
+    res.status(400).json({
+      success: false,
+      message: "Payment not verified",
+    });
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+
+    res.status(500).json({
+      message: "Verification failed",
+    });
+  }
+};
+
+exports.verifyPremiumPaystack = async (req, res) => {
+  try {
+    const {
+      reference,
+      vendorId,
+      planId,
+      billingCycle,
+      status = "active",
+      autoRenew,
+      amount,
+      method,
+      startedAt,
+      nextBillingAt,
+      paymentReference,
+    } = req.query;
+    const paymentMethod =
+      method === "card"
+        ? {
+            type: "card",
+            // last4: digits.slice(-4),
+            // brand: digits.startsWith("4") ? "Visa" : "Mastercard",
+          }
+        : { type: method };
+
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        },
+      },
+    );
+
+    const [vendorSubRow] = await db.query(
+      `SELECT * FROM vendor_subscriptions WHERE vendor_id = ?`,
+      [vendorId],
+    );
+
+    if (vendorSubRow.length > 0) {
+      const now = new Date();
+      const vendorSub = vendorSubRow[0];
+      const history = JSON.parse(vendorSub.history);
+      const latestHistory = {
+        id: `INV-${Date.now()}`,
+        date: now.toISOString(),
+        amount,
+        plan: "Premium Vendor",
+        status: "Paid",
+        method: method,
+      };
+      history.unshift(latestHistory);
+
+      await db.query("UPDATE vendors SET is_premium = ? WHERE user_id = ?", [
+        1,
+        vendorId,
+      ]);
+
+      const payload = buildSubscriptionPayload({
+        vendorId,
+        planId,
+        billingCycle,
+        status,
+        autoRenew,
+        amount,
+        paymentMethod,
+        history,
+        startedAt,
+        nextBillingAt,
+        paymentReference,
+      });
+
+      await db.query(
+        `
+      INSERT INTO vendor_subscriptions (
+        vendor_id,
+        plan_id,
+        billing_cycle,
+        status,
+        auto_renew,
+        amount,
+        payment_method,
+        history,
+        started_at,
+        next_billing_at,
+        last_payment_reference
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        plan_id = VALUES(plan_id),
+        billing_cycle = VALUES(billing_cycle),
+        status = VALUES(status),
+        auto_renew = VALUES(auto_renew),
+        amount = VALUES(amount),
+        payment_method = VALUES(payment_method),
+        history = VALUES(history),
+        started_at = VALUES(started_at),
+        next_billing_at = VALUES(next_billing_at),
+        last_payment_reference = VALUES(last_payment_reference)
+      `,
+        [
+          payload.vendor_id,
+          payload.plan_id,
+          payload.billing_cycle,
+          payload.status,
+          payload.auto_renew,
+          payload.amount,
+          payload.payment_method,
+          payload.history,
+          payload.started_at,
+          payload.next_billing_at,
+          payload.last_payment_reference,
+        ],
+      );
+    } else {
+      await db.query("UPDATE vendors SET is_premium = ? WHERE user_id = ?", [
+        1,
+        vendorId,
+      ]);
+
+      const payload = buildSubscriptionPayload({
+        vendorId,
+        planId,
+        billingCycle,
+        status,
+        autoRenew,
+        amount,
+        paymentMethod,
+        history,
+        startedAt,
+        nextBillingAt,
+        paymentReference,
+      });
+
+      await db.query(
+        `
+      INSERT INTO vendor_subscriptions (
+        vendor_id,
+        plan_id,
+        billing_cycle,
+        status,
+        auto_renew,
+        amount,
+        payment_method,
+        history,
+        started_at,
+        next_billing_at,
+        last_payment_reference
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        plan_id = VALUES(plan_id),
+        billing_cycle = VALUES(billing_cycle),
+        status = VALUES(status),
+        auto_renew = VALUES(auto_renew),
+        amount = VALUES(amount),
+        payment_method = VALUES(payment_method),
+        history = VALUES(history),
+        started_at = VALUES(started_at),
+        next_billing_at = VALUES(next_billing_at),
+        last_payment_reference = VALUES(last_payment_reference)
+      `,
+        [
+          payload.vendor_id,
+          payload.plan_id,
+          payload.billing_cycle,
+          payload.status,
+          payload.auto_renew,
+          payload.amount,
+          payload.payment_method,
+          payload.history,
+          payload.started_at,
+          payload.next_billing_at,
+          payload.last_payment_reference,
+        ],
+      );
+    }
+
+    if (response.data.data.status === "success") {
+      return res.json({
+        success: true,
+        data: response.data.data,
+        redirect_url: true,
+      });
+    }
+
+    res.status(400).json({
+      success: false,
+      message: "Payment not verified",
+    });
+  } catch (error) {
+    console.error(error.response?.data || error);
+
+    res.status(500).json({
+      message: "Verification failed",
     });
   }
 };

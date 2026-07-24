@@ -11,6 +11,7 @@ const {
   getProductVariants,
   getProductDetails,
 } = require("../controllers/productController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 const upload = require("../middleware/uploadProductImagesMiddleware");
 
@@ -28,6 +29,7 @@ router.get("/variants/:productId", getProductVariants);
 
 router.put(
   "/update/:id",
+  verifyToken,
   upload.fields([
     {
       name: "thumbnail",
@@ -41,10 +43,11 @@ router.put(
   updateProduct,
 );
 
-router.delete("/delete/:id", deleteProduct);
+router.delete("/delete/:id", verifyToken, deleteProduct);
 
 router.post(
   "/",
+  verifyToken,
   upload.fields([
     {
       name: "thumbnail",

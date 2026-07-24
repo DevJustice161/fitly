@@ -34,7 +34,7 @@ import { useMessages } from "@/contexts/MessagesContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const MessagesPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const {
     conversations,
@@ -115,6 +115,7 @@ const MessagesPage = () => {
       `http://localhost:5000/api/messages/conversations/${selected.id}`,
       {
         method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
 

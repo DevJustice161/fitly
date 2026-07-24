@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Minus, Plus, X, ArrowRight, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "../contexts/AuthContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { SkeletonLoader } from "@/components/ui/SkeletonLoader";
@@ -25,6 +26,7 @@ const CartPage = () => {
     totalPrice,
     totalItems,
   } = useCart();
+  const { user, token } = useAuth();
 
   const [variantMap, setVariantMap] = useState({});
 
@@ -37,6 +39,9 @@ const CartPage = () => {
           if (!map[item.product_id]) {
             const res = await fetch(
               `http://localhost:5000/api/products/variants/${item.product_id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
             );
 
             const data = await res.json();

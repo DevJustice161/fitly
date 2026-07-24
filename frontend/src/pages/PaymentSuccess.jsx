@@ -10,7 +10,7 @@ const PaymentSuccess = () => {
   const navigate = useNavigate();
 
   const { clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const verifyPayment = async () => {
     try {
@@ -22,6 +22,9 @@ const PaymentSuccess = () => {
       if (provider === "flutterwave" && transaction_id) {
         const response = await fetch(
           `http://localhost:5000/api/payments/flutterwave/verify?transaction_id=${transaction_id}&tx_ref=${tx_ref}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
 
         const data = await response.json();
@@ -34,6 +37,9 @@ const PaymentSuccess = () => {
       if (provider === "paystack" && reference) {
         const response = await fetch(
           `http://localhost:5000/api/payments/paystack/verify?reference=${reference}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
 
         const data = await response.json();

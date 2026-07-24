@@ -213,7 +213,7 @@ const ProductDetail = () => {
               <span className="font-body text-xs uppercase tracking-wider text-muted-foreground">
                 {product.vendor_name}
               </span>
-              {product.is_premium && (
+              {product.is_premium != 0 && (
                 <span className="premium-badge text-[10px]">
                   <Star size={10} fill="currentColor" /> Premium
                 </span>

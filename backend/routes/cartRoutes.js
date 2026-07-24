@@ -8,17 +8,18 @@ const {
   clearCart,
   updateCartVariant,
 } = require("../controllers/cartController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 router.get("/:userId", getCart);
 
-router.post("/add", addToCart);
+router.post("/add", verifyToken, addToCart);
 
-router.put("/update/:id", updateCartItem);
+router.put("/update/:id", verifyToken, updateCartItem);
 
-router.delete("/remove/:id", removeCartItem);
+router.delete("/remove/:id", verifyToken, removeCartItem);
 
-router.delete("/clear/:id", clearCart);
+router.delete("/clear/:id", verifyToken, clearCart);
 
-router.put("/variant/:cartId", updateCartVariant);
+router.put("/variant/:cartId", verifyToken, updateCartVariant);
 
 module.exports = router;

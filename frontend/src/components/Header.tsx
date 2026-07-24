@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
@@ -23,13 +23,49 @@ import {
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const Header = () => {
+  const [categories, setCategories] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { totalItems } = useCart();
   const { totalWishlists } = useWishlist();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
+  const API_URL = "http://localhost:5000/api";
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load categories");
+      }
+
+      const normalizedCategories = Array.isArray(data)
+        ? data.map((category) => {
+            if (typeof category === "string") {
+              return { name: category, slug: category };
+            }
+
+            return {
+              name: category.name || category.slug || "Unnamed category",
+              slug: category.slug || category.name || "",
+            };
+          })
+        : [];
+
+      setCategories(normalizedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [user?.id]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -41,14 +77,10 @@ const Header = () => {
     setSearchQuery("");
   };
 
-  const navLinks = [
-    { label: "Women", href: "/category/women" },
-    { label: "Men", href: "/category/men" },
-    { label: "Accessories", href: "/category/accessories" },
-    { label: "Shoes", href: "/category/shoes" },
-    { label: "Bags", href: "/category/bags" },
-    { label: "Beauty Products", href: "/category/beauty-products" },
-  ];
+  const navLinks = categories.map((category) => ({
+    label: category.name,
+    href: `/category/${category.slug}`,
+  }));
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">

@@ -4,6 +4,7 @@ import { SearchX } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Product {
   id: string | number;
@@ -15,6 +16,7 @@ interface Product {
 }
 
 const SearchPage = () => {
+  const { user, token } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [params] = useSearchParams();
   const query = (params.get("q") || "").trim();
@@ -23,6 +25,9 @@ const SearchPage = () => {
       try {
         const response = await fetch(
           "http://localhost:5000/api/products/productsCard",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
         const data = await response.json();
         setProducts(data as Product[]);
@@ -32,7 +37,7 @@ const SearchPage = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [user, token]);
 
   const results = useMemo(() => {
     if (!query) return [];

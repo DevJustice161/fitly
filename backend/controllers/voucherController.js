@@ -10,6 +10,9 @@ exports.createVoucher = async (req, res) => {
       expires_at,
       usage_limit,
       user_id,
+      vendor_id,
+      description,
+      is_active,
     } = req.body;
 
     const [existing] = await db.query(
@@ -34,9 +37,12 @@ exports.createVoucher = async (req, res) => {
         min_order_amount,
         expires_at,
         usage_limit,
-        user_id
+        user_id,
+        vendor_id,
+        description,
+        is_active
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         code,
@@ -46,6 +52,9 @@ exports.createVoucher = async (req, res) => {
         expires_at,
         usage_limit,
         user_id || null,
+        vendor_id,
+        description,
+        is_active,
       ],
     );
 
@@ -104,6 +113,29 @@ exports.getUserVouchers = async (req, res) => {
   }
 };
 
+exports.getVendorVouchers = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+
+    const [vouchers] = await db.query(
+      `
+      SELECT *
+      FROM vouchers
+      WHERE vendor_id = ?
+      ORDER BY expires_at ASC
+      `,
+      [vendorId],
+    );
+
+    res.json(vouchers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch vendor vouchers",
+    });
+  }
+};
+
 exports.getVoucherById = async (req, res) => {
   try {
     const [voucher] = await db.query("SELECT * FROM vouchers WHERE id = ?", [
@@ -134,6 +166,8 @@ exports.updateVoucher = async (req, res) => {
       expires_at,
       usage_limit,
       is_active,
+      description,
+      code,
     } = req.body;
 
     await db.query(
@@ -145,7 +179,9 @@ exports.updateVoucher = async (req, res) => {
         min_order_amount=?,
         expires_at=?,
         usage_limit=?,
-        is_active=?
+        is_active=?,
+        description=?,
+        code=?
       WHERE id=?
       `,
       [
@@ -155,6 +191,8 @@ exports.updateVoucher = async (req, res) => {
         expires_at,
         usage_limit,
         is_active,
+        description,
+        code,
         req.params.id,
       ],
     );
@@ -183,6 +221,32 @@ exports.deleteVoucher = async (req, res) => {
     console.error(error);
     res.status(500).json({
       message: "Failed to delete voucher",
+    });
+  }
+};
+
+exports.toggleActive = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [vouch] = await db.query(
+      "SELECT is_active FROM vouchers WHERE id=?",
+      [id],
+    );
+    const voucherStatus = vouch[0].is_active;
+    const status = voucherStatus ? 0 : 1;
+    await db.query("UPDATE vouchers set is_active = ? WHERE id =?", [
+      status,
+      id,
+    ]);
+
+    res.json({
+      success: true,
+      message: "Voucher Status updated",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to toggle voucher",
     });
   }
 };

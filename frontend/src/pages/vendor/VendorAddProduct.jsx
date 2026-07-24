@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, PlusCircle, X } from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,14 +20,6 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const API_URL = "http://localhost:5000/api";
 
-const categories = [
-  "Women's fashion",
-  "Men's fashion",
-  "Shoes",
-  "Bags",
-  "Accessories",
-  "Beauty products",
-];
 const sizes = [
   "XS",
   "S",
@@ -62,7 +53,7 @@ const colorOptions = [
 const VendorAddProduct = () => {
   const navigate = useNavigate();
 
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const { toast } = useToast();
 
@@ -71,6 +62,8 @@ const VendorAddProduct = () => {
   const [name, setName] = useState("");
 
   const [description, setDescription] = useState("");
+
+  const [categories, setCategories] = useState([]);
 
   const [category, setCategory] = useState("");
 
@@ -85,6 +78,40 @@ const VendorAddProduct = () => {
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load categories");
+      }
+
+      const normalizedCategories = Array.isArray(data)
+        ? data.map((category) => {
+            if (typeof category === "string") {
+              return { name: category, slug: category };
+            }
+
+            return {
+              name: category.name || category.slug || "Unnamed category",
+              slug: category.slug || category.name || "",
+            };
+          })
+        : [];
+
+      setCategories(normalizedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [user?.id]);
 
   const toggleSize = (size) => {
     setSelectedSizes((prev) =>
@@ -198,6 +225,7 @@ const VendorAddProduct = () => {
 
       const response = await fetch(`${API_URL}/products`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -214,8 +242,6 @@ const VendorAddProduct = () => {
 
       navigate("/vendor/products");
     } catch (error) {
-      console.error(error);
-
       toast({
         title: "Error",
         description: error.message || "Something went wrong.",
@@ -236,11 +262,9 @@ const VendorAddProduct = () => {
         Back to Products
       </Link>
 
-      <h1 className="font-heading text-3xl font-bold">Add New Product</h1>
+      <h1 className="font-heading text-3xl font-bold mb-4">Add New Product</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* PRODUCT DETAILS */}
-
         <Card>
           <CardHeader>
             <CardTitle>Product Details</CardTitle>
@@ -279,8 +303,8 @@ const VendorAddProduct = () => {
 
                   <SelectContent>
                     {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                      <SelectItem key={cat.slug} value={cat.name}>
+                        {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -325,9 +349,7 @@ const VendorAddProduct = () => {
           </CardContent>
         </Card>
 
-        {/* VARIANTS */}
-
-        <Card className="border border-border shadow-sm">
+        <Card className="border border-border shadow-sm mt-2">
           <CardHeader>
             <CardTitle className="font-heading text-lg">
               Sizes & Colors
@@ -375,9 +397,7 @@ const VendorAddProduct = () => {
           </CardContent>
         </Card>
 
-        {/* THUMBNAIL */}
-
-        <Card>
+        <Card className="mt-2">
           <CardHeader>
             <CardTitle>Thumbnail Image</CardTitle>
           </CardHeader>
@@ -390,12 +410,6 @@ const VendorAddProduct = () => {
                 className="hidden"
                 onChange={handleThumbnailChange}
               />
-
-              {/* <img
-                src="http://localhost:5000/uploads/logos/1778685419790-756531337.jpg"
-                alt="testing"
-                className="w-20 h-20 object-cover"
-              /> */}
 
               {thumbnailFile ? (
                 <>
@@ -430,9 +444,7 @@ const VendorAddProduct = () => {
           </CardContent>
         </Card>
 
-        {/* GALLERY */}
-
-        <Card>
+        <Card className="mt-2">
           <CardHeader>
             <CardTitle>Gallery Images</CardTitle>
           </CardHeader>
@@ -481,7 +493,11 @@ const VendorAddProduct = () => {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={loading} className="w-full h-12">
+        <Button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 mt-4 mb-4"
+        >
           <PlusCircle className="h-5 w-5 mr-2" />
 
           {loading ? "Publishing..." : "Publish Product"}

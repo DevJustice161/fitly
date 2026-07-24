@@ -169,6 +169,29 @@ exports.deleteConversation = async (req, res) => {
   });
 };
 
+exports.getAllMessages = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [messages] = await db.query(
+      `
+      SELECT *
+      FROM messages
+      WHERE receiver_id=?
+      ORDER BY created_at ASC
+      `,
+      [userId],
+    );
+
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Failed to fetch messages",
+    });
+  }
+};
+
 exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;

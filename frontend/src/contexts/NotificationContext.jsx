@@ -8,7 +8,7 @@ const NotificationContext = createContext();
 const socket = io("http://localhost:5000");
 
 export const NotificationProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -70,6 +70,9 @@ export const NotificationProvider = ({ children }) => {
 
     const res = await fetch(
       `http://localhost:5000/api/notification/${user.id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
     );
     const data = await res.json();
 
@@ -105,6 +108,7 @@ export const NotificationProvider = ({ children }) => {
         `http://localhost:5000/api/notification/mark-as-read/${id}`,
         {
           method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       toast.success("Notification marked as read");
@@ -126,6 +130,7 @@ export const NotificationProvider = ({ children }) => {
         `http://localhost:5000/api/notification/mark-as-unread/${id}`,
         {
           method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       toast.success("Notification marked as unread");
@@ -151,6 +156,7 @@ export const NotificationProvider = ({ children }) => {
         `http://localhost:5000/api/notification/mark-all-read/${user.id}`,
         {
           method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       toast.success("All notifications marked as read");
@@ -172,6 +178,7 @@ export const NotificationProvider = ({ children }) => {
         `http://localhost:5000/api/notification/delete-one/${id}`,
         {
           method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       toast.success("Notification deleted");
@@ -193,6 +200,7 @@ export const NotificationProvider = ({ children }) => {
         `http://localhost:5000/api/notification/clear/${user.id}`,
         {
           method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
       toast.success("All Notifications deleted");

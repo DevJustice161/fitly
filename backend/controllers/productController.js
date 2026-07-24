@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const fs = require("fs");
 const path = require("path");
+const { getProductLimitForVendor } = require("../utils/premiumUtils");
 
 exports.createProduct = async (req, res) => {
   try {
@@ -22,6 +23,28 @@ exports.createProduct = async (req, res) => {
 
     const slug = name.toLowerCase().replace(/\s+/g, "-");
 
+    const [vendorRows] = await db.query(
+      "SELECT is_premium FROM vendors WHERE user_id = ?",
+      [vendor_id],
+    );
+    const [productCountRows] = await db.query(
+      "SELECT COUNT(*) AS total FROM products WHERE vendor_id = ?",
+      [vendor_id],
+    );
+    const productLimit = await getProductLimitForVendor(
+      Boolean(vendorRows[0]?.is_premium),
+    );
+
+    if (Number.isFinite(productLimit)) {
+      const currentCount = Number(productCountRows[0]?.total || 0);
+      if (currentCount >= productLimit) {
+        return res.status(403).json({
+          success: false,
+          message: `Basic vendors can list up to ${productLimit} products. Upgrade to Premium for unlimited listings.`,
+        });
+      }
+    }
+
     const [productResult] = await db.query(
       `
       INSERT INTO products (
@@ -33,10 +56,11 @@ exports.createProduct = async (req, res) => {
         price,
         discount_price,
         stock_quantity,
+        is_new,
         thumbnail,
         status
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         vendor_id,
@@ -47,6 +71,7 @@ exports.createProduct = async (req, res) => {
         price,
         discount_price || null,
         stock_quantity,
+        1,
         thumbnail,
         "Active",
       ],
@@ -191,13 +216,78 @@ exports.getProductsByVendor = async (req, res) => {
       productImages[image.product_id].push(image);
     });
 
-    const productsWithImages = products.map((product) => ({
+    const [totalSales] = await db.query(
+      `
+      SELECT
+          p.id AS product_id,
+          COALESCE(SUM(oi.quantity), 0) AS units_sold,
+          COALESCE(SUM(oi.price*oi.quantity), 0) AS total_sales
+      FROM products p
+
+      LEFT JOIN order_items oi
+          ON oi.product_id = p.id
+
+      LEFT JOIN orders o
+          ON o.id = oi.order_id
+          AND o.status = 'delivered'
+
+      WHERE p.id IN (?)
+
+      GROUP BY p.id
+  `,
+      [products.map((p) => p.id)],
+    );
+    const sales = {};
+
+    totalSales.forEach((sale) => {
+      sales[sale.product_id] = {
+        unitsSold: Number(sale.units_sold),
+        totalSales: Number(sale.total_sales),
+      };
+    });
+
+    const [ratings] = await db.query(
+      `
+      SELECT
+          p.id AS product_id,
+          COALESCE(AVG(r.rating), 0) AS average_rating,
+          COUNT(r.id) AS review_count
+      FROM products p
+
+      LEFT JOIN reviews r
+          ON r.product_id = p.id
+
+      WHERE p.id IN (?)
+
+      GROUP BY p.id
+  `,
+      [products.map((p) => p.id)],
+    );
+
+    const productRatings = {};
+
+    ratings.forEach((rating) => {
+      productRatings[rating.product_id] = {
+        averageRating: Number(rating.average_rating),
+        reviewCount: Number(rating.review_count),
+      };
+    });
+    const productsDetails = products.map((product) => ({
       ...product,
       images: productImages[product.id] || [],
       variants: productVariants[product.id] || [],
+      sales: sales[product.id] || [],
+      sales: sales[product.id] || {
+        unitsSold: 0,
+        totalSales: 0,
+      },
+      ratings: productRatings[product.id] || {
+        averageRating: 0,
+        reviewCount: 0,
+      },
     }));
 
-    res.json(productsWithImages);
+    res.json(productsDetails);
   } catch (error) {
     console.error("Error fetching products by vendor:", error);
     res.status(500).json({ message: "Error fetching products by vendor" });

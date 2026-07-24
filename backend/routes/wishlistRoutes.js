@@ -6,13 +6,14 @@ const {
   removeWishlistsItem,
   clearWishlists,
 } = require("../controllers/wishlistController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 router.get("/:userId", getWishlists);
 
-router.post("/add", addToWishLists);
+router.post("/add", verifyToken, addToWishLists);
 
-router.delete("/remove/:id", removeWishlistsItem);
+router.delete("/remove/:id", verifyToken, removeWishlistsItem);
 
-router.delete("/clear/:id", clearWishlists);
+router.delete("/clear/:id", verifyToken, clearWishlists);
 
 module.exports = router;

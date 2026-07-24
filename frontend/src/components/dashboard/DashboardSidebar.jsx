@@ -42,6 +42,7 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useMessages } from "@/contexts/MessagesContext";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -57,7 +58,8 @@ const menuItems = [
 ];
 
 const DashboardSidebar = () => {
-  const { user } = useAuth();
+  const { unreadMsgCount } = useMessages();
+  const { user, token } = useAuth();
   const [userDetails, setUserDetails] = useState(null);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
 
@@ -67,7 +69,9 @@ const DashboardSidebar = () => {
   if (user.role === "vendor") {
     const fetchVendorDetails = async () => {
       try {
-        const response = await fetch(`${API_URL}/vendor/${user.id}`);
+        const response = await fetch(`${API_URL}/vendor/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch vendor details");
         }
@@ -161,6 +165,11 @@ const DashboardSidebar = () => {
                       {item.title == "Notifications" && unreadCount > 0 && (
                         <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
                           {unreadCount}
+                        </span>
+                      )}
+                      {item.title == "Messages" && unreadMsgCount > 0 && (
+                        <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {unreadMsgCount}
                         </span>
                       )}
                     </NavLink>

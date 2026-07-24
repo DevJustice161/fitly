@@ -8,10 +8,11 @@ const MessagesContext = createContext();
 const socket = io("http://localhost:5000");
 
 export const MessagesProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
 
   const fetchConversations = async () => {
@@ -20,6 +21,9 @@ export const MessagesProvider = ({ children }) => {
     try {
       const res = await fetch(
         `http://localhost:5000/api/messages/conversations/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       const data = await res.json();
@@ -34,10 +38,28 @@ export const MessagesProvider = ({ children }) => {
     }
   };
 
+  const fetchAllMessages = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/messages/all/${user?.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await res.json();
+      setAllMessages(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const fetchMessages = async (conversationId) => {
     try {
       const res = await fetch(
         `http://localhost:5000/api/messages/${conversationId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       const data = await res.json();
@@ -58,6 +80,7 @@ export const MessagesProvider = ({ children }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(convo),
     });
@@ -68,6 +91,7 @@ export const MessagesProvider = ({ children }) => {
   const sendMessage = async (formData) => {
     const res = await fetch("http://localhost:5000/api/messages", {
       method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
 
@@ -96,6 +120,7 @@ export const MessagesProvider = ({ children }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(userId),
       });
@@ -115,6 +140,7 @@ export const MessagesProvider = ({ children }) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ message }),
     });
@@ -129,6 +155,7 @@ export const MessagesProvider = ({ children }) => {
   const deleteMessage = async (id) => {
     const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
       method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (res.ok) {
@@ -181,7 +208,12 @@ export const MessagesProvider = ({ children }) => {
 
   useEffect(() => {
     fetchConversations();
-  }, [user]);
+    fetchAllMessages();
+  }, [user, activeConversation]);
+
+  const unreadMsgCount = allMessages.filter(
+    (n) => n.receiver_id === user?.id && !n.is_read,
+  ).length;
 
   return (
     <MessagesContext.Provider
@@ -190,10 +222,12 @@ export const MessagesProvider = ({ children }) => {
         setConversations,
         createNewConversation,
         messages,
+        unreadMsgCount,
         activeConversation,
         setActiveConversation,
         fetchConversations,
         fetchMessages,
+        fetchAllMessages,
         sendMessage,
         markConversationRead,
         updateMessage,

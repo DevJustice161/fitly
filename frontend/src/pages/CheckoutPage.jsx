@@ -60,11 +60,12 @@ const paymentMethods = [
 ];
 
 const CheckoutPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { triggerNotification } = useNotifications();
   const navigate = useNavigate();
 
   const [userDetails, setUserDetails] = useState([]);
+  const [courier, setCourier] = useState({});
   const [showTransferModal, setShowTransferModal] = useState(false);
 
   const { items, totalPrice, clearCart } = useCart();
@@ -89,7 +90,9 @@ const CheckoutPage = () => {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch(`${API_URL}/${user.id}`);
+      const response = await fetch(`${API_URL}/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
 
@@ -118,7 +121,25 @@ const CheckoutPage = () => {
     }
   };
 
+  const fetchCourier = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/couriers/default`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const data = await response.json();
+
+      setCourier(data);
+    } catch (error) {
+      console.error("Courier fetch error:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchCourier();
     fetchUserDetails();
   }, [user?.id]);
 
@@ -196,6 +217,7 @@ const CheckoutPage = () => {
       const orderItems = items.map((item) => ({
         product_id: item.product_id,
         vendor_id: item.vendor_id,
+        default_courier: item.default_courier,
         quantity: item.quantity,
         size: item.size,
         color: item.color,
@@ -211,6 +233,7 @@ const CheckoutPage = () => {
         payment_method: selectedPayment,
         payment_reference: "",
         order_items: orderItems,
+        courier_id: courier.id,
       };
 
       if (selectedPayment === "flutterwave") {
@@ -220,6 +243,7 @@ const CheckoutPage = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
 
             body: JSON.stringify({ payload: payload, order: order }),
@@ -244,6 +268,7 @@ const CheckoutPage = () => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
 
             body: JSON.stringify({ payload: payload, order: order }),
@@ -317,6 +342,7 @@ const CheckoutPage = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ payload: payload, order: order }),
         },

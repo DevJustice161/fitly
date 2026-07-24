@@ -16,6 +16,7 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/vendors", require("./routes/vendorRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/withdrawals", require("./routes/withdrawalRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/cart", require("./routes/cartRoutes"));
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
@@ -25,6 +26,8 @@ app.use("/api/notification", require("./routes/notificationRoutes"));
 app.use("/api/messages", require("./routes/messageRoutes"));
 app.use("/api/vouchers", require("./routes/voucherRoutes"));
 app.use("/api/recently-viewed", require("./routes/recentlyViewedRoutes"));
+app.use("/api/categories", require("./routes/categoryRoutes"));
+app.use("/api/couriers", require("./routes/courierRoutes"));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

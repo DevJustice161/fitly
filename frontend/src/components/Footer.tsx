@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Instagram,
@@ -12,8 +12,44 @@ import { toast } from "sonner";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 const Footer = () => {
-  const { user } = useAuth();
+  const API_URL = "http://localhost:5000/api";
+  const { user, token } = useAuth();
+  const [categories, setCategories] = useState([]);
   const [email, setEmail] = useState("");
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load categories");
+      }
+
+      const normalizedCategories = Array.isArray(data)
+        ? data.map((category) => {
+            if (typeof category === "string") {
+              return { name: category, slug: category };
+            }
+
+            return {
+              name: category.name || category.slug || "Unnamed category",
+              slug: category.slug || category.name || "",
+            };
+          })
+        : [];
+
+      setCategories(normalizedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [user?.id]);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -86,21 +122,13 @@ const Footer = () => {
               Shop
             </h5>
             <ul className="space-y-2">
-              {[
-                "Women",
-                "Men",
-                "Accessories",
-                "Shoes",
-                "Beauty Products",
-                "Bags",
-                "New Arrivals",
-              ].map((link) => (
-                <li key={link}>
+              {categories.map((link) => (
+                <li key={link.id}>
                   <Link
-                    to={`/category/${link.toLowerCase().replace(/\s+/g, "-")}`}
+                    to={`/category/${link.slug}`}
                     className="font-body text-sm text-primary-foreground/60 hover:text-primary transition-colors"
                   >
-                    {link}
+                    {link.name}
                   </Link>
                 </li>
               ))}

@@ -55,7 +55,7 @@ const emptyForm = {
 };
 
 const PaymentsPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [methods, setMethods] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
@@ -64,7 +64,9 @@ const PaymentsPage = () => {
 
   const getPaymentMethod = async () => {
     try {
-      const response = await fetch(`${API_URL}/get-methods/${user.id}`);
+      const response = await fetch(`${API_URL}/get-methods/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch payment methods");
       }
@@ -151,7 +153,10 @@ const PaymentsPage = () => {
     }
     await fetch(`${API_URL}/method`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(newMethod),
     });
     getPaymentMethod();
@@ -163,6 +168,7 @@ const PaymentsPage = () => {
     try {
       const response = await fetch(`${API_URL}/method/${deleteId}`, {
         method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
       getPaymentMethod();
       toast({ title: "Payment method removed" });
@@ -176,7 +182,10 @@ const PaymentsPage = () => {
     try {
       const response = await fetch(`${API_URL}/method/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ userId: user.id }),
       });
       if (!response.ok) {

@@ -9,14 +9,15 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import heroImage from "@/assets/hero-fashion.jpg";
-import { categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 const Index = () => {
-  const { user } = useAuth();
+  const API_URL = "http://localhost:5000/api";
+  const [categories, setCategories] = useState([]);
+  const { user, token } = useAuth();
   const [products, setProducts] = useState([]);
   const [vendors, setVendors] = useState([]);
 
@@ -25,6 +26,9 @@ const Index = () => {
       try {
         const response = await fetch(
           "http://localhost:5000/api/products/productsCard",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
         const data = await response.json();
         setProducts(data);
@@ -36,6 +40,9 @@ const Index = () => {
       try {
         const response = await fetch(
           "http://localhost:5000/api/vendors/vendors",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
         const data = await response.json();
         setVendors(data);
@@ -44,8 +51,42 @@ const Index = () => {
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/categories`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load categories");
+        }
+
+        const normalizedCategories = Array.isArray(data)
+          ? data.map((category) => {
+              if (typeof category === "string") {
+                return { name: category, slug: category };
+              }
+
+              return {
+                name: category.name || category.slug || "Unnamed category",
+                slug: category.slug || category.name || "",
+                image: category.image,
+                subcategories: category.sub_categories,
+                subcatname: category.subcatname,
+              };
+            })
+          : [];
+
+        setCategories(normalizedCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
     fetchProducts();
     fetchVendors();
+    fetchCategories();
   }, []);
   const trendingProducts = products.filter((p) => p.is_trending);
   const newProducts = products.filter((p) => p.is_new);
@@ -113,13 +154,13 @@ const Index = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((cat, i) => (
             <Link
-              key={cat.name}
-              to={`/category/${cat.name.toLowerCase()}`}
+              key={cat.id}
+              to={`/category/${cat.slug}`}
               className="group relative aspect-[3/4] rounded-xl overflow-hidden"
               style={{ animationDelay: `${i * 100}ms` }}
             >
               <img
-                src={cat.image}
+                src={`http://localhost:5000/uploads/categories/${cat.image}`}
                 alt={cat.name}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
@@ -130,7 +171,7 @@ const Index = () => {
                   {cat.name}
                 </h3>
                 <p className="font-body text-sm text-primary-foreground/70 mb-3">
-                  {cat.subcategories.join(" • ")}
+                  {cat.subcatname.join(" • ")}
                 </p>
                 <span className="font-body text-sm text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                   Explore <ChevronRight size={16} />

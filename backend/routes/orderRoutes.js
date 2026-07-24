@@ -8,6 +8,7 @@ const {
   getOrderItems,
   trackOrder,
 } = require("../controllers/orderController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 router.get("/", getOrders);
 
@@ -19,6 +20,6 @@ router.get("/user/:userId", getUserOrders);
 
 router.get("/order-items/:orderId", getOrderItems);
 
-router.post("/add", createOrder);
+router.post("/add", verifyToken, createOrder);
 
 module.exports = router;

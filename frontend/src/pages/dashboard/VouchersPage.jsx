@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 
 const VouchersPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [vouchers, setVouchers] = useState([]);
   const [copied, setCopied] = useState(null);
@@ -17,6 +17,9 @@ const VouchersPage = () => {
     try {
       const res = await fetch(
         `http://localhost:5000/api/vouchers/user/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       const data = await res.json();

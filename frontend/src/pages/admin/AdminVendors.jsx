@@ -122,7 +122,9 @@ const AdminVendors = () => {
 
   const fetchVendors = async () => {
     try {
-      const res = await fetch(`${API_URL}/vendors/vendors`);
+      const res = await fetch(`${API_URL}/vendors/vendors`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setVendors(data);
     } catch (error) {

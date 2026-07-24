@@ -82,7 +82,9 @@ exports.getCart = async (req, res) => {
   v.store_name AS vendor_name,
   v.is_premium,
   v.store_logo,
+  v.default_courier,
   v.store_description,
+
 
   AVG(r.rating) AS average_rating,
   COUNT(r.id) AS review_count,
@@ -121,6 +123,7 @@ GROUP BY
   v.store_name,
   v.is_premium,
   v.store_logo,
+  v.default_courier,
   v.store_description;
       `,
       [userId],

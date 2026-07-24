@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ReviewsPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const API_URL = "http://localhost:5000/api/products/productsCard";
   const [products, setProducts] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -32,7 +32,9 @@ const ReviewsPage = () => {
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const response = await fetch(`${API_URL}`);
+        const response = await fetch(`${API_URL}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = await response.json();
 

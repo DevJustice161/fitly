@@ -33,18 +33,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { vendorProducts as initialProducts } from "@/data/vendorData";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const API_URL = "http://localhost:5000/api/products";
-const categories = [
-  "Women's fashion",
-  "Men's fashion",
-  "Shoes",
-  "Bags",
-  "Accessories",
-  "Beauty products",
-];
+const API_URL_CAT = "http://localhost:5000/api";
 const sizes = [
   "XS",
   "S",
@@ -77,8 +69,9 @@ const colorOptions = [
 const statuses = ["Active", "Inactive", "Out of Stock"];
 
 const VendorProducts = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { toast } = useToast();
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
@@ -107,13 +100,47 @@ const VendorProducts = () => {
     colors: [],
   });
 
-  // fetch products
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL_CAT}/categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load categories");
+      }
+
+      const normalizedCategories = Array.isArray(data)
+        ? data.map((category) => {
+            if (typeof category === "string") {
+              return { name: category, slug: category };
+            }
+
+            return {
+              name: category.name || category.slug || "Unnamed category",
+              slug: category.slug || category.name || "",
+            };
+          })
+        : [];
+
+      setCategories(normalizedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_URL}/vendor/${user.id}`);
+      const res = await fetch(`${API_URL}/vendor/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       const data = await res.json();
 
@@ -126,7 +153,10 @@ const VendorProducts = () => {
   };
 
   useEffect(() => {
-    if (user?.id) fetchProducts();
+    if (user?.id) {
+      fetchProducts();
+      fetchCategories();
+    }
   }, [user]);
 
   const handleThumbnailChange = (e) => {
@@ -276,6 +306,7 @@ const VendorProducts = () => {
 
       const response = await fetch(`${API_URL}/update/${selected.id}`, {
         method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -313,6 +344,7 @@ const VendorProducts = () => {
     try {
       const response = await fetch(`${API_URL}/delete/${selected.id}`, {
         method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
@@ -360,12 +392,12 @@ const VendorProducts = () => {
 
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground " />
           <Input
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="pl-10"
           />
         </div>
         <div className="flex gap-2">
@@ -427,11 +459,11 @@ const VendorProducts = () => {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground mb-2">
                   <span>Stock: {product.stock_quantity}</span>
-                  {/* <span>Sales: {product.sales}</span> */}
-                  <span>Sales: 300</span>
-                  <span>⭐ {product.rating}</span>
+                  <span>Sales: {product.sales.unitsSold}</span>
+                  <span>Reviews: {product.ratings.reviewCount}</span>
+                  <span>⭐ {product.ratings.averageRating}</span>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <Button
@@ -463,8 +495,6 @@ const VendorProducts = () => {
         </div>
       )}
 
-      {/* Edit Dialog */}
-      {/* EDIT PRODUCT DIALOG */}
       <Dialog
         open={editOpen}
         onOpenChange={closeEditDialog}
@@ -480,7 +510,6 @@ const VendorProducts = () => {
             </DialogHeader>
 
             <div className="flex-1 overflow-y-auto px-6 pb-6">
-              {/* PRODUCT NAME */}
               <div className="space-y-2">
                 <Label>Product Name</Label>
                 <Input
@@ -494,7 +523,6 @@ const VendorProducts = () => {
                 />
               </div>
 
-              {/* DESCRIPTION */}
               <div className="space-y-2">
                 <Label>Description</Label>
                 <Textarea
@@ -509,7 +537,6 @@ const VendorProducts = () => {
                 />
               </div>
 
-              {/* CATEGORY */}
               <div className="space-y-2">
                 <Label>Category</Label>
 
@@ -528,15 +555,14 @@ const VendorProducts = () => {
 
                   <SelectContent>
                     {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+                      <SelectItem key={cat.slug} value={cat.name}>
+                        {cat.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* PRICE */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Price (₦)</Label>
@@ -569,7 +595,6 @@ const VendorProducts = () => {
                 </div>
               </div>
 
-              {/* STOCK + STATUS */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Stock Quantity</Label>
@@ -613,7 +638,6 @@ const VendorProducts = () => {
                 </div>
               </div>
 
-              {/* SIZES */}
               <div className="space-y-2">
                 <Label>Sizes</Label>
 
@@ -644,7 +668,6 @@ const VendorProducts = () => {
                 </div>
               </div>
 
-              {/* COLORS */}
               <div className="space-y-2">
                 <Label>Colors</Label>
 
@@ -675,7 +698,6 @@ const VendorProducts = () => {
                 </div>
               </div>
 
-              {/* THUMBNAIL */}
               <div className="space-y-2">
                 <Label>Thumbnail Image</Label>
 
@@ -700,16 +722,8 @@ const VendorProducts = () => {
                     />
                   )
                 )}
-
-                {/* {selected?.thumbnail && (
-                  <img
-                    src={`http://localhost:5000/uploads/products/${selected.thumbnail}`}
-                    className="h-32 w-32 object-cover rounded"
-                  />
-                )} */}
               </div>
 
-              {/* GALLERY */}
               <div className="space-y-2">
                 <Label>Gallery Images</Label>
 
@@ -721,13 +735,6 @@ const VendorProducts = () => {
                 />
 
                 <div className="flex flex-wrap gap-3">
-                  {/* {selected?.images?.map((img) => (
-                    <img
-                      key={img.id}
-                      src={`http://localhost:5000/uploads/products/${img.image_url}`}
-                      className="h-24 w-24 rounded object-cover"
-                    />
-                  ))} */}
                   {dataImages.length > 0 && (
                     <div className="flex flex-wrap gap-4">
                       {dataImages.map((file, index) => (
@@ -792,7 +799,6 @@ const VendorProducts = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirm */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -5,23 +5,30 @@ const {
   getAllVouchers,
   getVoucherById,
   getUserVouchers,
+  getVendorVouchers,
   updateVoucher,
+  toggleActive,
   deleteVoucher,
   validateVoucher,
 } = require("../controllers/voucherController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
-router.post("/", createVoucher);
+router.post("/", verifyToken, createVoucher);
 
 router.get("/", getAllVouchers);
 
 router.get("/user/:userId", getUserVouchers);
 
+router.get("/vendor/:vendorId", getVendorVouchers);
+
 router.get("/:id", getVoucherById);
 
-router.put("/:id", updateVoucher);
+router.put("/:id", verifyToken, updateVoucher);
 
-router.delete("/:id", deleteVoucher);
+router.put("/toggle/:id", verifyToken, toggleActive);
 
-router.post("/validate", validateVoucher);
+router.delete("/:id", verifyToken, deleteVoucher);
+
+router.post("/validate", verifyToken, validateVoucher);
 
 module.exports = router;

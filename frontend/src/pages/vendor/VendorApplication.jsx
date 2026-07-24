@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
@@ -26,15 +26,6 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext.jsx";
-
-const storeCategories = [
-  "Men's fashion",
-  "Women's fashion",
-  "Shoes",
-  "Bags",
-  "Accessories",
-  "Beauty products",
-];
 
 const nigerianStates = [
   "Abia",
@@ -77,8 +68,10 @@ const nigerianStates = [
 ];
 
 const VendorApplication = () => {
-  const { user } = useAuth();
+  const API_URL = "http://localhost:5000/api";
+  const { user, token } = useAuth();
   const [step, setStep] = useState(1);
+  const [storeCategories, setStoreCategories] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -97,11 +90,43 @@ const VendorApplication = () => {
   const [agreed, setAgreed] = useState(false);
 
   const totalSteps = 4;
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load categories");
+      }
+
+      const normalizedCategories = Array.isArray(data)
+        ? data.map((category) => {
+            if (typeof category === "string") {
+              return { name: category, slug: category };
+            }
+
+            return {
+              name: category.name || category.slug || "Unnamed category",
+              slug: category.slug || category.name || "",
+            };
+          })
+        : [];
+
+      setStoreCategories(normalizedCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [user?.id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //Validation;
     if (
       !storeName ||
       !storeDescription ||
@@ -133,10 +158,8 @@ const VendorApplication = () => {
     }
 
     try {
-      // Create FormData
       const formData = new FormData();
 
-      // Text fields
       formData.append("user_id", user.id);
 
       formData.append("full_name", fullName);
@@ -163,7 +186,6 @@ const VendorApplication = () => {
 
       formData.append("account_number", accountNumber);
 
-      // File uploads
       if (storeLogo) {
         formData.append("store_logo", storeLogo);
       }
@@ -176,10 +198,9 @@ const VendorApplication = () => {
         formData.append("cac", cac);
       }
 
-      // Send request
       const response = await fetch("http://localhost:5000/api/vendors/apply", {
         method: "POST",
-
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -293,7 +314,6 @@ const VendorApplication = () => {
           </div>
 
           <form onSubmit={handleSubmit} enctype="multipart/form-data">
-            {/* Step 1: Personal Info */}
             {step === 1 && (
               <Card className="border border-border shadow-sm">
                 <CardHeader>
@@ -341,7 +361,6 @@ const VendorApplication = () => {
               </Card>
             )}
 
-            {/* Step 2: Store Info */}
             {step === 2 && (
               <Card className="border border-border shadow-sm">
                 <CardHeader>
@@ -392,21 +411,8 @@ const VendorApplication = () => {
                           }
                           className="mx-auto w-full h-30 object-contain"
                         />
-                        {/* <Upload className="h-6 w-6 mx-auto text-muted-foreground mb-2" /> */}
-                        {/* <p className="text-sm text-muted-foreground">
-                          Upload logo
-                        </p> */}
                       </div>
                     </div>
-                    {/* <div className="space-y-2">
-                      <Label>Store Banner</Label>
-                      <div className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors">
-                        <Upload className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          Upload banner
-                        </p>
-                      </div>
-                    </div> */}
                   </div>
                   <div className="flex gap-3">
                     <Button
@@ -429,7 +435,6 @@ const VendorApplication = () => {
               </Card>
             )}
 
-            {/* Step 3: Business Info */}
             {step === 3 && (
               <Card className="border border-border shadow-sm">
                 <CardHeader>
@@ -537,7 +542,6 @@ const VendorApplication = () => {
               </Card>
             )}
 
-            {/* Step 4: Payment + Agreement */}
             {step === 4 && (
               <Card className="border border-border shadow-sm">
                 <CardHeader>

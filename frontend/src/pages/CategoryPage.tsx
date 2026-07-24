@@ -1,13 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SlidersHorizontal, ChevronDown } from "lucide-react";
-import { categories } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const CategoryPage = () => {
-  let { slug } = useParams();
+  const { slug } = useParams();
+  const [categories, setCategories] = useState([]);
   const [sortBy, setSortBy] = useState("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
@@ -24,34 +24,46 @@ const CategoryPage = () => {
         console.error("Error fetching products:", error);
       }
     };
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/categories`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load categories");
+        }
+
+        const normalizedCategories = Array.isArray(data)
+          ? data.map((category) => {
+              if (typeof category === "string") {
+                return { name: category, slug: category };
+              }
+
+              return {
+                name: category.name || category.slug || "Unnamed category",
+                slug: category.slug || category.name || "",
+                image: category.image,
+                subcategories: category.sub_categories,
+              };
+            })
+          : [];
+
+        setCategories(normalizedCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
     fetchProducts();
+    fetchCategories();
   }, []);
 
-  let categoryName = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "";
+  const categoryName = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "";
 
-  switch (categoryName) {
-    case "Women":
-      categoryName = "Women's fashion";
-      slug = "women's fashion";
-      break;
-    case "Men":
-      categoryName = "Men's fashion";
-      slug = "men's fashion";
-      break;
-    case "Beauty-products":
-      categoryName = "Beauty products";
-      slug = "beauty products";
-      break;
-
-    default:
-      break;
-  }
-  const category = categories.find((c) => c.name.toLowerCase() === slug);
+  const category = categories.find((c) => c.slug === slug);
   const filteredProducts = products.filter(
-    (p) => p.category.toLowerCase() === slug,
+    (p) => p.category === category?.name,
   );
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -74,10 +86,10 @@ const CategoryPage = () => {
           <div className="flex items-center justify-center gap-4 mt-4">
             {category.subcategories.map((sub) => (
               <button
-                key={sub}
+                key={sub.id}
                 className="font-body text-sm font-medium text-muted-foreground hover:text-foreground px-4 py-2 rounded-full border border-border hover:border-primary hover:bg-secondary transition-all"
               >
-                {sub}
+                {sub.name}
               </button>
             ))}
           </div>

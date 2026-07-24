@@ -272,7 +272,7 @@ const InvoiceDialog = ({ order, open, onClose }) => {
 };
 
 const OrdersPage = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { addToCart } = useCart();
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
@@ -291,7 +291,9 @@ const OrdersPage = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/user/${user.id}`);
+        const res = await fetch(`${API_URL}/user/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.message || "Failed to fetch orders");
@@ -315,7 +317,9 @@ const OrdersPage = () => {
   const fetchOrderItems = async (orderId) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/order-items/${orderId}`);
+      const res = await fetch(`${API_URL}/order-items/${orderId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || "Failed to fetch orders items");

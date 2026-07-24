@@ -76,10 +76,10 @@ const SettingsPage = () => {
       }
       const response = await fetch(`${API_URL}/update/${user.id}`, {
         method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       const data = await response.json();
-      console.log("Update user:", data.user);
 
       const updatedUser = {
         ...user,

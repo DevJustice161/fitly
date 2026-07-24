@@ -15,6 +15,8 @@ import {
   Bell,
   LogOut,
   BadgeCheck,
+  Star,
+  Ticket,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -42,31 +44,44 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { useMessages } from "@/contexts/MessagesContext";
 
 const menuItems = [
   { title: "Dashboard", url: "/vendor", icon: LayoutDashboard },
   { title: "My Products", url: "/vendor/products", icon: Package },
   { title: "Add Product", url: "/vendor/products/add", icon: PlusCircle },
   { title: "Orders", url: "/vendor/orders", icon: ShoppingBag },
+  { title: "Customers", url: "/vendor/customers", icon: Users },
   { title: "Revenue", url: "/vendor/revenue", icon: DollarSign },
   { title: "Analytics", url: "/vendor/analytics", icon: BarChart3 },
   { title: "Withdraw Funds", url: "/vendor/withdrawals", icon: Wallet },
   { title: "Store Settings", url: "/vendor/settings", icon: Settings },
   { title: "Premium", url: "/vendor/premium", icon: Crown },
+  { title: "Messages", url: "/vendor/messages", icon: MessageCircle },
+  { title: "Reviews", url: "/vendor/reviews", icon: Star },
+  { title: "Vouchers", url: "/vendor/vouchers", icon: Ticket },
+  { title: "Notifications", url: "/vendor/notifications", icon: Bell },
 ];
 
 const VendorDashboardSidebar = () => {
+  const { unreadCount } = useNotifications();
+  const { unreadMsgCount } = useMessages();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const API_URL = "http://localhost:5000/api";
   const { state } = useSidebar();
   const [vendorProfile, setVendorProfile] = useState({});
   const collapsed = state === "collapsed";
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
 
   const fetchVendorProfile = async () => {
+    if (!user?.id) return;
+
     try {
-      const res = await fetch(`${API_URL}/vendors/profile/${user.id}`);
+      const res = await fetch(`${API_URL}/vendors/profile/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setVendorProfile(data);
     } catch (error) {
@@ -76,7 +91,34 @@ const VendorDashboardSidebar = () => {
 
   useEffect(() => {
     fetchVendorProfile();
-  }, []);
+  }, [user?.id]);
+
+  useEffect(() => {
+    const handleVendorProfileUpdate = () => {
+      fetchVendorProfile();
+    };
+
+    window.addEventListener(
+      "vendor-profile-updated",
+      handleVendorProfileUpdate,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "vendor-profile-updated",
+        handleVendorProfileUpdate,
+      );
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.store_logo || user?.avatar) {
+      setVendorProfile((prev) => ({
+        ...prev,
+        store_logo: user.store_logo || user.avatar,
+      }));
+    }
+  }, [user?.store_logo, user?.avatar]);
 
   const handleLogout = () => {
     logout();
@@ -90,7 +132,7 @@ const VendorDashboardSidebar = () => {
           <div className="flex items-center gap-3">
             <Avatar className="h-12 w-12 border-2 border-primary">
               <AvatarImage
-                src={`http://localhost:5000/uploads/logos/${vendorProfile.store_logo}`}
+                src={`http://localhost:5000/uploads/logos/${vendorProfile.store_logo || user?.store_logo || user?.avatar || ""}`}
               />
               <AvatarFallback className="bg-secondary text-secondary-foreground font-heading text-lg">
                 {vendorProfile?.store_name
@@ -112,6 +154,11 @@ const VendorDashboardSidebar = () => {
                 {vendorProfile.created_at &&
                   new Date(vendorProfile.created_at).toLocaleDateString(
                     "en-NG",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    },
                   )}
               </p>
               {vendorProfile.is_premium === 1 && (
@@ -151,6 +198,16 @@ const VendorDashboardSidebar = () => {
                     >
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
+                      {item.title == "Notifications" && unreadCount > 0 && (
+                        <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                      {item.title == "Messages" && unreadMsgCount > 0 && (
+                        <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {unreadMsgCount}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

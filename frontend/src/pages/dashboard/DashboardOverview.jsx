@@ -17,7 +17,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const DashboardOverview = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -58,6 +58,9 @@ const DashboardOverview = () => {
       try {
         const response = await fetch(
           `http://localhost:5000/api/dashboard/${user.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
 
         const data = await response.json();

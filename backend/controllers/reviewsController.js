@@ -324,3 +324,65 @@ exports.updateHelpfulCount = async (req, res) => {
     res.status(500).json({ message: "Error updating review" });
   }
 };
+
+exports.replyToReview = async (req, res) => {
+  const { id } = req.params;
+  const { vendorId, text, userId } = req.body;
+  try {
+    const [reviewRows] = await db.query("SELECT * FROM reviews WHERE id = ?", [
+      id,
+    ]);
+    if (reviewRows.length === 0) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    const [existingReply] = await db.query(
+      "SELECT * FROM review_replies WHERE review_id = ?",
+      [id],
+    );
+
+    if (existingReply.length > 0) {
+      return res.json({
+        success: false,
+        message: "Reply already exists for this review",
+      });
+    }
+
+    await db.query(
+      "INSERT INTO review_replies (vendor_id, review_id, user_id, reply) VALUES (?, ?, ?, ?)",
+      [vendorId, id, userId, text],
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Reply added successfully",
+    });
+  } catch (error) {
+    console.error("Error replying to review:", error);
+    res.status(500).json({ message: "Error replying to review" });
+  }
+};
+
+exports.deleteReviewReply = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [existingReply] = await db.query(
+      "SELECT * FROM review_replies WHERE id = ?",
+      [id],
+    );
+
+    if (existingReply.length === 0) {
+      return res.status(404).json({ message: "Reply not found" });
+    }
+
+    await db.query("DELETE FROM review_replies WHERE id = ?", [id]);
+
+    res.status(200).json({
+      success: true,
+      message: "Reply deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting review reply:", error);
+    res.status(500).json({ message: "Error deleting review reply" });
+  }
+};

@@ -4,12 +4,14 @@ const {
   sendMessage,
   getConversations,
   getMessages,
+  getAllMessages,
   markConversationRead,
   deleteMessage,
   updateMessage,
   createConversation,
   deleteConversation,
 } = require("../controllers/messageController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 const upload = require("../middleware/uploadMessagesImagesMiddleware");
 
@@ -17,16 +19,18 @@ router.get("/conversations/:userId", getConversations);
 
 router.get("/:conversationId", getMessages);
 
-router.post("/conversation", createConversation);
+router.get("/all/:userId", getAllMessages);
 
-router.post("/", upload.single("image"), sendMessage);
+router.post("/conversation", verifyToken, createConversation);
 
-router.put("/read/:conversationId", markConversationRead);
+router.post("/", upload.single("image"), verifyToken, sendMessage);
 
-router.put("/:id", updateMessage);
+router.put("/read/:conversationId", verifyToken, markConversationRead);
 
-router.delete("/:id", deleteMessage);
+router.put("/:id", verifyToken, updateMessage);
 
-router.delete("/conversations/:id", deleteConversation);
+router.delete("/:id", verifyToken, deleteMessage);
+
+router.delete("/conversations/:id", verifyToken, deleteConversation);
 
 module.exports = router;

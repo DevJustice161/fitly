@@ -12,7 +12,7 @@ const WishlistContext = createContext(undefined);
 const API_URL = "http://localhost:5000/api/wishlists";
 
 export const WishlistProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
 
@@ -22,7 +22,9 @@ export const WishlistProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/${user.id}`);
+      const response = await fetch(`${API_URL}/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await response.json();
 
       if (!response.ok) {
@@ -58,7 +60,10 @@ export const WishlistProvider = ({ children }) => {
       try {
         const response = await fetch(`${API_URL}/add`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({
             user_id: user.id,
             product_id: product.id,
@@ -86,6 +91,7 @@ export const WishlistProvider = ({ children }) => {
       try {
         const response = await fetch(`${API_URL}/remove/${wishlistItemId}`, {
           method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         const data = await response.json();
@@ -130,6 +136,9 @@ export const WishlistProvider = ({ children }) => {
     try {
       const response = await fetch(`${API_URL}/clear/${user.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const data = await response.json();

@@ -13,7 +13,7 @@ export const CURRENT_USER = () => {
 const ReviewsContext = createContext(null);
 
 export const ReviewsProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -29,6 +29,11 @@ export const ReviewsProvider = ({ children }) => {
     try {
       const response = await fetch(
         "http://localhost:5000/api/products/productsCard",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
       const data = await response.json();
       setProducts(data);
@@ -39,7 +44,11 @@ export const ReviewsProvider = ({ children }) => {
 
   const getOrders = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/orders");
+      const response = await fetch("http://localhost:5000/api/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -49,7 +58,11 @@ export const ReviewsProvider = ({ children }) => {
 
   const getReviews = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/reviews");
+      const response = await fetch("http://localhost:5000/api/reviews", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setReviews(data);
     } catch (error) {
@@ -86,6 +99,9 @@ export const ReviewsProvider = ({ children }) => {
       const response = await fetch(`http://localhost:5000/api/reviews/add`, {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const data = await response.json();
@@ -117,6 +133,9 @@ export const ReviewsProvider = ({ children }) => {
         {
           method: "PUT",
           body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 
@@ -138,6 +157,9 @@ export const ReviewsProvider = ({ children }) => {
         `http://localhost:5000/api/reviews/delete/${id}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
 
@@ -168,6 +190,7 @@ export const ReviewsProvider = ({ children }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ arithmetic }),
       },
@@ -176,17 +199,36 @@ export const ReviewsProvider = ({ children }) => {
     await getReviews();
   };
 
-  const replyToReview = (id, text) => {
+  const replyToReview = async (id, text, userId) => {
     const date = new Date().toISOString().slice(0, 10);
-    setReviews((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, reply: { text, date } } : r)),
+    const det = { vendorId: user.id, text: text, userId: userId };
+    const response = await fetch(
+      `http://localhost:5000/api/reviews/reply/${id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(det),
+      },
     );
+
+    await getReviews();
   };
 
-  const deleteReply = (id) => {
-    setReviews((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, reply: null } : r)),
+  const deleteReply = async (id) => {
+    const response = await fetch(
+      `http://localhost:5000/api/reviews/reply/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
+
+    await getReviews();
   };
 
   const getProductReviews = (productId) =>
@@ -225,7 +267,6 @@ export const ReviewsProvider = ({ children }) => {
   const reviewableItems = useMemo(() => {
     const delivered = orders.filter((o) => o.status === "delivered");
 
-    // Track seen product IDs to prevent duplicates
     const seenProductIds = new Set();
     const uniqueItems = [];
 

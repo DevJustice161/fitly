@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const RecentlyViewedContext = createContext();
 
 export const RecentlyViewedProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const [recentlyViewed, setRecentlyViewed] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,9 @@ export const RecentlyViewedProvider = ({ children }) => {
 
       const res = await fetch(
         `http://localhost:5000/api/recently-viewed/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       const data = await res.json();
@@ -46,6 +49,7 @@ export const RecentlyViewedProvider = ({ children }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           userId: user.id,
@@ -73,6 +77,7 @@ export const RecentlyViewedProvider = ({ children }) => {
         `http://localhost:5000/api/recently-viewed/item/${id}`,
         {
           method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
 
@@ -100,6 +105,7 @@ export const RecentlyViewedProvider = ({ children }) => {
         `http://localhost:5000/api/recently-viewed/clear/${user.id}`,
         {
           method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
         },
       );
 

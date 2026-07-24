@@ -6,9 +6,12 @@ const {
   updateReview,
   deleteReview,
   updateHelpfulCount,
+  replyToReview,
+  deleteReviewReply,
 } = require("../controllers/reviewsController");
 
 const upload = require("../middleware/uploadReviewsImagesMiddleware");
+const { verifyToken } = require("../middleware/authMiddleware");
 
 router.post(
   "/add",
@@ -18,6 +21,7 @@ router.post(
       maxCount: 5,
     },
   ]),
+  verifyToken,
   addToReviews,
 );
 
@@ -35,11 +39,16 @@ router.put(
       maxCount: 20,
     },
   ]),
+  verifyToken,
   updateReview,
 );
 
-router.delete("/delete/:id", deleteReview);
+router.delete("/delete/:id", verifyToken, deleteReview);
 
-router.put("/update-helpful/:revId", updateHelpfulCount);
+router.put("/update-helpful/:revId", verifyToken, updateHelpfulCount);
+
+router.post("/reply/:id", verifyToken, replyToReview);
+
+router.delete("/reply/:id", verifyToken, deleteReviewReply);
 
 module.exports = router;

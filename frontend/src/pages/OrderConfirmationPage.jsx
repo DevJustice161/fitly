@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formatPrice = (price) =>
   new Intl.NumberFormat("en-NG", {
@@ -26,6 +27,7 @@ const formatPrice = (price) =>
 const API_URL = "http://localhost:5000/api/orders";
 
 const OrderConfirmationPage = () => {
+  const { token } = useAuth();
   const { state } = useLocation();
 
   const [params] = useSearchParams();
@@ -44,7 +46,9 @@ const OrderConfirmationPage = () => {
 
         setLoading(true);
 
-        const response = await fetch(`${API_URL}/${orderId}`);
+        const response = await fetch(`${API_URL}/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = await response.json();
 

@@ -46,11 +46,14 @@ import VendorCustomers from "./pages/vendor/VendorCustomers";
 import VendorRevenue from "./pages/vendor/VendorRevenue";
 import VendorAnalytics from "./pages/vendor/VendorAnalytics";
 import VendorWithdrawals from "./pages/vendor/VendorWithdrawals";
+import VendorVouchers from "./pages/vendor/VendorVouchers";
 import VendorStoreSettings from "./pages/vendor/VendorStoreSettings";
 import VendorPremium from "./pages/vendor/VendorPremium";
 import VendorMessages from "./pages/vendor/VendorMessages";
 import VendorNotifications from "./pages/vendor/VendorNotifications";
 import VendorStorePage from "./pages/vendor/VendorStorePage";
+import VendorReviews from "./pages/vendor/VendorReviews";
+import VendorPaymentSuccess from "./pages/vendor/VendorPaymentSuccess";
 
 // Admin pages
 import AdminDashboardLayout from "./components/admin/AdminDashboardLayout";
@@ -165,11 +168,17 @@ const App = () => (
                           path="settings"
                           element={<VendorStoreSettings />}
                         />
+                        <Route path="vouchers" element={<VendorVouchers />} />
                         <Route path="premium" element={<VendorPremium />} />
                         <Route path="messages" element={<VendorMessages />} />
+                        <Route path="reviews" element={<VendorReviews />} />
                         <Route
                           path="notifications"
                           element={<VendorNotifications />}
+                        />
+                        <Route
+                          path="premium-payment"
+                          element={<VendorPaymentSuccess />}
                         />
                       </Route>
 
