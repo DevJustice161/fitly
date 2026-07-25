@@ -16,14 +16,15 @@ exports.verifyToken = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach the logged-in user to the request
     req.user = decoded;
 
     next();
   } catch (err) {
+    console.error(err);
+
     return res.status(403).json({
       success: false,
-      message: "Invalid or expired token.",
+      message: err.message,
     });
   }
 };

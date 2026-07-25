@@ -232,7 +232,9 @@ exports.trackOrder = async (req, res) => {
 
         v.user_id AS vendor_id,
         v.store_name,
-        v.store_logo
+        v.store_logo,
+
+        u.city AS vendor_city
 
 
       FROM order_items oi
@@ -242,6 +244,9 @@ exports.trackOrder = async (req, res) => {
       
       JOIN vendors v
       ON oi.vendor_id = v.user_id
+
+      JOIN users u
+      ON oi.vendor_id = u.id
 
       WHERE oi.order_id = ?
       `,

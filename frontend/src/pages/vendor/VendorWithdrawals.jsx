@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { Wallet, ArrowDownCircle, CheckCircle, Clock } from "lucide-react";
+import {
+  Wallet,
+  ArrowDownCircle,
+  CheckCircle,
+  Clock,
+  BadgeCheck,
+  XCircle,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +20,35 @@ const VendorWithdrawals = () => {
   const [withdrawals, setWithdrawals] = useState([]);
   const [vendorProfile, setVendorProfile] = useState({});
   const [amount, setAmount] = useState("");
+
+  const capitalizeWord = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+  const capitalizeSentence = (str) => {
+    if (!str) return "";
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "pending":
+        return <Clock className="h-5 w-5 text-yellow-500" />;
+      case "approved":
+        return <BadgeCheck className="h-5 w-5 text-blue-600" />;
+      case "paid":
+        return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case "rejected":
+        return <XCircle className="h-5 w-5 text-red-600" />;
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     const fetchWithdrawals = async () => {
@@ -131,21 +167,9 @@ const VendorWithdrawals = () => {
           </p>
           <div className="flex gap-4 mt-3 text-sm">
             <span className="text-muted-foreground">
-              Gross Sales:{" "}
-              <span className="text-foreground font-medium">
-                ₦{withdrawals.grossSales?.toLocaleString()}
-              </span>
-            </span>
-            <span className="text-muted-foreground">
               Earnings:{" "}
               <span className="text-foreground font-medium">
                 ₦{withdrawals.totalEarnings?.toLocaleString()}
-              </span>
-            </span>
-            <span className="text-muted-foreground">
-              Commission:{" "}
-              <span className="text-destructive font-medium">
-                ₦{withdrawals.commission?.toLocaleString()}
               </span>
             </span>
             <span className="text-muted-foreground">
@@ -204,11 +228,7 @@ const VendorWithdrawals = () => {
             <Card key={w.id} className="border border-border shadow-sm">
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {w.status === "paid" ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-yellow-500" />
-                  )}
+                  {getStatusIcon(w.status)}
                   <div>
                     <p className="font-heading font-semibold text-foreground">
                       ₦{w.amount.toLocaleString()}
@@ -222,18 +242,24 @@ const VendorWithdrawals = () => {
                       • {w.bank_name} • ****{w.account_number.slice(-4)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {w.status === "paid" ? "Paid" : "Pending"}
+                      {w.status === "paid" ? "Paid" : capitalizeWord(w.status)}
                     </p>
                   </div>
                 </div>
                 <span
                   className={`text-xs px-3 py-1 rounded-full font-medium ${
-                    w.status === "paid"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
+                    w.status === "pending"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : w.status === "approved"
+                        ? "bg-blue-100 text-blue-700"
+                        : w.status === "paid"
+                          ? "bg-green-100 text-green-700"
+                          : w.status === "rejected"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-gray-100 text-gray-700"
                   }`}
                 >
-                  {w.status === "paid" ? "Paid" : "Pending"}
+                  {w.status === "paid" ? "Paid" : capitalizeWord(w.status)}
                 </span>
               </CardContent>
             </Card>

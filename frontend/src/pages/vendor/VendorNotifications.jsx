@@ -155,8 +155,8 @@ const VendorNotifications = () => {
                 key={n.id}
                 className={`border shadow-sm transition-colors ${
                   !n.is_read
-                    ? "border-primary/30 bg-primary/[0.02]"
-                    : "border-border"
+                    ? "border-border"
+                    : "border-primary/30 bg-primary/[0.02]"
                 }`}
               >
                 <CardContent className="p-4 flex notifications-start gap-3">

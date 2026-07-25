@@ -282,7 +282,7 @@ const VendorOrders = () => {
                       </p>
                     </div>
                     <span
-                      className={`text-xs px-3 py-1 rounded-full font-medium ${statusColors[order.status]}`}
+                      className={`text-xs px-3 py-1 rounded-full font-medium ${statusColors[statusNameChange(order.status)]}`}
                     >
                       {statusNameChange(order.status)}
                     </span>

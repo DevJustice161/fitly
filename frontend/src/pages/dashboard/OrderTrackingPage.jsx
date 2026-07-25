@@ -87,6 +87,9 @@ const buildTimeline = (order) => {
   };
 
   const firstStore = order.items?.[0]?.store_name ?? "Vendor";
+  const firstCity = order.items?.[0]?.vendor_city ?? "Lagos";
+  const courierName = order.courier?.[0]?.company ?? "Fitly Logistics Hub";
+  const courierLocation = order.courier?.[0]?.location ?? "Ikeja";
 
   const events = [
     {
@@ -99,7 +102,7 @@ const buildTimeline = (order) => {
     },
     {
       title: "Confirmed by vendor",
-      location: `${firstStore} · Lagos`,
+      location: `${firstStore} · ${firstCity}`,
       date: fmt(add(0, 1)),
       time: fmtTime(add(0, 1)),
       desc: "Vendor accepted and started preparing.",
@@ -107,7 +110,7 @@ const buildTimeline = (order) => {
     },
     {
       title: "Package picked up",
-      location: "Fitly Logistics Hub, Ikeja",
+      location: `${courierName}, ${courierLocation}`,
       date: fmt(add(1)),
       time: fmtTime(add(1)),
       desc: "Collected by Fitly Express courier.",
@@ -115,7 +118,7 @@ const buildTimeline = (order) => {
     },
     {
       title: "In transit",
-      location: "Distribution center, Lagos",
+      location: `Distribution center, ${courierLocation}`,
       date: fmt(add(2)),
       time: fmtTime(add(2)),
       desc: "Package sorted and routed to destination.",
@@ -136,7 +139,7 @@ const buildTimeline = (order) => {
     const deliveredDate = new Date(order.delivered_at);
     events.push({
       title: "Delivered",
-      location: "Customer address",
+      location: `${order.shipping_address}, ${order.customer_city}`,
       date: fmt(deliveredDate),
       time: fmtTime(deliveredDate),
       desc: "Package successfully delivered.",
@@ -145,7 +148,7 @@ const buildTimeline = (order) => {
     });
   }
 
-  return events.reverse(); // most recent first
+  return events.reverse();
 };
 
 const StepperBar = ({ currentStep }) => {
@@ -391,15 +394,18 @@ const OrderTrackingPage = () => {
         orderId: order.id, // numeric id from API
       };
       const creating = await createNewConversation(convo);
-      const formData = new FormData();
-      formData.append("conversationId", creating.id);
-      formData.append("receiverId", user.id);
-      formData.append("senderId", item.vendor_id);
-      formData.append(
-        "message",
-        `👋 Welcome! Thanks for contacting ${creating.otherUserName}. We're here to help with any questions about your order or our products.`,
-      );
-      await sendMessage(formData);
+
+      if (creating.id) {
+        const formData = new FormData();
+        formData.append("conversationId", creating.id);
+        formData.append("receiverId", user.id);
+        formData.append("senderId", item.vendor_id);
+        formData.append(
+          "message",
+          `👋 Welcome! Thanks for contacting ${creating.otherUserName}. We're here to help with any questions about your order or our products.`,
+        );
+        await sendMessage(formData);
+      }
       navigate("/dashboard/messages");
     } catch (err) {
       console.error("Message error:", err);
@@ -667,7 +673,7 @@ const OrderTrackingPage = () => {
                   </p>
                 ) : (
                   visibleTimeline.map((event, idx) => (
-                    <div key={idx} className="relative">
+                    <div key={idx} className="">
                       <TimelineDot isActive={idx === 0} />
                       <div className="flex justify-between gap-2 items-baseline">
                         <p className="text-sm font-medium text-foreground">
@@ -790,7 +796,10 @@ const OrderTrackingPage = () => {
               size="sm"
               className="rounded-full border-border"
               onClick={() =>
-                toast({ title: "Calling courier…", description: courier.phone })
+                toast({
+                  title: "Call courier with the number below…",
+                  description: courier.phone,
+                })
               }
             >
               <Phone className="h-4 w-4 mr-1" /> Call courier

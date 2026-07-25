@@ -197,7 +197,7 @@ const VendorRevenue = () => {
                   <p className="font-semibold text-sm text-green-600">
                     +₦{order.price.toLocaleString()}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground text-red-700">
                     -₦
                     {parseFloat(
                       order.price *

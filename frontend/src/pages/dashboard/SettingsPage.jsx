@@ -237,7 +237,7 @@ const SettingsPage = () => {
               htmlFor="avatar-upload"
               className=" -bottom-1 -right-1 h-7 w-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer mb-4"
             >
-              <Camera className="h-3 w-3 ml-4" />{" "}
+              <Camera className="h-3 w-3" />{" "}
             </label>
             <span className="ml-2">Upload Avatar</span>
           </div>

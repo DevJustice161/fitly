@@ -248,6 +248,15 @@ exports.approveVendor = async (req, res) => {
       ],
     );
 
+    await db.query(
+      `
+      INSERT IGNORE INTO wallets
+      (vendor_id)
+      VALUES (?)
+      `,
+      [application.user_id],
+    );
+
     await createNotification({
       userId: application.user_id,
       type: "vendor",
@@ -1044,14 +1053,71 @@ exports.updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status, orderId } = req.body;
 
+    const [items] = await db.query(
+      `
+      SELECT
+          oi.wallet_credited,
+          oi.price,
+          oi.quantity,
+          p.vendor_id,
+          v.is_premium
+      FROM order_items oi
+      JOIN products p
+          ON oi.product_id=p.id
+      JOIN vendors v
+          ON p.vendor_id=v.user_id
+      WHERE oi.id=?
+      `,
+      [id],
+    );
+
+    if (!items.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Order item not found",
+      });
+    }
+
+    const item = items[0];
     await db.query(
       `
-      UPDATE order_items
-      SET status = ?
-      WHERE id = ?
-      `,
+        UPDATE order_items
+        SET status=?
+        WHERE id=?
+        `,
       [status, id],
     );
+
+    if (status === "delivered") {
+      if (item.wallet_credited === 0) {
+        const commissionType = item.is_premium ? "premium" : "default";
+
+        const commission = await calculateCommission(
+          item.price * item.quantity,
+          commissionType,
+        );
+
+        await db.query(
+          `
+            UPDATE wallets
+            SET
+                balance = balance + ?,
+                total_earned = total_earned + ?
+            WHERE vendor_id = ?
+          `,
+          [commission.totalEarnings, commission.totalEarnings, item.vendor_id],
+        );
+
+        await db.query(
+          `
+          UPDATE order_items
+          SET wallet_credited=1
+          WHERE id=?
+          `,
+          [id],
+        );
+      }
+    }
 
     const [statuses] = await db.query(
       `

@@ -85,6 +85,7 @@ const DashboardOverview = () => {
   const statusNameChange = (status) => {
     const map = {
       pending_payment: "Pending",
+      processing: "Processing",
       paid: "Processing",
       shipped: "Shipped",
       delivered: "Delivered",

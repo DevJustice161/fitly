@@ -7,59 +7,24 @@ exports.getWithdrawals = async (req, res) => {
   try {
     const { vendorId } = req.params;
 
-    const [vendor] = await db.query(
-      `SELECT is_premium
-       FROM vendors
-       WHERE user_id = ?`,
+    const [wallet] = await db.query(
+      `
+      SELECT
+      balance,
+      total_earned,
+      total_withdrawn
+      FROM wallets
+      WHERE vendor_id=?
+      `,
       [vendorId],
     );
 
-    if (vendor.length === 0) {
+    if (wallet.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Vendor not found",
+        message: "Wallet not found",
       });
     }
-
-    const [salesResult] = await db.query(
-      `
-      SELECT
-        COALESCE(SUM(oi.price * oi.quantity), 0) AS totalEarned
-      FROM order_items oi
-      JOIN products p
-        ON oi.product_id = p.id
-      JOIN orders o
-        ON oi.order_id = o.id
-      WHERE
-        p.vendor_id = ?
-        AND oi.status = 'delivered'
-      `,
-      [vendorId],
-    );
-
-    const grossSales = Number(salesResult[0].totalEarned);
-
-    const commissionType = vendor[0].is_premium ? "premium" : "default";
-
-    const commissionDetails = await calculateCommission(
-      grossSales,
-      commissionType,
-    );
-
-    const [withdrawalResult] = await db.query(
-      `
-      SELECT
-        COALESCE(SUM(amount), 0) AS totalWithdrawn
-      FROM withdrawals
-      WHERE vendor_id = ?
-      AND status = 'paid'
-      `,
-      [vendorId],
-    );
-
-    const totalWithdrawn = Number(withdrawalResult[0].totalWithdrawn);
-    const totalEarnings = commissionDetails.totalEarnings;
-    const availableBalance = totalEarnings - totalWithdrawn;
 
     const [withdrawals] = await db.query(
       `
@@ -78,12 +43,13 @@ exports.getWithdrawals = async (req, res) => {
       [vendorId],
     );
 
-    res.json({
-      grossSales,
-      commission: commissionDetails.commissionDeducted,
-      totalEarnings,
-      totalWithdrawn,
-      availableBalance,
+    res.status(200).json({
+      availableBalance: wallet[0].balance,
+
+      totalEarnings: wallet[0].total_earned,
+
+      totalWithdrawn: wallet[0].total_withdrawn,
+
       withdrawals,
     });
   } catch (error) {
@@ -124,7 +90,30 @@ exports.initiateWithdrawal = async (req, res) => {
     if (pendingWithdrawals[0].pendingCount > 0) {
       return res.json({
         success: false,
-        message: "You have pending withdrawals",
+        message: "You have pending withdrawal(s)",
+      });
+    }
+
+    const [wallet] = await db.query(
+      `
+      SELECT balance
+      FROM wallets
+      WHERE vendor_id=?
+      `,
+      [vendorId],
+    );
+
+    if (wallet.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Wallet not found",
+      });
+    }
+
+    if (Number(amount) > Number(wallet[0].balance)) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient wallet balance",
       });
     }
 
@@ -151,6 +140,186 @@ exports.initiateWithdrawal = async (req, res) => {
     return res.status(404).json({
       success: false,
       message: "Cannot initiate withdrawal",
+    });
+  }
+};
+
+exports.approveWithdrawal = async (req, res) => {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const { id } = req.params;
+
+    const [withdrawals] = await connection.query(
+      `
+      SELECT *
+      FROM withdrawals
+      WHERE id = ?
+      FOR UPDATE
+      `,
+      [id],
+    );
+
+    if (withdrawals.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: "Withdrawal not found",
+      });
+    }
+
+    const withdrawal = withdrawals[0];
+
+    if (withdrawal.status === "paid") {
+      await connection.rollback();
+
+      return res.status(400).json({
+        success: false,
+        message: "Withdrawal already approved",
+      });
+    }
+
+    if (withdrawal.status === "rejected") {
+      await connection.rollback();
+
+      return res.status(400).json({
+        success: false,
+        message: "This withdrawal has already been rejected",
+      });
+    }
+
+    const [wallets] = await connection.query(
+      `
+      SELECT *
+      FROM wallets
+      WHERE vendor_id = ?
+      FOR UPDATE
+      `,
+      [withdrawal.vendor_id],
+    );
+
+    if (wallets.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: "Vendor wallet not found",
+      });
+    }
+
+    const wallet = wallets[0];
+
+    if (Number(wallet.balance) < Number(withdrawal.amount)) {
+      await connection.rollback();
+
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient wallet balance",
+      });
+    }
+
+    await connection.query(
+      `
+      UPDATE wallets
+      SET
+        balance = balance - ?,
+        total_withdrawn = total_withdrawn + ?
+      WHERE vendor_id = ?
+      `,
+      [withdrawal.amount, withdrawal.amount, withdrawal.vendor_id],
+    );
+
+    await connection.query(
+      `
+      UPDATE withdrawals
+      SET
+        status = 'paid',
+        paid_at = NOW()
+      WHERE id = ?
+      `,
+      [id],
+    );
+
+    await createNotification({
+      userId: withdrawal.vendor_id,
+      type: "withdrawal",
+      title: "Withdrawal Approved",
+      message: `Your withdrawal of ₦${Number(withdrawal.amount).toLocaleString()} has been approved.`,
+      referenceId: id,
+    });
+
+    await connection.commit();
+
+    res.status(200).json({
+      success: true,
+      message: "Withdrawal approved successfully",
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to approve withdrawal",
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+exports.rejectWithdrawal = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [withdrawals] = await db.query(
+      "SELECT * FROM withdrawals WHERE id = ?",
+      [id],
+    );
+
+    if (withdrawals.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Withdrawal not found",
+      });
+    }
+
+    if (withdrawals[0].status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Withdrawal has already been processed",
+      });
+    }
+
+    await db.query(
+      `
+      UPDATE withdrawals
+      SET status = 'rejected'
+      WHERE id = ?
+      `,
+      [id],
+    );
+
+    await createNotification({
+      userId: withdrawals[0].vendor_id,
+      type: "withdrawal",
+      title: "Withdrawal Rejected",
+      message: `Your withdrawal request of ₦${Number(withdrawals[0].amount).toLocaleString()} was rejected.`,
+      referenceId: id,
+    });
+
+    res.json({
+      success: true,
+      message: "Withdrawal rejected",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
     });
   }
 };
