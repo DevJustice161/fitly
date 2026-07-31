@@ -221,15 +221,42 @@ exports.approveWithdrawal = async (req, res) => {
       });
     }
 
+    let transactionHistory = [];
+
+    try {
+      transactionHistory = wallet.transaction_history
+        ? JSON.parse(wallet.transaction_history)
+        : [];
+    } catch (err) {
+      transactionHistory = [];
+    }
+
+    const newTransaction = {
+      id: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      date: new Date().toISOString(),
+      amount: withdrawal.amount.toString(),
+      title: "Withdrawal",
+      status: "successful",
+      to:
+        withdrawal.method === "bank"
+          ? `${withdrawal.bank_name} • ${withdrawal.account_number}`
+          : withdrawal.method,
+      method: withdrawal.method,
+      reference: withdrawal.id,
+    };
+
+    transactionHistory.unshift(newTransaction);
+
     await connection.query(
-      `
-      UPDATE wallets
-      SET
-        balance = balance - ?,
-        total_withdrawn = total_withdrawn + ?
-      WHERE vendor_id = ?
-      `,
-      [withdrawal.amount, withdrawal.amount, withdrawal.vendor_id],
+      ` UPDATE wallets SET balance = balance - ?, total_withdrawn = total_withdrawn + ?,
+        transaction_history = ? WHERE vendor_id = ?
+  `,
+      [
+        withdrawal.amount,
+        withdrawal.amount,
+        JSON.stringify(transactionHistory),
+        withdrawal.vendor_id,
+      ],
     );
 
     await connection.query(

@@ -128,29 +128,61 @@ exports.updateUserPassword = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
+    const [user] = await db.query(
+      ` SELECT * FROM users WHERE id = ?
+      `,
+      [id],
+    );
 
-    const [user] = await db.query("SELECT * FROM users where id = ?", [id]);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (user.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
     }
+    const userData = user[0];
 
-    if (user.avatar) {
-      const avatarPath = path.join(
+    if (userData.avatar) {
+      const oldThumbnailPath = path.join(
         __dirname,
         "../uploads/avatars",
-        user.avatar,
+        userData.avatar,
       );
-      if (fs.existsSync(avatarPath)) {
-        fs.unlinkSync(avatarPath);
-      } else {
-        console.warn(`Avatar file not found: ${avatarPath}`);
+      if (fs.existsSync(oldThumbnailPath)) {
+        fs.unlinkSync(oldThumbnailPath);
       }
     }
-
+    await db.query("DELETE FROM conversations WHERE buyer_id = ?", [id]);
+    await db.query("DELETE FROM coupon_usages WHERE user_id = ?", [id]);
+    await db.query(
+      "DELETE FROM messages WHERE sender_id = ? AND receiver_id = ?",
+      [id, id],
+    );
+    await db.query("DELETE FROM notifications WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM orders WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM order_items WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM payment_method WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM recently_viewed WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM reviews WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM review_images WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM review_replies WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM vendor_applications WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM vouchers WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM voucher_usage WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM wishlists WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM coupon_usages WHERE user_id = ?", [id]);
     await db.query("DELETE FROM users WHERE id = ?", [id]);
-    res.json({ message: "User deleted successfully" });
+
+    res.json({
+      success: true,
+      message: `User deleted.`,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to delete user" });
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete user.",
+    });
   }
 };

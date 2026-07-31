@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Image,
   Map,
@@ -36,8 +36,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-//import { vendorApplications } from "@/data/vendorData";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const statusColors = {
   Pending: "bg-yellow-100 text-yellow-700",
@@ -48,6 +48,7 @@ const statusColors = {
 const AdminVendorApplications = () => {
   const API_URL = "http://localhost:5000/api";
   const { toast } = useToast();
+  const { user, token } = useAuth();
   const [apps, setApps] = useState([]);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
@@ -59,7 +60,11 @@ const AdminVendorApplications = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch(`${API_URL}/vendors/applications`);
+      const response = await fetch(`${API_URL}/vendors/applications`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setApps(data);
     } catch (error) {
@@ -72,18 +77,9 @@ const AdminVendorApplications = () => {
     }
   };
 
-  // Fetch applications on component mount
-  useState(() => {
+  useEffect(() => {
     fetchApplications();
   }, []);
-
-  // const updateStatus = (id, status) => {
-  //   setApps((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-  //   toast({
-  //     title: `Application ${status}`,
-  //     description: `Vendor application has been ${status.toLowerCase()}.`,
-  //   });
-  // };
 
   const updateApprovedStatus = (id, status) => {
     setApps((prev) =>
@@ -103,7 +99,7 @@ const AdminVendorApplications = () => {
     setApps((prev) =>
       prev.map((a) =>
         a.id === id
-          ? { ...a, status: status === "Pending" ? "Approved" : "Rejected" }
+          ? { ...a, status: status === "Pending" ? "Rejected" : "Approved" }
           : a,
       ),
     );
@@ -119,6 +115,7 @@ const AdminVendorApplications = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });
@@ -138,6 +135,7 @@ const AdminVendorApplications = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ status }),
       });
@@ -159,7 +157,7 @@ const AdminVendorApplications = () => {
     return matchSearch && matchFilter;
   });
 
-  const sendRequestInfo = () => {
+  const sendRequestInfo = async () => {
     if (!requestMessage.trim()) {
       toast({
         title: "Message required",
@@ -168,12 +166,42 @@ const AdminVendorApplications = () => {
       });
       return;
     }
-    toast({
-      title: "Request sent",
-      description: `Information request sent to ${requestApp.name}.`,
-    });
-    setRequestApp(null);
-    setRequestMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/vendor/request-info/${requestApp.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            message: requestMessage,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      toast({
+        title: "Request sent",
+        description: data.message,
+      });
+
+      setRequestApp(null);
+      setRequestMessage("");
+    } catch (error) {
+      toast({
+        title: "Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (

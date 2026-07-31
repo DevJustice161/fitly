@@ -21,6 +21,7 @@ const {
   getVendorCustomers,
   getOrders,
   updateOrderStatus,
+  requestVendorInformation,
 } = require("../controllers/vendorController");
 const { verify } = require("jsonwebtoken");
 
@@ -47,6 +48,8 @@ router.get("/vendors", getVendors);
 router.put("/approve/:id", verifyToken, approveVendor);
 
 router.put("/reject/:id", verifyToken, rejectVendor);
+
+router.put("/vendor/request-info/:id", verifyToken, requestVendorInformation);
 
 router.put("/status/:id", verifyToken, updateVendorStatus);
 router.get("/premium/:id", getVendorPremiumStatus);

@@ -11,6 +11,12 @@ import {
   LogOut,
   ShoppingBag,
   BarChart3,
+  Star,
+  Package,
+  Layers,
+  Truck,
+  UserRound,
+  Ticket,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -20,6 +26,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -45,8 +52,18 @@ const menuItems = [
   { title: "Withdrawals", url: "/admin/withdrawals", icon: Wallet },
   { title: "Commission Settings", url: "/admin/commission", icon: DollarSign },
   { title: "Revenue", url: "/admin/revenue", icon: BarChart3 },
+  { title: "Reviews", url: "/admin/reviews", icon: Star },
   { title: "Notifications", url: "/admin/notifications", icon: Bell },
   { title: "Settings", url: "/admin/settings", icon: Settings },
+];
+
+const catalogItems = [
+  { title: "Manage Orders", url: "/admin/orders", icon: ShoppingBag },
+  { title: "Manage Products", url: "/admin/products", icon: Package },
+  { title: "Manage Categories", url: "/admin/categories", icon: Layers },
+  { title: "Manage Couriers", url: "/admin/couriers", icon: Truck },
+  { title: "Manage Customers", url: "/admin/customers", icon: UserRound },
+  { title: "Manage Vouchers", url: "/admin/vouchers", icon: Ticket },
 ];
 
 const AdminDashboardSidebar = () => {
@@ -99,6 +116,27 @@ const AdminDashboardSidebar = () => {
                     <NavLink
                       to={item.url}
                       end={item.url === "/admin"}
+                      className="hover:bg-accent/50 transition-colors"
+                      activeClassName="bg-accent text-primary font-medium"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>Catalog</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {catalogItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.url}
                       className="hover:bg-accent/50 transition-colors"
                       activeClassName="bg-accent text-primary font-medium"
                     >

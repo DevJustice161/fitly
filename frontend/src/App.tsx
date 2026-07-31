@@ -60,6 +60,13 @@ import AdminDashboardLayout from "./components/admin/AdminDashboardLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminVendorApplications from "./pages/admin/AdminVendorApplications";
 import AdminWithdrawals from "./pages/admin/AdminWithdrawals";
+import AdminCategories from "./pages/admin/AdminCategories";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminCustomers from "./pages/admin/AdminCustomers";
+import AdminCouriers from "./pages/admin/AdminCouriers";
+import AdminReviews from "./pages/admin/AdminReviews";
+import AdminVouchers from "./pages/admin/AdminVouchers";
 import AdminCommission from "./pages/admin/AdminCommission";
 import AdminVendors from "./pages/admin/AdminVendors";
 import AdminRevenue from "./pages/admin/AdminRevenue";
@@ -201,6 +208,16 @@ const App = () => (
                           path="withdrawals"
                           element={<AdminWithdrawals />}
                         />
+                        <Route
+                          path="categories"
+                          element={<AdminCategories />}
+                        />
+                        <Route path="orders" element={<AdminOrders />} />
+                        <Route path="products" element={<AdminProducts />} />
+                        <Route path="customers" element={<AdminCustomers />} />
+                        <Route path="couriers" element={<AdminCouriers />} />
+                        <Route path="reviews" element={<AdminReviews />} />
+                        <Route path="vouchers" element={<AdminVouchers />} />
                         <Route
                           path="commission"
                           element={<AdminCommission />}

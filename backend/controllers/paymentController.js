@@ -85,6 +85,7 @@ exports.initializeFlutterwave = async (req, res) => {
       orderQuery.insertId,
       item.product_id,
       item.vendor_id,
+      user_id,
       item.default_courier,
       item.quantity,
       item.size,
@@ -93,7 +94,7 @@ exports.initializeFlutterwave = async (req, res) => {
     ]);
     const sql = `
             INSERT INTO order_items
-            (order_id, product_id, vendor_id, default_courier, quantity, size, color, price)
+            (order_id, product_id, vendor_id, user_id, default_courier, quantity, size, color, price)
             VALUES ?
             `;
 
@@ -227,6 +228,7 @@ exports.initializePaystack = async (req, res) => {
       orderQuery.insertId,
       item.product_id,
       item.vendor_id,
+      user_id,
       item.quantity,
       item.size,
       item.color,
@@ -234,7 +236,7 @@ exports.initializePaystack = async (req, res) => {
     ]);
     const sql = `
             INSERT INTO order_items
-            (order_id, product_id, vendor_id, quantity, size, color, price)
+            (order_id, product_id, vendor_id, user_id, quantity, size, color, price)
             VALUES ?
             `;
 
@@ -350,6 +352,7 @@ exports.initializeTransfer = async (req, res) => {
       orderQuery.insertId,
       item.product_id,
       item.vendor_id,
+      user_id,
       item.quantity,
       item.size,
       item.color,
@@ -357,7 +360,7 @@ exports.initializeTransfer = async (req, res) => {
     ]);
     const sql = `
             INSERT INTO order_items
-            (order_id, product_id, vendor_id, quantity, size, color, price)
+            (order_id, product_id, vendor_id, user_id, quantity, size, color, price)
             VALUES ?
             `;
 

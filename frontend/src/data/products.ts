@@ -4,12 +4,12 @@ import product5 from "@/assets/product-5.jpg";
 import product6 from "@/assets/product-6.jpg";
 import product7 from "@/assets/product-7.jpg";
 import product8 from "@/assets/product-8.jpg";
-import collectionWomen from "@/assets/collection-women.jpg";
-import collectionMen from "@/assets/collection-men.jpg";
-import collectionAccessories from "@/assets/collection-accessories.jpg";
-import collectionShoes from "@/assets/collection-shoes.avif";
-import collectionBags from "@/assets/collection-bags.jpg";
-import collectionBeautyProducts from "@/assets/collection-beauty-products.avif";
+// import collectionWomen from "@/assets/collection-women.jpg";
+// import collectionMen from "@/assets/collection-men.jpg";
+// import collectionAccessories from "@/assets/collection-accessories.jpg";
+// import collectionShoes from "@/assets/collection-shoes.avif";
+// import collectionBags from "@/assets/collection-bags.jpg";
+// import collectionBeautyProducts from "@/assets/collection-beauty-products.avif";
 export const products = [
   {
     id: "1",
@@ -104,70 +104,70 @@ export const products = [
   },
 ];
 
-export const categories = [
-  {
-    name: "Women's fashion",
-    image: collectionWomen,
-    subcategories: ["Dresses", "Two-piece", "Gowns"],
-  },
-  {
-    name: "Men's fashion",
-    image: collectionMen,
-    subcategories: ["Native Wear", "Casual", "Corporate"],
-  },
-  {
-    name: "Accessories",
-    image: collectionAccessories,
-    subcategories: ["Bags", "Shoes", "Jewelry"],
-  },
-  {
-    name: "Shoes",
-    image: collectionShoes,
-    subcategories: ["Heels", "Flats", "Sneakers"],
-  },
-  {
-    name: "Bags",
-    image: collectionBags,
-    subcategories: ["Handbags", "Backpacks", "Clutches"],
-  },
-  {
-    name: "Beauty products",
-    image: collectionBeautyProducts,
-    subcategories: ["Skincare", "Makeup", "Fragrances"],
-  },
-];
+// export const categories = [
+//   {
+//     name: "Women's fashion",
+//     image: collectionWomen,
+//     subcategories: ["Dresses", "Two-piece", "Gowns"],
+//   },
+//   {
+//     name: "Men's fashion",
+//     image: collectionMen,
+//     subcategories: ["Native Wear", "Casual", "Corporate"],
+//   },
+//   {
+//     name: "Accessories",
+//     image: collectionAccessories,
+//     subcategories: ["Bags", "Shoes", "Jewelry"],
+//   },
+//   {
+//     name: "Shoes",
+//     image: collectionShoes,
+//     subcategories: ["Heels", "Flats", "Sneakers"],
+//   },
+//   {
+//     name: "Bags",
+//     image: collectionBags,
+//     subcategories: ["Handbags", "Backpacks", "Clutches"],
+//   },
+//   {
+//     name: "Beauty products",
+//     image: collectionBeautyProducts,
+//     subcategories: ["Skincare", "Makeup", "Fragrances"],
+//   },
+// ];
 
-export const vendors = [
-  {
-    id: "1",
-    name: "Ama Collections",
-    logo: collectionWomen,
-    isPremium: true,
-    rating: 4.8,
-    productCount: 48,
-  },
-  {
-    id: "2",
-    name: "Kings Tailoring",
-    logo: collectionMen,
-    isPremium: true,
-    rating: 4.9,
-    productCount: 35,
-  },
-  {
-    id: "3",
-    name: "Luxe Accessories NG",
-    logo: collectionAccessories,
-    isPremium: false,
-    rating: 4.6,
-    productCount: 62,
-  },
-  {
-    id: "4",
-    name: "Elite Menswear",
-    logo: collectionMen,
-    isPremium: true,
-    rating: 4.7,
-    productCount: 28,
-  },
-];
+// export const vendors = [
+//   {
+//     id: "1",
+//     name: "Ama Collections",
+//     logo: collectionWomen,
+//     isPremium: true,
+//     rating: 4.8,
+//     productCount: 48,
+//   },
+//   {
+//     id: "2",
+//     name: "Kings Tailoring",
+//     logo: collectionMen,
+//     isPremium: true,
+//     rating: 4.9,
+//     productCount: 35,
+//   },
+//   {
+//     id: "3",
+//     name: "Luxe Accessories NG",
+//     logo: collectionAccessories,
+//     isPremium: false,
+//     rating: 4.6,
+//     productCount: 62,
+//   },
+//   {
+//     id: "4",
+//     name: "Elite Menswear",
+//     logo: collectionMen,
+//     isPremium: true,
+//     rating: 4.7,
+//     productCount: 28,
+//   },
+// ];

@@ -13,6 +13,7 @@ app.use(express.json());
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/vendors", require("./routes/vendorRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
@@ -28,6 +29,7 @@ app.use("/api/vouchers", require("./routes/voucherRoutes"));
 app.use("/api/recently-viewed", require("./routes/recentlyViewedRoutes"));
 app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/couriers", require("./routes/courierRoutes"));
+app.use("/api/settings", require("./routes/siteRoutes"));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 

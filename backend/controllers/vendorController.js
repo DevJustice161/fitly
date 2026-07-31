@@ -9,6 +9,7 @@ const {
   buildSubscriptionPayload,
   buildPremiumPaymentCallbackUrl,
 } = require("../utils/premiumUtils");
+const { sendEmail } = require("../utils/emailService");
 
 const ensurePremiumTables = async () => {
   await db.query(`
@@ -165,11 +166,15 @@ exports.getVendors = async (req, res) => {
   try {
     const [vendors] = await db.query(
       `
-      SELECT users.name AS owner, vendors.*, vendor_applications.*, (SELECT COUNT(*) FROM products WHERE products.vendor_id = vendors.user_id) AS products_count
-      FROM vendors
-      JOIN users ON vendors.user_id = users.id
-      JOIN vendor_applications ON vendors.user_id = vendor_applications.user_id
-      ORDER BY vendors.created_at DESC
+      SELECT u.name AS owner, u.email, u.phone, u.address, v.*, va.category, va.city, va.state, va.country, va.business_address, COUNT(DISTINCT p.id) AS totalProducts, COUNT(DISTINCT oi.id) AS totalOrders, COALESCE(SUM(oi.price * oi.quantity), 0) AS totalSales,
+      COALESCE( SUM(oi.price * oi.quantity) / NULLIF(COUNT(DISTINCT oi.id), 0), 0 ) AS averageOrderValue, w.balance, w.total_earned, w.total_withdrawn, w.transaction_history
+      FROM vendors v
+      JOIN users u ON u.id = v.user_id
+      LEFT JOIN vendor_applications va ON va.user_id = v.user_id LEFT JOIN products p ON p.vendor_id = v.user_id
+      LEFT JOIN order_items oi ON oi.product_id = p.id
+      LEFT JOIN wallets w ON w.vendor_id = v.user_id
+      GROUP BY v.user_id
+      ORDER BY v.created_at DESC;
       `,
     );
 
@@ -214,6 +219,10 @@ exports.approveVendor = async (req, res) => {
       [application.user_id],
     );
 
+    const [defaultCourier] = await db.query(
+      `SELECT * FROM courier WHERE default_courier = 1`,
+    );
+
     await db.query(
       `
   INSERT INTO vendors (
@@ -221,16 +230,18 @@ exports.approveVendor = async (req, res) => {
     store_name,
     store_logo,
     store_description,
+    default_courier,
     is_verified,
     is_premium,
     v_status,
     rating
   )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   ON DUPLICATE KEY UPDATE
     store_name = VALUES(store_name),
     store_logo = VALUES(store_logo),
     store_description = VALUES(store_description),
+    default_courier = VALUES(default_courier),
     is_verified = VALUES(is_verified),
     is_premium = VALUES(is_premium),
     v_status = VALUES(v_status),
@@ -241,6 +252,7 @@ exports.approveVendor = async (req, res) => {
         application.store_name,
         application.store_logo,
         application.store_description,
+        defaultCourier[0]?.id,
         false,
         false,
         "Active",
@@ -262,12 +274,14 @@ exports.approveVendor = async (req, res) => {
       type: "vendor",
       title: "Vendor Approved",
       message: "Your vendor account has been approved.",
+      referenceId: application.user_id,
     });
 
     res.json({
       message: "Vendor approved successfully",
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json(error);
   }
 };
@@ -298,6 +312,7 @@ exports.rejectVendor = async (req, res) => {
       title: "Vendor Rejected",
       message:
         "Your vendor account has been rejected. You can apply again once you meet the requirements.",
+      referenceId: id,
     });
 
     res.json({
@@ -305,6 +320,79 @@ exports.rejectVendor = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json(error);
+  }
+};
+
+exports.requestVendorInformation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    const [applications] = await db.query(
+      `
+      SELECT
+        va.*,
+        u.email,
+        u.name
+      FROM vendor_applications va
+      JOIN users u
+        ON va.user_id = u.id
+      WHERE va.id = ?
+      `,
+      [id],
+    );
+
+    if (applications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Application not found",
+      });
+    }
+
+    const application = applications[0];
+
+    await sendEmail(
+      application.email,
+      "Additional Information Required for Your Fitly Vendor Application",
+      `
+      <h2>Hello ${application.name},</h2>
+
+      <p>Thank you for applying to become a vendor on <strong>Fitly</strong>.</p>
+
+      <p>Before we can continue reviewing your application, we need the following additional information:</p>
+
+      <blockquote>
+        ${message}
+      </blockquote>
+
+      <p>Please reply to this email or update your application as soon as possible.</p>
+
+      <br>
+
+      <p>Regards,</p>
+      <strong>Fitly Admin Team</strong>
+      `,
+    );
+
+    await createNotification({
+      userId: application.user_id,
+      type: "vendor",
+      title: "Additional Information Requested",
+      message:
+        "The admin has requested additional information about your application.",
+    });
+
+    res.json({
+      success: true,
+      message: "Request sent successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to send request.",
+    });
   }
 };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Eye,
@@ -33,79 +33,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
-const seedVendors = [
-  {
-    id: "v1",
-    name: "Ama Collections",
-    owner: "Amara Johnson",
-    email: "amara@amacollections.ng",
-    category: "Women's fashion",
-    city: "Lagos",
-    products: 48,
-    sales: 3850000,
-    rating: 4.8,
-    isPremium: true,
-    status: "Active",
-    joined: "Jan 2024",
-  },
-  {
-    id: "v2",
-    name: "Kings Tailoring",
-    owner: "Tunde Adeyemi",
-    email: "tunde@kings.ng",
-    category: "Men's fashion",
-    city: "Lagos",
-    products: 32,
-    sales: 2150000,
-    rating: 4.6,
-    isPremium: false,
-    status: "Active",
-    joined: "Feb 2024",
-  },
-  {
-    id: "v3",
-    name: "Luxe Accessories NG",
-    owner: "Amina Bello",
-    email: "amina@luxe.ng",
-    category: "Accessories",
-    city: "Kano",
-    products: 24,
-    sales: 985000,
-    rating: 4.5,
-    isPremium: true,
-    status: "Active",
-    joined: "Dec 2023",
-  },
-  {
-    id: "v4",
-    name: "Royal Fits",
-    owner: "Chukwu Eze",
-    email: "chukwu@royalfits.ng",
-    category: "Men's fashion",
-    city: "Port Harcourt",
-    products: 18,
-    sales: 540000,
-    rating: 4.2,
-    isPremium: false,
-    status: "Suspended",
-    joined: "Mar 2024",
-  },
-  {
-    id: "v5",
-    name: "Glow Beauty",
-    owner: "Blessing Eze",
-    email: "blessing@glow.ng",
-    category: "Beauty products",
-    city: "Abuja",
-    products: 56,
-    sales: 4250000,
-    rating: 4.9,
-    isPremium: true,
-    status: "Active",
-    joined: "Nov 2023",
-  },
-];
-
 const statusColors = {
   Active: "bg-green-100 text-green-700",
   Suspended: "bg-red-100 text-red-700",
@@ -113,6 +40,7 @@ const statusColors = {
 
 const AdminVendors = () => {
   const API_URL = "http://localhost:5000/api";
+  const { token } = useAuth();
   const { toast } = useToast();
   const [vendors, setVendors] = useState([]);
   const [search, setSearch] = useState("");
@@ -122,17 +50,36 @@ const AdminVendors = () => {
 
   const fetchVendors = async () => {
     try {
-      const res = await fetch(`${API_URL}/vendors/vendors`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetch(`${API_URL}/vendors/vendors`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const data = await res.json();
-      setVendors(data);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      setVendors(
+        data.map((vendor) => ({
+          ...vendor,
+          transaction_history: vendor.transaction_history
+            ? JSON.parse(vendor.transaction_history)
+            : [],
+        })),
+      );
     } catch (error) {
-      console.error("Error fetching vendors:", error);
+      toast({
+        variant: "destructive",
+        title: "Failed",
+        description: error.message,
+      });
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchVendors();
   }, []);
 
@@ -141,15 +88,15 @@ const AdminVendors = () => {
   const filtered = vendors.filter((v) => {
     const s = search.toLowerCase();
     const matchSearch =
-      v.store_name.toLowerCase().includes(s) ||
-      v.owner.toLowerCase().includes(s);
+      v.store_name?.toLowerCase().includes(s) ||
+      v.owner?.toLowerCase().includes(s) ||
+      v.email?.toLowerCase().includes(s) ||
+      v.state?.toLowerCase().includes(s);
     const matchFilter =
       filter === "All" ||
       (filter === "Premium" ? v.is_premium : v.v_status === filter);
     return matchSearch && matchFilter;
   });
-
-  const { token } = useAuth();
 
   const toggleStatus = async (id) => {
     try {
@@ -178,7 +125,6 @@ const AdminVendors = () => {
         throw new Error(data.message || "Failed to update vendor status");
       }
 
-      // Update UI after successful DB update
       setVendors((prev) =>
         prev.map((v) => (v.user_id === id ? { ...v, v_status: newStatus } : v)),
       );
@@ -201,23 +147,6 @@ const AdminVendors = () => {
       });
     }
   };
-
-  // const toggleStatus = (id) => {
-  //   setVendors((prev) =>
-  //     prev.map((v) =>
-  //       v.id === id
-  //         ? { ...v, v_status: v.v_status === "Active" ? "Suspended" : "Active" }
-  //         : v,
-  //     ),
-  //   );
-  //   const v = vendors.find((x) => x.id === id);
-  //   toast({
-  //     title:
-  //       v.v_status === "Active" ? "Vendor suspended" : "Vendor reactivated",
-  //     description: `${v.store_name} has been updated.`,
-  //   });
-  //   setConfirmAction(null);
-  // };
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -259,14 +188,22 @@ const AdminVendors = () => {
 
       <div className="space-y-3">
         {filtered.map((v) => (
-          <Card key={v.id} className="border border-border shadow-sm">
+          <Card key={v.user_id} className="border border-border shadow-sm">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12 border">
-                    <AvatarFallback className="bg-primary/10 text-primary font-heading">
-                      {v.store_name.charAt(0)}
-                    </AvatarFallback>
+                    {v.store_logo ? (
+                      <img
+                        src={`http://localhost:5000/uploads/logos/${v.store_logo}`}
+                        alt={v.store_name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-primary/10 text-primary font-heading">
+                        {v.store_name.charAt(0)}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div>
                     <div className="flex items-center gap-2">
@@ -283,18 +220,25 @@ const AdminVendors = () => {
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {v.owner} • {v.state}
+                      {v.owner} • {v.city}, {v.state}
                     </p>
                     <div className="flex gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
-                      {/* <span>{v.products} products</span> */}
-                      <span>40 products</span>
-                      {/* <span>₦{(v.sales / 1000000).toFixed(2)}M sales</span> */}
-                      <span>₦{(3000 / 1000000).toFixed(2)}M sales</span>
+                      <span>
+                        {v.totalProducts}{" "}
+                        {v.totalProducts <= 1 ? "product" : "products"}
+                      </span>
+                      <span>
+                        ₦{Number(v.totalSales).toLocaleString()} sales
+                      </span>
                       <span className="flex items-center gap-1">
                         <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                         {v.rating}
                       </span>
-                      <span>{v.city}</span>
+                      <span>
+                        <p>
+                          {v.city}, {v.state}
+                        </p>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -353,13 +297,15 @@ const AdminVendors = () => {
                   <p className="text-muted-foreground text-xs">Email</p>
                   <p className="font-medium">{view.email}</p>
                 </div>
-                {/* <div>
+                <div>
                   <p className="text-muted-foreground text-xs">Category</p>
                   <p className="font-medium">{view.category}</p>
-                </div> */}
+                </div>
                 <div>
                   <p className="text-muted-foreground text-xs">City</p>
-                  <p className="font-medium">{view.city}</p>
+                  <p className="font-medium">
+                    {view.city}, {view.state}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs">Joined</p>
@@ -373,18 +319,117 @@ const AdminVendors = () => {
                     {view.is_premium === 1 ? "Premium" : "Standard"}
                   </p>
                 </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    Average Order Value
+                  </p>
+                  <p className="font-medium">
+                    ₦{Number(view.averageOrderValue).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    Wallet Balance
+                  </p>
+                  <p className="font-medium">
+                    ₦{Number(view.balance).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Total Earned</p>
+                  <p className="font-medium">
+                    ₦{Number(view.total_earned).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    Total Withdrawn
+                  </p>
+                  <p className="font-medium">
+                    ₦{Number(view.total_withdrawn).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-foreground">
+                    Transaction History
+                  </h3>
+                  <span className="text-xs text-muted-foreground">
+                    {view.transaction_history.length} transaction
+                    {view.transaction_history.length !== 1 && "s"}
+                  </span>
+                </div>
+
+                {view.transaction_history.length > 0 ? (
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {view.transaction_history.map((t) => (
+                      <div
+                        key={t.id}
+                        className="rounded-xl border border-border bg-card p-4 shadow-sm"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="font-medium text-foreground">
+                              {t.title}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {new Date(t.date).toLocaleString("en-NG", {
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                              })}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Transaction ID: {t.id}
+                            </p>
+
+                            <p className="text-xs text-muted-foreground">
+                              Destination: {t.to}
+                            </p>
+                          </div>
+
+                          <div className="text-right">
+                            <p className="font-semibold text-lg">
+                              ₦{Number(t.amount).toLocaleString()}
+                            </p>
+
+                            <span
+                              className={`inline-flex mt-2 px-2.5 py-1 rounded-full text-xs font-medium ${
+                                t.status === "successful"
+                                  ? "bg-green-100 text-green-700"
+                                  : t.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {t.status.charAt(0).toUpperCase() +
+                                t.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-border py-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      No transaction history available.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
                 <div className="text-center">
                   <p className="font-heading text-lg font-bold">
-                    {/* {view.products} */} 40
+                    {view.totalProducts}
                   </p>
                   <p className="text-xs text-muted-foreground">Products</p>
                 </div>
                 <div className="text-center">
                   <p className="font-heading text-lg font-bold">
-                    {/* ₦{(view.sales / 1000000).toFixed(2)}M */} ₦
-                    {(3000 / 1000000).toFixed(2)}M
+                    ₦{Number(view.totalSales).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">Total Sales</p>
                 </div>

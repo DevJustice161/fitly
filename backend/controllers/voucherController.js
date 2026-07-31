@@ -93,6 +93,13 @@ exports.getUserVouchers = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    await db.query(`
+    UPDATE vouchers
+    SET is_active = 0
+    WHERE expires_at < NOW()
+      AND is_active = 1
+    `);
+
     const [vouchers] = await db.query(
       `
       SELECT *

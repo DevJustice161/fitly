@@ -1,4 +1,6 @@
 const db = require("../config/db");
+const fs = require("fs");
+const path = require("path");
 
 const DEFAULT_CATEGORIES = [
   { name: "Women's fashion", slug: "womens-fashion" },
@@ -90,7 +92,10 @@ exports.getCategories = async (req, res) => {
     }
 
     const [categories] = await db.query(
-      `SELECT id, name, image, slug FROM categories ORDER BY id ASC`,
+      `SELECT c.id, c.name, c.image, c.slug, (SELECT COUNT(*) FROM products WHERE category = c.name) AS products, c.active
+      FROM categories c
+      JOIN products p ON c.name = p.category
+      ORDER BY id ASC`,
     );
 
     const categoriesWithSubCategories = await Promise.all(
@@ -184,5 +189,286 @@ exports.createCategory = async (req, res) => {
   } catch (error) {
     console.error("Error creating category:", error);
     res.status(500).json({ message: "Failed to create category" });
+  }
+};
+
+exports.updateCategory = async (req, res) => {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const { id } = req.params;
+    const { name, slug, sub_categories = [] } = req.body;
+
+    const [category] = await connection.query(
+      "SELECT * FROM categories WHERE id = ?",
+      [id],
+    );
+
+    if (category.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+    const oldCategoryName = category[0].name;
+
+    await connection.query(
+      `
+      UPDATE categories
+      SET
+        name = ?,
+        slug = ?
+      WHERE id = ?
+      `,
+      [name, slug, id],
+    );
+
+    await connection.query(
+      ` UPDATE products SET category = ? WHERE category = ?`,
+      [name, oldCategoryName],
+    );
+
+    await connection.query(
+      ` UPDATE vendor_applications SET category = ? WHERE category = ?`,
+      [name, oldCategoryName],
+    );
+
+    const [existingSubs] = await connection.query(
+      `
+      SELECT id, name
+      FROM sub_categories
+      WHERE category_id = ?
+      `,
+      [id],
+    );
+
+    const existingNames = existingSubs.map((s) => s.name);
+
+    for (const sub of sub_categories) {
+      if (!existingNames.includes(sub)) {
+        await connection.query(
+          `
+          INSERT INTO sub_categories
+          (category_id, name)
+          VALUES (?, ?)
+          `,
+          [id, sub],
+        );
+      }
+    }
+
+    for (const sub of existingSubs) {
+      if (!sub_categories.includes(sub.name)) {
+        await connection.query(
+          `
+          DELETE FROM sub_categories
+          WHERE id = ?
+          `,
+          [sub.id],
+        );
+      }
+    }
+
+    await connection.commit();
+
+    res.json({
+      success: true,
+      message: "Category updated successfully",
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update category",
+    });
+  } finally {
+    connection.release();
+  }
+};
+
+exports.updateCategoryImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload an image.",
+      });
+    }
+
+    const [category] = await db.query(
+      "SELECT image FROM categories WHERE id = ?",
+      [id],
+    );
+
+    if (category.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    if (category[0].image) {
+      const oldImage = path.join(
+        __dirname,
+        "../uploads/categories",
+        category[0].image,
+      );
+
+      if (fs.existsSync(oldImage)) {
+        fs.unlinkSync(oldImage);
+      }
+    }
+
+    await db.query(
+      `
+      UPDATE categories
+      SET image = ?
+      WHERE id = ?
+      `,
+      [req.file.filename, id],
+    );
+
+    res.json({
+      success: true,
+      message: "Category image updated successfully.",
+      image: req.file.filename,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update category image.",
+    });
+  }
+};
+
+exports.updateCategoryStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { active } = req.body;
+
+    const [category] = await db.query(
+      "SELECT id FROM categories WHERE id = ?",
+      [id],
+    );
+
+    if (category.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    await db.query(
+      `
+      UPDATE categories
+      SET active = ?
+      WHERE id = ?
+      `,
+      [active ? 1 : 0, id],
+    );
+
+    res.json({
+      success: true,
+      message: `Category ${active ? "activated" : "deactivated"} successfully.`,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to update category status.",
+    });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const { id } = req.params;
+
+    const [categories] = await connection.query(
+      "SELECT * FROM categories WHERE id = ?",
+      [id],
+    );
+
+    if (categories.length === 0) {
+      await connection.rollback();
+
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    const category = categories[0];
+
+    if (category.image) {
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "uploads",
+        "categories",
+        category.image,
+      );
+
+      fs.unlink(imagePath, (err) => {
+        if (err && err.code !== "ENOENT") {
+          console.error("Failed to delete category image:", err);
+        }
+      });
+    }
+
+    await connection.query(
+      `
+      UPDATE products SET category = 'Uncategorized' WHERE category = ?;
+      `,
+      [category.name],
+    );
+
+    await connection.query(
+      `
+      DELETE FROM sub_categories
+      WHERE category_id = ?
+      `,
+      [id],
+    );
+
+    await connection.query(
+      `
+      DELETE FROM categories
+      WHERE id = ?
+      `,
+      [id],
+    );
+
+    await connection.commit();
+
+    res.json({
+      success: true,
+      message: "Category deleted successfully.",
+    });
+  } catch (error) {
+    await connection.rollback();
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete category.",
+    });
+  } finally {
+    connection.release();
   }
 };
