@@ -39,6 +39,7 @@ import StatisticCard from "@/components/admin/StatisticCard";
 import { adminCustomers } from "@/data/adminManagementData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const FILTERS = ["All", "Active", "Inactive", "Suspended"];
 
@@ -52,6 +53,8 @@ const initials = (name) =>
 
 const AdminCustomers = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const API_URL = "http://localhost:5000/api";
   const { toast } = useToast();
   const [customers, setCustomers] = useState(adminCustomers);
@@ -214,7 +217,7 @@ const AdminCustomers = () => {
         />
         <StatisticCard
           label="Lifetime Value"
-          value={`₦${totalSpent.toLocaleString()}`}
+          value={`${currencySymbol}${totalSpent.toLocaleString()}`}
           icon={Wallet}
           tone="gold"
         />
@@ -277,7 +280,8 @@ const AdminCustomers = () => {
                       {c.email}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {c.orders} {c.orders <= 1 ? "order" : "orders"} • ₦
+                      {c.orders} {c.orders <= 1 ? "order" : "orders"} •
+                      {currencySymbol}
                       {Number(c.spent).toLocaleString()} spent • {c.location}
                     </p>
                   </div>
@@ -366,7 +370,8 @@ const AdminCustomers = () => {
                   <div className="rounded-xl border border-border p-3">
                     <p className="text-xs text-muted-foreground">Total Spent</p>
                     <p className="font-heading text-lg font-bold text-foreground">
-                      ₦{Number(selected.spent).toLocaleString()}
+                      {currencySymbol}
+                      {Number(selected.spent).toLocaleString()}
                     </p>
                   </div>
                   <div className="rounded-xl border border-border p-3">
@@ -398,7 +403,8 @@ const AdminCustomers = () => {
                       Average Order Value
                     </p>
                     <p className="font-heading text-lg font-bold text-foreground">
-                      ₦{Number(selected.averageOrderValue).toLocaleString()}
+                      {currencySymbol}
+                      {Number(selected.averageOrderValue).toLocaleString()}
                     </p>
                   </div>
                 </div>

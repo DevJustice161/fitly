@@ -133,7 +133,9 @@ exports.createProduct = async (req, res) => {
 
 exports.getProducts = async (req, res) => {
   try {
-    const [products] = await db.query("SELECT * FROM products");
+    const [products] = await db.query(
+      "SELECT * FROM products WHERE status = 'Active'",
+    );
 
     res.json(products);
   } catch (error) {
@@ -160,8 +162,9 @@ exports.getProductsCard = async (req, res) => {
         FROM product_variants pv
         WHERE pv.product_id = p.id
     ) AS colors
-            FROM products p
+            FROM products p 
             JOIN vendors v ON p.vendor_id = v.user_id
+            WHERE p.status = 'Active'
     `,
     );
 
@@ -349,10 +352,16 @@ exports.getProductDetails = async (req, res) => {
       ? productRows[0].colors.split(",")
       : [];
 
+    const [categorySlugRow] = await db.query(
+      `SELECT slug FROM categories WHERE name = ?`,
+      [productRows[0].category],
+    );
+
     res.json({
       product: productRows[0],
       sizes: sizes,
       colors: colors,
+      category_slug: categorySlugRow[0]?.slug || null,
       product_images: images,
     });
   } catch (error) {

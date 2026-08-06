@@ -3,8 +3,10 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import VendorDashboardSidebar from "./VendorDashboardSidebar";
 import { Link } from "react-router-dom";
 import { Store } from "lucide-react";
+import { useSiteDetails } from "@/contexts/SiteContext";
 
 const VendorDashboardLayout = () => {
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -17,7 +19,7 @@ const VendorDashboardLayout = () => {
                 to="/"
                 className="font-heading text-xl font-bold text-primary"
               >
-                Fitly.ng
+                {brand}.{extension}
               </Link>
               <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
                 Vendor

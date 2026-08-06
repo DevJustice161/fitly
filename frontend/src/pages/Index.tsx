@@ -14,10 +14,13 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { useSiteDetails } from "../contexts/SiteContext.jsx";
 const Index = () => {
   const API_URL = "http://localhost:5000/api";
+
   const [categories, setCategories] = useState([]);
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
   const [products, setProducts] = useState([]);
   const [vendors, setVendors] = useState([]);
 
@@ -105,7 +108,7 @@ const Index = () => {
         <div className="relative section-padding h-full flex items-center">
           <div className="max-w-xl animate-fade-in-up">
             <span className="premium-badge text-sm mb-4 inline-block px-4 py-2">
-              <Sparkles size={14} /> New Collection 2026
+              <Sparkles size={14} /> New Collection {new Date().getFullYear()}
             </span>
             <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-primary-foreground leading-[1.1] mb-4">
               Redefine Your <span className="text-primary italic">Style</span>

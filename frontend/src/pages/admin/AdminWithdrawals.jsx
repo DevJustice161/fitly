@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import EmptyState from "@/components/admin/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const FILTERS = ["All", "Pending", "Approved", "Paid", "Rejected"];
 
 const AdminWithdrawals = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [requests, setRequests] = useState([]);
   const [query, setQuery] = useState("");
@@ -87,9 +90,6 @@ const AdminWithdrawals = () => {
         throw new Error(data.message || "Failed to update withdrawal");
       }
 
-      // setRequests((prev) =>
-      //   prev.map((r) => (r.id === id ? { ...r, status: action } : r)),
-      // );
       fetchRequests();
 
       toast({
@@ -157,10 +157,16 @@ const AdminWithdrawals = () => {
                 <div>
                   <p className="font-medium text-foreground">{w.vendor}</p>
                   <p className="text-lg font-heading font-bold text-foreground">
-                    ₦{w.amount.toLocaleString()}
+                    {currencySymbol}
+                    {Number(w.amount).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {w.date} • {w.bank} • {w.accountNumber}
+                    {new Date(w.date).toLocaleDateString("en-NG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}{" "}
+                    • {w.bank} • {w.accountNumber}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

@@ -24,40 +24,17 @@ import ProductReviewsSection from "@/components/reviews/ProductReviewsSection";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRecentlyViewed } from "@/contexts/RecentlyViewedContext";
-
-const formatPrice = (price) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(price);
-
-const sampleReviews = [
-  {
-    name: "Adaeze O.",
-    rating: 5,
-    date: "2 weeks ago",
-    text: "Absolutely stunning! Fabric quality is premium and the fit is perfect. Will definitely order again.",
-  },
-  {
-    name: "Tunde A.",
-    rating: 4,
-    date: "1 month ago",
-    text: "Great product, arrived earlier than expected. Sizing runs slightly large but still beautiful.",
-  },
-  {
-    name: "Chiamaka E.",
-    rating: 5,
-    date: "1 month ago",
-    text: "Got so many compliments! Worth every naira. The vendor was very responsive too.",
-  },
-];
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const ProductDetail = () => {
   const { slug } = useParams();
   const { addToCart } = useCart();
   const { getProductStats } = useReviews();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState(null);
   const [sizes, setSizes] = useState(null);
@@ -69,6 +46,7 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState("description");
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const [categorySlug, setCategorySlug] = useState("");
 
   useEffect(() => {
     try {
@@ -86,6 +64,7 @@ const ProductDetail = () => {
         setColors(data.colors);
         setProductImages(data.product_images);
         setSelectedImage(null);
+        setCategorySlug(data.category_slug);
       };
       const fetchProducts = async () => {
         const response = await fetch(
@@ -109,7 +88,6 @@ const ProductDetail = () => {
   const { addRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
-    console.log(product);
     if (product?.id) {
       addRecentlyViewed(product.id);
     }
@@ -167,7 +145,7 @@ const ProductDetail = () => {
           </Link>
           <ChevronRight size={14} />
           <Link
-            to={`/category/${product.category.toLowerCase()}`}
+            to={`/category/${categorySlug || product.category?.toLowerCase()}`}
             className="hover:text-foreground transition-colors"
           >
             {product.category}
@@ -265,7 +243,7 @@ const ProductDetail = () => {
             <div className="mb-4">
               {product.stock_quantity > 0 ? (
                 <span className="text-green-600 font-semibold">
-                  In Stock ({product.stock} available)
+                  In Stock ({product.stock_quantity} available)
                 </span>
               ) : (
                 <span className="text-red-500 font-semibold">Out of Stock</span>

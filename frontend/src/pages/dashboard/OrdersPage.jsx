@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const statusFilters = [
   "All",
@@ -54,6 +55,11 @@ const statusSteps = ["Pending", "Processing", "Shipped", "Delivered"];
 const OrderDetailsDialog = ({ order, open, onClose }) => {
   if (!order) return null;
 
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
+
   const currentStep = statusSteps.indexOf(
     order.status === "Cancelled" ? "Pending" : order.status,
   );
@@ -71,7 +77,7 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
           <div className="flex gap-4">
             <div className="flex-1">
               <p className="font-heading font-semibold text-foreground mt-1">
-                ₦{order.total.toLocaleString()}
+                {formatPrice(order.total)}
               </p>
             </div>
           </div>
@@ -86,7 +92,11 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
             <div>
               <span className="text-muted-foreground">Date:</span>
               <p className="font-medium">
-                {new Date(order.created_at).toLocaleDateString("en-NG")}
+                {new Date(order.created_at).toLocaleDateString("en-NG", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
               </p>
             </div>
             <div>
@@ -160,20 +170,19 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
             <p className="font-medium text-foreground">Price Summary</p>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₦{order.total.toLocaleString()}</span>
+              <span>{formatPrice(order.subtotal)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
-              <span>₦{order.delivery_fee.toLocaleString()}</span>
+              <span>{formatPrice(order.delivery_fee)}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-semibold">
               <span>Total</span>
               <span>
-                ₦
-                {(
-                  parseInt(order.total) + parseInt(order.delivery_fee)
-                ).toLocaleString()}
+                {formatPrice(
+                  parseInt(order.subtotal) + parseInt(order.delivery_fee),
+                )}
               </span>
             </div>
           </div>
@@ -185,6 +194,11 @@ const OrderDetailsDialog = ({ order, open, onClose }) => {
 
 const InvoiceDialog = ({ order, open, onClose }) => {
   if (!order) return null;
+
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const handlePrint = () => window.print();
 
@@ -198,7 +212,7 @@ const InvoiceDialog = ({ order, open, onClose }) => {
         <div className="space-y-4 text-sm" id="invoice-content">
           <div className="text-center border-b border-border pb-3">
             <h2 className="font-heading text-xl font-bold text-primary">
-              Fitly.ng
+              {domain}
             </h2>
             <p className="text-xs text-muted-foreground">Fashion Marketplace</p>
           </div>
@@ -211,7 +225,11 @@ const InvoiceDialog = ({ order, open, onClose }) => {
             <div>
               <span className="text-muted-foreground">Date:</span>
               <p className="font-medium">
-                {new Date(order.created_at).toLocaleDateString("en-NG")}
+                {new Date(order.created_at).toLocaleDateString("en-NG", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
               </p>
             </div>
           </div>
@@ -223,31 +241,32 @@ const InvoiceDialog = ({ order, open, onClose }) => {
           <div className="space-y-1">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₦{order.total.toLocaleString()}</span>
+              <span>{formatPrice(order.total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
-              <span>₦{order.delivery_fee.toLocaleString()}</span>
+              <span>{formatPrice(order.delivery_fee)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Tax (0%)</span>
-              <span>₦0</span>
+              <span>{formatPrice(0)}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold text-base">
               <span>Total</span>
               <span>
-                ₦
-                {(
-                  parseInt(order.total) + parseInt(order.delivery_fee)
-                ).toLocaleString()}
+                {formatPrice(
+                  parseInt(order.total) + parseInt(order.delivery_fee),
+                )}
               </span>
             </div>
           </div>
 
           <div className="text-center text-xs text-muted-foreground pt-2 border-t border-border">
-            <p>Thank you for shopping with Fitly.ng</p>
-            <p>support@fitly.ng · www.fitly.ng</p>
+            <p>Thank you for shopping with {domain}</p>
+            <p>
+              {siteDetails?.support_email}· www.{brand}.{extension}
+            </p>
           </div>
         </div>
 
@@ -273,6 +292,8 @@ const InvoiceDialog = ({ order, open, onClose }) => {
 
 const OrdersPage = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { addToCart } = useCart();
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
@@ -443,13 +464,20 @@ const OrdersPage = () => {
               </div>
             )}
 
-            <p>Total: ₦{Number(selectedOrder.total).toLocaleString()}</p>
+            <p>
+              Total: {currencySymbol}
+              {Number(selectedOrder.total).toLocaleString()}
+            </p>
 
             <p>Payment Method: {selectedOrder.payment_method}</p>
 
             <p>
               Date Ordered:{" "}
-              {new Date(selectedOrder.created_at).toLocaleDateString("en-NG")}
+              {new Date(selectedOrder.created_at).toLocaleDateString("en-NG", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
             </p>
           </CardContent>
         </Card>
@@ -479,7 +507,8 @@ const OrdersPage = () => {
                     <p className="text-sm">Quantity: {item.quantity}</p>
 
                     <p className="font-semibold mt-2">
-                      ₦{Number(item.price).toLocaleString()}
+                      {currencySymbol}
+                      {Number(item.price).toLocaleString()}
                     </p>
                     <Button
                       size="sm"
@@ -541,7 +570,7 @@ const OrdersPage = () => {
               <CardContent className="p-4">
                 <div
                   key={order.id}
-                  className="cursor-pointer hover:shadow-md transition-all mb-4"
+                  className="cursor-pointer hover:shadow-md transition-all mb-4 rounded-lg border border-border p-4"
                   onClick={() => setSelectedOrder(order)}
                 >
                   <div className="flex justify-between items-start">
@@ -549,7 +578,14 @@ const OrdersPage = () => {
                       <h3 className="font-semibold">Order #{order.order_id}</h3>
 
                       <p className="text-sm text-muted-foreground">
-                        {new Date(order.created_at).toLocaleDateString("en-NG")}
+                        {new Date(order.created_at).toLocaleDateString(
+                          "en-NG",
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
                       </p>
                     </div>
 
@@ -562,7 +598,8 @@ const OrdersPage = () => {
                     <div>
                       <p className="text-muted-foreground">Total</p>
                       <p className="font-semibold">
-                        ₦{Number(order.total).toLocaleString()}
+                        {currencySymbol}
+                        {Number(order.total).toLocaleString()}
                       </p>
                     </div>
 

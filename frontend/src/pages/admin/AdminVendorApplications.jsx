@@ -260,7 +260,11 @@ const AdminVendorApplications = () => {
                     <span>{app.phone}</span>
                     <span>{app.city}</span>
                     <span>
-                      {new Date(app.created_at).toLocaleDateString("en-NG")}
+                      {new Date(app.created_at).toLocaleDateString("en-NG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </span>
                   </div>
                 </div>
@@ -371,7 +375,11 @@ const AdminVendorApplications = () => {
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground col-span-2">
                   <Calendar className="h-4 w-4" /> Applied on{" "}
-                  {new Date(viewApp.created_at).toLocaleDateString("en-NG")}
+                  {new Date(viewApp.created_at).toLocaleDateString("en-NG", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <bold>Government ID</bold>

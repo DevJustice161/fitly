@@ -108,6 +108,7 @@ exports.getReviews = async (req, res) => {
         rv.updated_at,
         rv.product_id AS productId,
         rv.user_id AS userId,
+        rv.visibility,
 
         u.name AS userName,
         u.avatar AS userAvatar,
@@ -164,6 +165,23 @@ exports.getReviews = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch reviews" });
+  }
+};
+
+exports.getHelpfulVotes = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [items] = await db.query(
+      `SELECT review_id FROM review_helpful_votes WHERE user_id = ?`,
+      [id],
+    );
+
+    if (!items.length) return res.json([]);
+
+    res.json(items);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch helpful votes" });
   }
 };
 
@@ -314,6 +332,96 @@ exports.updateHelpfulCount = async (req, res) => {
         referenceId: revId,
       });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Review updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating review:", error);
+    res.status(500).json({ message: "Error updating review" });
+  }
+};
+
+exports.toggleHelpful = async (req, res) => {
+  try {
+    const reviewId = req.params.id;
+    const userId = req.user.id;
+
+    const [existing] = await db.query(
+      `SELECT id FROM review_helpful_votes WHERE review_id = ? AND user_id = ? `,
+      [reviewId, userId],
+    );
+
+    if (existing.length) {
+      await db.query(
+        `DELETE FROM review_helpful_votes WHERE review_id = ? AND user_id = ? `,
+        [reviewId, userId],
+      );
+
+      await db.query(`UPDATE reviews SET helpful = helpful - 1 WHERE id = ? `, [
+        reviewId,
+      ]);
+
+      return res.json({
+        voted: false,
+      });
+    }
+
+    await db.query(
+      `INSERT INTO review_helpful_votes (review_id,user_id) VALUES (?,?) `,
+      [reviewId, userId],
+    );
+
+    await db.query(`UPDATE reviews SET helpful = helpful + 1 WHERE id = ?`, [
+      reviewId,
+    ]);
+
+    res.json({
+      voted: true,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Couldn't update helpful vote",
+    });
+  }
+};
+
+exports.updateVisibility = async (req, res) => {
+  const { revId } = req.params;
+  try {
+    const { visibility } = req.body;
+
+    const [reviewRows] = await db.query("SELECT * FROM reviews WHERE id = ?", [
+      revId,
+    ]);
+
+    const [productRows] = await db.query(
+      "SELECT name FROM products WHERE id = ?",
+      [reviewRows[0].product_id],
+    );
+
+    const [userRows] = await db.query("SELECT name FROM users WHERE id = ?", [
+      reviewRows[0].user_id,
+    ]);
+    if (reviewRows.length === 0) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    const theReviewVisibility = reviewRows[0].visibility;
+
+    const visibilityStatus = visibility === "visible" ? 1 : 0;
+
+    await db.query(
+      `
+        UPDATE reviews
+        SET
+          visibility = ?
+        WHERE id = ?
+        `,
+      [visibilityStatus, revId],
+    );
 
     res.status(200).json({
       success: true,

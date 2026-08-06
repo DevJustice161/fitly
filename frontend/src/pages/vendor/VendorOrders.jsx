@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const statusColors = {
   Delivered: "bg-green-100 text-green-700",
@@ -32,6 +33,7 @@ const statusColors = {
 
 const VendorOrders = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
   const { toast } = useToast();
   const [orders, setOrders] = useState([]);
   const [couriers, setCouriers] = useState([]);
@@ -51,6 +53,7 @@ const VendorOrders = () => {
   const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState("");
   const invoiceRef = useRef(null);
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
 
   const filtered = orders.filter((order) => {
     const keyword = search.toLowerCase();
@@ -277,9 +280,6 @@ const VendorOrders = () => {
                       <p className="text-sm text-muted-foreground">
                         {order.order_id} • {order.customer_name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(order.date).toLocaleDateString}
-                      </p>
                     </div>
                     <span
                       className={`text-xs px-3 py-1 rounded-full font-medium ${statusColors[statusNameChange(order.status)]}`}
@@ -291,7 +291,8 @@ const VendorOrders = () => {
                     <div>
                       <span className="text-muted-foreground">Price:</span>{" "}
                       <span className="font-semibold">
-                        ₦{order.price.toLocaleString()}
+                        {currencySymbol}
+                        {Number(order.price).toLocaleString()}
                       </span>
                     </div>
                     <div>
@@ -330,13 +331,15 @@ const VendorOrders = () => {
                     <div>
                       <span className="text-muted-foreground">Commission:</span>{" "}
                       <span className="text-destructive">
-                        -₦{order.commission.toLocaleString()}
+                        -{currencySymbol}
+                        {Number(order.commission).toLocaleString()}
                       </span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">You Earn:</span>{" "}
                       <span className="text-green-600 font-semibold">
-                        ₦{order.earning.toLocaleString()}
+                        {currencySymbol}
+                        {Number(order.earning).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -471,31 +474,34 @@ const VendorOrders = () => {
                   <tr className="border-b border-border">
                     <td className="py-2">{selected.product_name}</td>
                     <td className="right text-right py-2">
-                      ₦{selected.total.toLocaleString()}
+                      {currencySymbol}
+                      {Number(selected.total).toLocaleString()}
                     </td>
-                    <td className="py-2">{selected.quantity}</td>
-                    <td className="py-2">{selected.size}</td>
-                    <td className="py-2">{selected.color}</td>
+                    <td className="text-right py-2">{selected.quantity}</td>
+                    <td className="text-right py-2">{selected.size}</td>
+                    <td className="text-right py-2">{selected.color}</td>
                   </tr>
                   <tr className="border-b border-border">
                     <td className="py-2 text-muted-foreground">
                       Platform Commission
                     </td>
                     <td className="right text-right py-2 text-destructive">
-                      -₦{selected.commission.toLocaleString()}
+                      -{currencySymbol}
+                      {Number(selected.commission).toLocaleString()}
                     </td>
                   </tr>
                   <tr>
                     <td className="py-3 total font-bold">Vendor Earnings</td>
                     <td className="right text-right py-3 total font-bold">
-                      ₦{selected.earning.toLocaleString()}
+                      {currencySymbol}
+                      {Number(selected.earning).toLocaleString()}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
               <p className="text-xs text-muted-foreground text-center pt-4 border-t border-border">
-                Thank you for selling on Fitly.ng
+                Thank you for selling on {domain}.
               </p>
             </div>
           )}

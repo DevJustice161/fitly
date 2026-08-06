@@ -17,11 +17,14 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import EmptyState from "@/components/admin/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const FILTERS = ["All", "Active", "Inactive", "Out of Stock"];
 
 const AdminProducts = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState("");
@@ -186,7 +189,8 @@ const AdminProducts = () => {
                     {p.vendor} • {p.category}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    ₦{p.price.toLocaleString()} • {p.stock} in stock
+                    {currencySymbol}
+                    {Number(p.price).toLocaleString()} • {p.stock} in stock
                   </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">

@@ -12,9 +12,12 @@ import {
   Line,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VendorRevenue = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const [vendorDashboard, setVendorDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -96,10 +99,10 @@ const VendorRevenue = () => {
             </div>
             <div>
               <p className="text-xl font-heading font-bold text-foreground">
-                ₦
-                {parseFloat(vendorDashboard?.commissionDetails.totalEarnings)
-                  .toFixed(2)
-                  .toLocaleString()}
+                {currencySymbol}
+                {Number(
+                  vendorDashboard?.commissionDetails.totalEarnings,
+                ).toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">Total Earnings</p>
             </div>
@@ -112,12 +115,10 @@ const VendorRevenue = () => {
             </div>
             <div>
               <p className="text-xl font-heading font-bold text-foreground">
-                ₦
-                {parseFloat(
+                {currencySymbol}
+                {Number(
                   vendorDashboard?.commissionDetails.commissionDeducted,
-                )
-                  .toFixed(2)
-                  .toLocaleString()}
+                ).toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">
                 Commission Deducted (
@@ -133,10 +134,10 @@ const VendorRevenue = () => {
             </div>
             <div>
               <p className="text-xl font-heading font-bold text-foreground">
-                ₦
-                {parseFloat(vendorDashboard?.commissionDetails.netBalance)
-                  .toFixed(2)
-                  .toLocaleString()}
+                {currencySymbol}
+                {Number(
+                  vendorDashboard?.commissionDetails.netBalance,
+                ).toLocaleString()}
               </p>
               <p className="text-xs text-muted-foreground">Available Balance</p>
             </div>
@@ -154,10 +155,13 @@ const VendorRevenue = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `₦${v / 1000}k`}
+                tickFormatter={(v) => `${currencySymbol}${v / 1000}k`}
               />
               <Tooltip
-                formatter={(v) => [`₦${v.toLocaleString()}`, "Revenue"]}
+                formatter={(v) => [
+                  `${currencySymbol}${v.toLocaleString()}`,
+                  "Revenue",
+                ]}
               />
               <Line
                 type="monotone"
@@ -189,17 +193,22 @@ const VendorRevenue = () => {
                     {order.product}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(order.created_at).toLocaleDateString("en-NG")} •{" "}
-                    {order.customer}
+                    {new Date(order.created_at).toLocaleDateString("en-NG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}{" "}
+                    • {order.customer}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-sm text-green-600">
-                    +₦{order.price.toLocaleString()}
+                    +{currencySymbol}
+                    {Number(order.price).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground text-red-700">
-                    -₦
-                    {parseFloat(
+                    -{currencySymbol}
+                    {Number(
                       order.price *
                         vendorDashboard.commissionDetails.commissionRate,
                     ).toLocaleString()}{" "}

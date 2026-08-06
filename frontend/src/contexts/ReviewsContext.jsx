@@ -2,9 +2,6 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
-const STORAGE_KEY = "fitly_reviews_v1";
-const HELPFUL_KEY = "fitly_reviews_helpful_v1";
-
 export const CURRENT_USER = () => {
   const { user } = useAuth();
   return { id: user.id, name: user.name, avatar: user.avatar };
@@ -18,12 +15,7 @@ export const ReviewsProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
 
-  const [helpfulVotes, setHelpfulVotes] = useState(() => {
-    try {
-      const raw = localStorage.getItem(HELPFUL_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch {}
-  });
+  const [helpfulVotes, setHelpfulVotes] = useState({});
 
   const getProducts = async () => {
     try {
@@ -70,17 +62,35 @@ export const ReviewsProvider = ({ children }) => {
     }
   };
 
+  const getHelpfulVotes = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/reviews/helpful/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const votes = await response.json();
+      const map = {};
+
+      votes.forEach((v) => {
+        map[v.review_id] = true;
+      });
+
+      setHelpfulVotes(map);
+    } catch (error) {
+      console.log("can't fetch helpful votes", error);
+    }
+  };
+
   useEffect(() => {
     getProducts();
     getOrders();
     getReviews();
-  }, [user?.id]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(HELPFUL_KEY, JSON.stringify(helpfulVotes));
-    } catch {}
-  }, [helpfulVotes]);
+    getHelpfulVotes(user?.id);
+  }, [user?.id, helpfulVotes]);
 
   const addReview = async (revData) => {
     try {
@@ -151,7 +161,6 @@ export const ReviewsProvider = ({ children }) => {
   };
 
   const deleteReview = async (id) => {
-    //setReviews((prev) => prev.filter((r) => r.id !== id));
     try {
       const response = await fetch(
         `http://localhost:5000/api/reviews/delete/${id}`,
@@ -169,6 +178,7 @@ export const ReviewsProvider = ({ children }) => {
       }
 
       await getReviews();
+      return true;
     } catch (error) {
       console.error("Delete error:", error);
 
@@ -177,26 +187,41 @@ export const ReviewsProvider = ({ children }) => {
         description: error.message || "Could not delete review",
         variant: "destructive",
       });
+      return false;
     }
   };
 
   const toggleHelpful = async (id) => {
-    const already = !!helpfulVotes[id];
-    const arithmetic = already ? "subtract" : "add";
-    setHelpfulVotes((prev) => ({ ...prev, [id]: !already }));
     const response = await fetch(
-      `http://localhost:5000/api/reviews/update-helpful/${id}`,
+      `http://localhost:5000/api/reviews/helpful/${id}`,
       {
-        method: "PUT",
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ arithmetic }),
       },
     );
+  };
 
-    await getReviews();
+  const toggleVisibility = async (id, visibility) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/reviews/update-visibility/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ visibility }),
+        },
+      );
+
+      await getReviews();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const replyToReview = async (id, text, userId) => {
@@ -232,7 +257,9 @@ export const ReviewsProvider = ({ children }) => {
   };
 
   const getProductReviews = (productId) =>
-    reviews.filter((r) => String(r.productId) === String(productId));
+    reviews.filter(
+      (r) => r.visibility == 1 && String(r.productId) === String(productId),
+    );
 
   const getProductStats = (productId) => {
     const list = getProductReviews(productId);
@@ -316,14 +343,18 @@ export const ReviewsProvider = ({ children }) => {
     return !item.reviewed;
   };
 
-  const hasUserVotedHelpful = (id) => !!helpfulVotes[id];
+  const hasUserVotedHelpful = (reviewId) => {
+    return !!helpfulVotes[reviewId];
+  };
 
   const value = {
     reviews,
+    products,
     addReview,
     updateReview,
     deleteReview,
     toggleHelpful,
+    toggleVisibility,
     replyToReview,
     deleteReply,
     getProductReviews,

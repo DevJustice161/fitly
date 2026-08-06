@@ -29,6 +29,7 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 import { io } from "socket.io-client";
 
 export const socket = io("http://localhost:5000");
@@ -57,6 +58,10 @@ const NotificationsPage = () => {
     clearAll,
   } = useNotifications();
   const [filter, setFilter] = useState("all");
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const filtered = useMemo(() => {
     if (filter === "unread") return notifications.filter((n) => !n.is_read);

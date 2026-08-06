@@ -43,11 +43,11 @@ export const CartProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, token]);
 
   useEffect(() => {
     fetchCart();
-  }, [fetchCart]);
+  }, [fetchCart, token]);
 
   const addToCart = useCallback(
     async (product, size = null, color = null, quantity = 1) => {
@@ -87,7 +87,7 @@ export const CartProvider = ({ children }) => {
         toast.error(error.message || "Failed to add to cart");
       }
     },
-    [user?.id, fetchCart],
+    [user?.id, fetchCart, token],
   );
 
   const removeFromCart = useCallback(
@@ -111,7 +111,7 @@ export const CartProvider = ({ children }) => {
         toast.error(error.message || "Failed to remove item");
       }
     },
-    [fetchCart],
+    [fetchCart, token],
   );
 
   const updateQuantity = useCallback(
@@ -143,34 +143,37 @@ export const CartProvider = ({ children }) => {
         toast.error(error.message || "Failed to update quantity");
       }
     },
-    [removeFromCart, fetchCart],
+    [removeFromCart, fetchCart, token],
   );
 
-  const updateVariant = useCallback(async (cartItemId, size, color) => {
-    try {
-      const response = await fetch(`${API_URL}/variant/${cartItemId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ size, color }),
-      });
+  const updateVariant = useCallback(
+    async (cartItemId, size, color) => {
+      try {
+        const response = await fetch(`${API_URL}/variant/${cartItemId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ size, color }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message);
+        if (!response.ok) throw new Error(data.message);
 
-      setItems((prev) =>
-        prev.map((item) =>
-          item.cart_id === cartItemId ? { ...item, size, color } : item,
-        ),
-      );
-    } catch (err) {
-      console.error(err);
-      toast.error(err.message || "Failed to update variant");
-    }
-  }, []);
+        setItems((prev) =>
+          prev.map((item) =>
+            item.cart_id === cartItemId ? { ...item, size, color } : item,
+          ),
+        );
+      } catch (err) {
+        console.error(err);
+        toast.error(err.message || "Failed to update variant");
+      }
+    },
+    [token],
+  );
 
   const clearCart = useCallback(async () => {
     if (!user?.id) return;
@@ -192,7 +195,7 @@ export const CartProvider = ({ children }) => {
       console.error("Clear cart error:", error);
       toast.error(error.message || "Failed to clear cart");
     }
-  }, [user?.id]);
+  }, [user?.id, token]);
 
   const totalItems = items.reduce(
     (sum, item) => sum + Number(item.quantity),

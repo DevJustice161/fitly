@@ -1,10 +1,13 @@
-import { Outlet } from 'react-router-dom';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import AdminDashboardSidebar from './AdminDashboardSidebar';
-import { Link } from 'react-router-dom';
-import { Shield } from 'lucide-react';
+import { Outlet } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AdminDashboardSidebar from "./AdminDashboardSidebar";
+import { Link } from "react-router-dom";
+import { Shield } from "lucide-react";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const AdminDashboardLayout = () => {
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -13,7 +16,12 @@ const AdminDashboardLayout = () => {
           <header className="h-14 flex items-center justify-between border-b border-border px-4 bg-card sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
-              <Link to="/" className="font-heading text-xl font-bold text-primary">Fitly.ng</Link>
+              <Link
+                to="/"
+                className="font-heading text-xl font-bold text-primary"
+              >
+                {domain}
+              </Link>
               <span className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
                 <Shield className="h-3 w-3" /> Admin
               </span>

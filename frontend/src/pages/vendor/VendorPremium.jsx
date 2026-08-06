@@ -50,12 +50,15 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const STORAGE_KEY = "fitly_vendor_premium";
 
 const VendorPremium = () => {
   const { toast } = useToast();
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const API_URL = "http://localhost:5000/api";
 
   const defaultState = {
@@ -164,7 +167,7 @@ const VendorPremium = () => {
     },
   };
 
-  const fmt = (n) => `₦${n.toLocaleString()}`;
+  const fmt = (n) => `${currencySymbol}${n.toLocaleString()}`;
   const addDays = (d, days) => new Date(d.getTime() + days * 86400000);
 
   const isPremium = state.planId === "premium";
@@ -753,12 +756,16 @@ const VendorPremium = () => {
                   <div>
                     <p className="font-medium text-foreground">{h.plan}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(h.date).toLocaleDateString("en-NG")} · {h.id} ·{" "}
-                      <span className="capitalize">{h.method}</span>
+                      {new Date(h.date).toLocaleDateString("en-NG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}{" "}
+                      · {h.id} · <span className="capitalize">{h.method}</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="font-medium">{fmt(String(h.amount))}</span>
+                    <span className="font-medium">{fmt(Number(h.amount))}</span>
                     <Badge
                       variant="secondary"
                       className="bg-green-100 text-green-700 hover:bg-green-100"

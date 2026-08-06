@@ -3,9 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VendorCustomers = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const [search, setSearch] = useState("");
   const [customers, setCustomers] = useState(null);
 
@@ -82,7 +85,8 @@ const VendorCustomers = () => {
                 </td>
                 <td className="py-3 px-4 text-center">{customer.orders}</td>
                 <td className="py-3 px-4 text-right font-semibold">
-                  ₦{customer.totalSpent.toLocaleString()}
+                  {currencySymbol}
+                  {Number(customer.totalSpent).toLocaleString()}
                 </td>
                 <td className="py-3 px-4 text-right text-muted-foreground">
                   {new Date(customer.lastOrder).toLocaleDateString("en-NG", {

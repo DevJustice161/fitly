@@ -13,9 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VendorWithdrawals = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [withdrawals, setWithdrawals] = useState([]);
   const [vendorProfile, setVendorProfile] = useState({});
@@ -135,7 +138,7 @@ const VendorWithdrawals = () => {
       if (data.success) {
         toast({
           title: "Withdrawal Requested",
-          description: `₦${Number(amount).toLocaleString()} withdrawal request submitted.`,
+          description: `${currencySymbol}${Number(amount).toLocaleString()} withdrawal request submitted.`,
         });
         setAmount("");
         fetchVendorProfile();
@@ -163,19 +166,22 @@ const VendorWithdrawals = () => {
             Available Balance
           </p>
           <p className="text-3xl font-heading font-bold text-foreground">
-            ₦{withdrawals.availableBalance?.toLocaleString()}
+            {currencySymbol}
+            {Number(withdrawals.availableBalance)?.toLocaleString()}
           </p>
           <div className="flex gap-4 mt-3 text-sm">
             <span className="text-muted-foreground">
               Earnings:{" "}
               <span className="text-foreground font-medium">
-                ₦{withdrawals.totalEarnings?.toLocaleString()}
+                {currencySymbol}
+                {Number(withdrawals.totalEarnings)?.toLocaleString()}
               </span>
             </span>
             <span className="text-muted-foreground">
               Withdrawn:{" "}
               <span className="text-foreground font-medium">
-                ₦{withdrawals.totalWithdrawn?.toLocaleString()}
+                {currencySymbol}
+                {Number(withdrawals.totalWithdrawn)?.toLocaleString()}
               </span>
             </span>
           </div>
@@ -191,7 +197,7 @@ const VendorWithdrawals = () => {
         <CardContent>
           <form onSubmit={handleWithdraw} className="space-y-4">
             <div className="space-y-2">
-              <Label>Withdrawal Amount (₦)</Label>
+              <Label>Withdrawal Amount ({currencySymbol})</Label>
               <Input
                 type="number"
                 placeholder="Enter amount"
@@ -231,7 +237,8 @@ const VendorWithdrawals = () => {
                   {getStatusIcon(w.status)}
                   <div>
                     <p className="font-heading font-semibold text-foreground">
-                      ₦{w.amount.toLocaleString()}
+                      {currencySymbol}
+                      {Number(w.amount).toLocaleString()}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(w.created_at).toLocaleDateString("en-NG", {

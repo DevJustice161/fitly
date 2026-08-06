@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const Header = () => {
   const [categories, setCategories] = useState([]);
@@ -31,6 +32,7 @@ const Header = () => {
   const { totalItems } = useCart();
   const { totalWishlists } = useWishlist();
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
   const API_URL = "http://localhost:5000/api";
 
   const fetchCategories = async () => {
@@ -85,7 +87,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
       <div className="bg-primary text-primary-foreground text-center py-1.5 text-xs font-body tracking-wider">
-        FREE DELIVERY ON ORDERS OVER ₦50,000 | Use code: FITLY10
+        {siteDetails?.news_tip || ""}
       </div>
 
       <div className="section-padding">
@@ -103,8 +105,8 @@ const Header = () => {
             to="/"
             className="font-heading text-2xl lg:text-3xl font-bold tracking-tight"
           >
-            <span className="text-gradient-gold">Fitly</span>
-            <span className="text-foreground">.ng</span>
+            <span className="text-gradient-gold">{brand}</span>
+            <span className="text-foreground">.{extension} </span>
           </Link>
 
           {/* Desktop nav */}

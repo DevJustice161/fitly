@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext";
 import { useMessages } from "@/contexts/MessagesContext";
 
 const API_URL = "http://localhost:5000/api/orders";
@@ -287,7 +288,6 @@ const DeliveryMap = ({ progress }) => (
         You
       </span>
     </div>
-    {/* Courier pin (animated) */}
     <div
       className="absolute transition-all duration-700"
       style={{
@@ -307,13 +307,17 @@ const DeliveryMap = ({ progress }) => (
 
 const OrderTrackingPage = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
   const { createNewConversation, sendMessage } = useMessages();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { id } = useParams();
 
-  const [order, setOrder] = useState(null); // null = not yet loaded
+  const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -357,13 +361,12 @@ const OrderTrackingPage = () => {
   const timeline = useMemo(() => (order ? buildTimeline(order) : []), [order]);
   const visibleTimeline = timeline.filter((e) => e.step <= currentStep);
 
-  const subtotal =
-    order?.items?.reduce(
-      (sum, i) => sum + parseFloat(i.discount_price ?? i.price ?? 0),
-      0,
-    ) ?? 0;
   const deliveryFee = parseFloat(order?.delivery_fee ?? 0);
-  const total = parseFloat(subtotal + deliveryFee);
+  const subtotal =
+    (order?.items?.reduce((sum, i) => sum + parseFloat(i.price ?? 0), 0) ?? 0) -
+    deliveryFee;
+
+  const total = parseFloat(subtotal) + deliveryFee;
 
   const courier = order?.courier?.[0] ?? null;
 
@@ -561,21 +564,20 @@ const OrderTrackingPage = () => {
                     </div>
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center gap-2">
-                        {item.discount_price &&
-                        parseFloat(item.discount_price) <
+                        {item.product_discount_price &&
+                        parseFloat(item.product_discount_price) <
                           parseFloat(item.price) ? (
                           <>
                             <p className="font-semibold text-base text-foreground">
-                              ₦
-                              {parseFloat(item.discount_price).toLocaleString()}
+                              {formatPrice(item.product_discount_price)}
                             </p>
                             <p className="text-xs text-muted-foreground line-through">
-                              ₦{parseFloat(item.price).toLocaleString()}
+                              {formatPrice(item.price)}
                             </p>
                           </>
                         ) : (
                           <p className="font-semibold text-base text-foreground">
-                            ₦{parseFloat(item.price).toLocaleString()}
+                            {formatPrice(item.price)}
                           </p>
                         )}
                       </div>
@@ -746,13 +748,10 @@ const OrderTrackingPage = () => {
                   </span>
                 ),
               },
-              { label: "Subtotal", value: `₦${subtotal.toLocaleString()}` },
+              { label: "Subtotal", value: formatPrice(subtotal) },
               {
                 label: "Delivery fee",
-                value:
-                  deliveryFee === 0
-                    ? "Free"
-                    : `₦${deliveryFee.toLocaleString()}`,
+                value: deliveryFee === 0 ? "Free" : formatPrice(deliveryFee),
               },
             ].map(({ label, value }) => (
               <div
@@ -765,9 +764,7 @@ const OrderTrackingPage = () => {
             ))}
             <div className="flex justify-between pt-2 text-sm">
               <span className="font-semibold">Total</span>
-              <span className="font-bold text-base">
-                ₦{total.toLocaleString()}
-              </span>
+              <span className="font-bold text-base">{formatPrice(total)}</span>
             </div>
           </CardContent>
         </Card>
@@ -852,8 +849,13 @@ const OrderTrackingPage = () => {
       <Separator />
       <p className="text-xs text-muted-foreground text-center">
         Questions? Email{" "}
-        <span className="text-primary font-medium">support@fitly.ng</span> or
-        call <span className="text-primary font-medium">0800-FITLY-NG</span>
+        <span className="text-primary font-medium">
+          {siteDetails?.support_email}
+        </span>{" "}
+        or call{" "}
+        <span className="text-primary font-medium">
+          {siteDetails?.support_phone}
+        </span>
       </p>
     </div>
   );

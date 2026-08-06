@@ -3,8 +3,10 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "./DashboardSidebar";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const DashboardLayout = () => {
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -13,8 +15,13 @@ const DashboardLayout = () => {
           <header className="h-14 flex items-center justify-between border-b border-border px-4 bg-card sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
-              <Link to="/" className="font-heading text-xl font-bold text-primary">
-                Fitly.ng
+              <Link
+                to="/"
+                className="font-heading text-xl font-bold text-primary"
+              >
+                {brand}
+                <span className="text-muted-foreground">.</span>
+                {extension}
               </Link>
             </div>
             <Link

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   CreditCard,
@@ -28,13 +28,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useNotifications } from "../contexts/NotificationContext";
-
-const formatPrice = (price) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(Number(price));
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const paymentMethods = [
   {
@@ -63,12 +57,23 @@ const CheckoutPage = () => {
   const { user, token } = useAuth();
   const { triggerNotification } = useNotifications();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const [userDetails, setUserDetails] = useState([]);
   const [courier, setCourier] = useState({});
   const [showTransferModal, setShowTransferModal] = useState(false);
 
   const { items, totalPrice, clearCart } = useCart();
+  const routeVoucherState = location.state || {};
+  const {
+    appliedVouchers = {},
+    voucherDiscountTotal = 0,
+    discountedCartTotal = totalPrice,
+  } = routeVoucherState;
 
   const [step, setStep] = useState(1);
 
@@ -80,7 +85,62 @@ const CheckoutPage = () => {
 
   const deliveryFee = totalPrice >= 50000 ? 0 : 3500;
 
-  const total = totalPrice + deliveryFee;
+  const getItemSubtotal = (item) =>
+    Number(item.quantity) * Number(item.discount_price || item.price);
+
+  const getVendorItems = (vendorId) =>
+    items.filter((item) => String(item.vendor_id) === String(vendorId));
+
+  const getVendorSubtotal = (vendorId) =>
+    getVendorItems(vendorId).reduce(
+      (sum, item) => sum + getItemSubtotal(item),
+      0,
+    );
+
+  const getDiscountForVendor = (vendorId) => {
+    const voucher = appliedVouchers[vendorId];
+    if (!voucher) return 0;
+
+    const vendorItems = getVendorItems(vendorId);
+    const vendorSubtotal = getVendorSubtotal(vendorId);
+    if (!vendorSubtotal) return 0;
+
+    if (voucher.discount_type === "percentage") {
+      return vendorItems.reduce(
+        (sum, item) =>
+          sum + getItemSubtotal(item) * (Number(voucher.discount_value) / 100),
+        0,
+      );
+    }
+
+    const fixedDiscount = Number(voucher.discount || 0);
+    return vendorItems.reduce((sum, item) => {
+      const lineSubtotal = getItemSubtotal(item);
+      return sum + (lineSubtotal / vendorSubtotal) * fixedDiscount;
+    }, 0);
+  };
+
+  const getDisplayUnitPrice = (item) => {
+    const price = Number(item.discount_price || item.price);
+    const voucher = appliedVouchers[item.vendor_id];
+
+    if (!voucher) return price;
+
+    if (voucher.discount_type === "percentage") {
+      return Math.max(price * (1 - Number(voucher.discount_value) / 100), 0);
+    }
+
+    const vendorDiscount = getDiscountForVendor(item.vendor_id);
+    const lineSubtotal = getItemSubtotal(item);
+    const vendorSubtotal = getVendorSubtotal(item.vendor_id);
+    const share = vendorSubtotal ? lineSubtotal / vendorSubtotal : 0;
+    const lineDiscount = share * vendorDiscount;
+
+    return Math.max(price - lineDiscount / Number(item.quantity || 1), 0);
+  };
+
+  const effectiveSubtotal = Number(discountedCartTotal || totalPrice || 0);
+  const total = effectiveSubtotal + deliveryFee;
 
   const API_URL = "http://localhost:5000/api/users";
 
@@ -221,15 +281,19 @@ const CheckoutPage = () => {
         quantity: item.quantity,
         size: item.size,
         color: item.color,
-        price: item.price,
+        price: getDisplayUnitPrice(item),
+        voucher_id: appliedVouchers[item.vendor_id]?.id || null,
+        applied_vendor_coupon: appliedVouchers[item.vendor_id]?.code || null,
+        coupon_discount: appliedVouchers[item.vendor_id]?.discount || 0,
       }));
 
       const order = {
         user_id: user.id,
         status: "pending_payment",
-        subtotal: total,
+        subtotal: effectiveSubtotal,
         delivery_fee: deliveryFee,
         total: total,
+        voucher_discount: voucherDiscountTotal,
         payment_method: selectedPayment,
         payment_reference: "",
         order_items: orderItems,
@@ -322,7 +386,8 @@ const CheckoutPage = () => {
         quantity: item.quantity,
         size: item.size,
         color: item.color,
-        price: item.price,
+        price: getDisplayUnitPrice(item),
+        voucher_id: appliedVouchers[item.vendor_id]?.id || null,
       }));
 
       const order = {

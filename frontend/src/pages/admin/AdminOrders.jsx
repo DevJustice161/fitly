@@ -13,6 +13,7 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import EmptyState from "@/components/admin/EmptyState";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const FILTERS = [
   "All",
@@ -25,6 +26,8 @@ const FILTERS = [
 
 const AdminOrders = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const API_URL = "http://localhost:5000/api";
   const [orders, setOrders] = useState([]);
@@ -183,7 +186,8 @@ const AdminOrders = () => {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-heading font-bold text-foreground mr-2">
-                    ₦{Number(o.total).toLocaleString()}
+                    {currencySymbol}
+                    {Number(o.total).toLocaleString()}
                   </p>
                   <Button
                     size="sm"
@@ -273,7 +277,10 @@ const AdminOrders = () => {
               </div>
               <div className="flex justify-between border-t border-border pt-2 font-heading font-bold">
                 <span>Total</span>
-                <span>₦{Number(selected.total).toLocaleString()}</span>
+                <span>
+                  {currencySymbol}
+                  {Number(selected.total).toLocaleString()}
+                </span>
               </div>
             </div>
           )}

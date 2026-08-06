@@ -260,33 +260,70 @@ exports.toggleActive = async (req, res) => {
 
 exports.validateVoucher = async (req, res) => {
   try {
-    const { code, subtotal } = req.body;
+    const { code, subtotal, vendor_id } = req.body;
+    const userId = req.user?.id;
+    const [settingsRows] = await db.query(
+      "SELECT currency_symbol FROM settings LIMIT 1",
+    );
+    const currencySymbol = settingsRows[0]?.currency_symbol || "₦";
 
     const [voucher] = await db.query(
       `
       SELECT *
       FROM vouchers
       WHERE code = ?
-      AND is_active = 1
-      AND expires_at > NOW()
+        AND is_active = 1
+        AND expires_at > NOW()
+        AND vendor_id = ?
+        AND (user_id IS NULL OR user_id = ?)
       `,
-      [code],
+      [code, vendor_id, userId || 0],
     );
 
     if (!voucher.length) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired voucher",
+        message: "Invalid or expired voucher for this vendor",
       });
     }
 
     const v = voucher[0];
 
-    if (subtotal < v.min_order_amount) {
+    if (Number(subtotal) < Number(v.min_order_amount || 0)) {
       return res.status(400).json({
         success: false,
-        message: `Minimum order amount is ₦${v.min_order_amount}`,
+        message: `Minimum order amount is ${currencySymbol}${v.min_order_amount}`,
       });
+    }
+
+    if (
+      Number(v.usage_limit) > 0 &&
+      Number(v.used_count) >= Number(v.usage_limit)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Voucher usage limit has been reached",
+      });
+    }
+
+    if (userId) {
+      const [existingUsage] = await db.query(
+        `
+        SELECT id
+        FROM voucher_usage
+        WHERE voucher_id = ?
+          AND user_id = ?
+        LIMIT 1
+        `,
+        [v.id, userId],
+      );
+
+      if (existingUsage.length) {
+        return res.status(400).json({
+          success: false,
+          message: "You have already used this voucher",
+        });
+      }
     }
 
     let discount = 0;
@@ -294,13 +331,15 @@ exports.validateVoucher = async (req, res) => {
     if (v.discount_type === "percentage") {
       discount = subtotal * (v.discount_value / 100);
     } else {
-      discount = v.discount_value;
+      discount = Number(v.discount_value || 0);
     }
+
+    const cappedDiscount = Math.min(discount, Number(subtotal || 0));
 
     res.json({
       success: true,
       voucher: v,
-      discount,
+      discount: cappedDiscount,
     });
   } catch (error) {
     console.error(error);

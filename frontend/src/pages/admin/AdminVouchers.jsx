@@ -43,6 +43,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatisticCard from "@/components/admin/StatisticCard";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const emptyForm = {
   code: "",
@@ -58,6 +59,8 @@ const emptyForm = {
 const AdminVouchers = () => {
   const [vouchers, setVouchers] = useState([]);
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const API_URL = "http://localhost:5000/api";
   const [tab, setTab] = useState("all");
   const [search, setSearch] = useState("");
@@ -212,10 +215,11 @@ const AdminVouchers = () => {
   };
 
   const label = (v) => {
-    if (v.discount_type === "percentage") return `${v.discount_value}% off`;
+    if (v.discount_type === "percentage")
+      return `${Number(v.discount_value)}% off`;
 
     if (v.discount_type === "fixed")
-      return `₦${Number(v.discount_value).toLocaleString()} off`;
+      return `${currencySymbol}${Number(v.discount_value).toLocaleString()} off`;
 
     return "Free Shipping";
   };
@@ -362,7 +366,8 @@ const AdminVouchers = () => {
                   <p>
                     Min order:{" "}
                     <span className="text-foreground font-medium">
-                      ₦{Number(v.min_order_amount).toLocaleString()}
+                      {currencySymbol}
+                      {Number(v.min_order_amount).toLocaleString()}
                     </span>
                   </p>
                   <p>
@@ -463,7 +468,9 @@ const AdminVouchers = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>
-                  {form.type === "percentage" ? "Discount (%)" : "Discount (₦)"}
+                  {form.type === "percentage"
+                    ? "Discount (%)"
+                    : `Discount (${currencySymbol})`}
                 </Label>
                 <Input
                   type="number"
@@ -475,7 +482,7 @@ const AdminVouchers = () => {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Min. Order (₦)</Label>
+                <Label>Min. Order ({currencySymbol})</Label>
                 <Input
                   type="number"
                   value={form.minOrder}
@@ -510,7 +517,7 @@ const AdminVouchers = () => {
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                placeholder="10% off all orders above ₦10,000"
+                placeholder={`10% off all orders above ${currencySymbol}10,000`}
               />
             </div>
             <div className="flex items-center justify-between pt-1">

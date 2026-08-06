@@ -4,9 +4,12 @@ import { SlidersHorizontal, ChevronDown } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const CategoryPage = () => {
   const { slug } = useParams();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const [categories, setCategories] = useState([]);
   const [sortBy, setSortBy] = useState("popular");
   const [showFilters, setShowFilters] = useState(false);
@@ -115,10 +118,10 @@ const CategoryPage = () => {
                 Price Range
               </h4>
               {[
-                "Under ₦20,000",
-                "₦20,000 - ₦50,000",
-                "₦50,000 - ₦100,000",
-                "Over ₦100,000",
+                `Under ${currencySymbol}20,000`,
+                `${currencySymbol}20,000 - ${currencySymbol}50,000`,
+                `${currencySymbol}50,000 - ${currencySymbol}100,000`,
+                `Over ${currencySymbol}100,000`,
               ].map((p) => (
                 <label
                   key={p}

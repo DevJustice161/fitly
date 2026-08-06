@@ -26,6 +26,7 @@ import EmptyState from "@/components/admin/EmptyState";
 import { adminCouriers } from "@/data/adminManagementData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const emptyForm = {
   name: "",
@@ -40,6 +41,8 @@ const emptyForm = {
 
 const AdminCouriers = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [couriers, setCouriers] = useState(adminCouriers);
   const [query, setQuery] = useState("");
@@ -375,7 +378,8 @@ const AdminCouriers = () => {
 
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                   <span className="font-heading font-semibold text-foreground">
-                    ₦{Number(c.baseFee).toLocaleString()} base fee
+                    {currencySymbol}
+                    {Number(c.baseFee).toLocaleString()} base fee
                   </span>
 
                   <span className="flex items-center gap-1">

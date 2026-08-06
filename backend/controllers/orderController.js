@@ -222,12 +222,13 @@ exports.trackOrder = async (req, res) => {
     const [items] = await db.query(
       `
       SELECT
-        oi.*,
+        oi.id, oi.order_id, oi.product_id, oi.quantity, oi.size, oi.color, oi.price,
+        oi.user_id, oi.status, oi.default_courier,
 
         p.id AS product_id,
         p.name AS product_name,
-        p.price,
-        p.discount_price,
+        p.price AS product_price,
+        p.discount_price AS product_discount_price,
         p.thumbnail,
 
         v.user_id AS vendor_id,

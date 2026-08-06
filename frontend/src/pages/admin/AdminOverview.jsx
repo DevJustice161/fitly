@@ -42,6 +42,7 @@ import {
   adminWithdrawalRequests,
 } from "@/data/vendorData";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const API_URL = "http://localhost:5000/api/admin";
 
@@ -59,13 +60,6 @@ const capitalizeSentence = (str) => {
     .join(" ");
 };
 
-const naira = (v) => `₦${Number(v || 0).toLocaleString()}`;
-const compactNaira = (v) => {
-  const n = Number(v || 0);
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `₦${(n / 1_000).toFixed(0)}K`;
-  return `₦${n}`;
-};
 const num = (v) => Number(v || 0).toLocaleString();
 const initials = (s) =>
   String(s || "?")
@@ -127,6 +121,16 @@ const AdminOverview = () => {
   const { token, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const naira = (v) => `${currencySymbol}${Number(v || 0).toLocaleString()}`;
+  const compactNaira = (v) => {
+    const n = Number(v || 0);
+    if (n >= 1_000_000)
+      return `${currencySymbol}${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${currencySymbol}${(n / 1_000).toFixed(0)}K`;
+    return `${currencySymbol}${n}`;
+  };
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

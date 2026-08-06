@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Search,
   Trash2,
@@ -12,7 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -40,12 +40,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useReviews } from "@/contexts/ReviewsContext";
-import { products } from "@/data/products";
 import StarRating from "@/components/reviews/StarRating";
 import { toast } from "sonner";
-
-const HIDDEN_KEY = "fitly_admin_hidden_reviews";
-const REPORTS_KEY = "fitly_admin_review_reports";
 
 const seedReports = (reviews) => {
   const low = reviews.filter((r) => r.rating <= 3).slice(0, 3);
@@ -66,40 +62,13 @@ const seedReports = (reviews) => {
 };
 
 const AdminReviews = () => {
-  const { reviews, deleteReview } = useReviews();
+  const { reviews, products, toggleVisibility, deleteReview } = useReviews();
   const [search, setSearch] = useState("");
   const [rating, setRating] = useState("all");
   const [tab, setTab] = useState("all");
-  const [hidden, setHidden] = useState([]);
-  const [reports, setReports] = useState({});
+  const [dismissedReports, setDismissedReports] = useState({});
   const [viewing, setViewing] = useState(null);
   const [deleting, setDeleting] = useState(null);
-
-  useEffect(() => {
-    try {
-      const h = JSON.parse(localStorage.getItem(HIDDEN_KEY) || "[]");
-      setHidden(Array.isArray(h) ? h : []);
-      const stored = localStorage.getItem(REPORTS_KEY);
-      if (stored) setReports(JSON.parse(stored));
-      else if (reviews.length) {
-        const seeded = seedReports(reviews);
-        setReports(seeded);
-        localStorage.setItem(REPORTS_KEY, JSON.stringify(seeded));
-      }
-    } catch {
-      /* ignore */
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reviews.length]);
-
-  const persistHidden = (next) => {
-    setHidden(next);
-    localStorage.setItem(HIDDEN_KEY, JSON.stringify(next));
-  };
-  const persistReports = (next) => {
-    setReports(next);
-    localStorage.setItem(REPORTS_KEY, JSON.stringify(next));
-  };
 
   const productMap = useMemo(() => {
     const m = {};
@@ -107,17 +76,25 @@ const AdminReviews = () => {
       m[String(p.id)] = p;
     });
     return m;
-  }, []);
+  }, [products]);
 
-  const isHidden = (id) => hidden.includes(id);
+  const reports = useMemo(() => {
+    const seeded = seedReports(reviews);
+    Object.keys(dismissedReports).forEach((id) => {
+      delete seeded[id];
+    });
+    return seeded;
+  }, [reviews, dismissedReports]);
+
+  const isHidden = (review) => Number(review?.visibility ?? 1) === 0;
 
   const filtered = useMemo(() => {
     return reviews
       .filter((r) => rating === "all" || r.rating === Number(rating))
       .filter((r) => {
         if (tab === "reported") return !!reports[r.id];
-        if (tab === "hidden") return isHidden(r.id);
-        if (tab === "visible") return !isHidden(r.id);
+        if (tab === "hidden") return isHidden(r);
+        if (tab === "visible") return !isHidden(r);
         return true;
       })
       .filter((r) => {
@@ -131,40 +108,44 @@ const AdminReviews = () => {
           r.review.toLowerCase().includes(q)
         );
       })
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reviews, search, rating, tab, productMap, hidden, reports]);
+      .sort(
+        (a, b) =>
+          new Date(b.created_at || b.createdAt) -
+          new Date(a.created_at || a.createdAt),
+      );
+  }, [reviews, search, rating, tab, productMap, reports]);
 
-  const toggleHide = (r) => {
-    if (isHidden(r.id)) {
-      persistHidden(hidden.filter((id) => id !== r.id));
-      toast.success("Review is now visible on the storefront");
-    } else {
-      persistHidden([...hidden, r.id]);
-      toast.success("Review hidden from the storefront");
-    }
+  const toggleHide = async (r) => {
+    const nextVisibility = isHidden(r) ? "visible" : "hidden";
+    await toggleVisibility(r.id, nextVisibility);
+    toast.success(
+      nextVisibility === "visible"
+        ? "Review is now visible on the storefront"
+        : "Review hidden from the storefront",
+    );
   };
 
   const dismissReport = (id) => {
-    const next = { ...reports };
-    delete next[id];
-    persistReports(next);
+    setDismissedReports((current) => ({ ...current, [id]: true }));
     toast.success("Report dismissed");
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleting) return;
-    deleteReview(deleting.id);
+
+    const deleted = await deleteReview(deleting.id);
+    if (!deleted) return;
+
     dismissReport(deleting.id);
-    persistHidden(hidden.filter((id) => id !== deleting.id));
     setDeleting(null);
-    toast.success("Review deleted");
+    toast.success(`Review by ${deleting.userName} deleted`);
   };
 
   const avg = reviews.length
     ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
     : 0;
-  const reportedCount = reviews.filter((r) => reports[r.id]).length;
+  const reportedCount = Object.keys(reports).length;
+  const hiddenCount = reviews.filter((r) => isHidden(r)).length;
 
   return (
     <div className="space-y-6">
@@ -204,7 +185,7 @@ const AdminReviews = () => {
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">Hidden</p>
             <p className="font-heading text-2xl font-bold mt-1">
-              {hidden.length}
+              {hiddenCount}
             </p>
           </CardContent>
         </Card>
@@ -214,7 +195,7 @@ const AdminReviews = () => {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="all">All ({reviews.length})</TabsTrigger>
           <TabsTrigger value="reported">Reported ({reportedCount})</TabsTrigger>
-          <TabsTrigger value="hidden">Hidden ({hidden.length})</TabsTrigger>
+          <TabsTrigger value="hidden">Hidden ({hiddenCount})</TabsTrigger>
           <TabsTrigger value="visible">Visible</TabsTrigger>
         </TabsList>
       </Tabs>
@@ -261,15 +242,16 @@ const AdminReviews = () => {
           {filtered.map((r) => {
             const product = productMap[String(r.productId)];
             const report = reports[r.id];
+            console.log("Review:", r);
             return (
               <Card
                 key={r.id}
-                className={`rounded-xl ${isHidden(r.id) ? "opacity-70 border-dashed" : ""}`}
+                className={`rounded-xl ${isHidden(r) ? "opacity-70 border-dashed" : ""}`}
               >
                 <CardContent className="p-4 flex flex-col sm:flex-row gap-3">
                   {product && (
                     <img
-                      src={product.image}
+                      src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
                       alt={product.name}
                       className="w-14 h-14 rounded-md object-cover"
                     />
@@ -283,10 +265,10 @@ const AdminReviews = () => {
                       )}
                       {product && (
                         <span className="text-xs text-muted-foreground">
-                          · {product.vendor}
+                          · {product.vendor_name}
                         </span>
                       )}
-                      {isHidden(r.id) && (
+                      {isHidden(r) && (
                         <Badge variant="secondary" className="text-[10px]">
                           Hidden
                         </Badge>
@@ -301,11 +283,19 @@ const AdminReviews = () => {
                         </Badge>
                       )}
                       <span className="text-xs text-muted-foreground ml-auto">
-                        {r.createdAt}
+                        {new Date(r.created_at).toLocaleDateString("en-NG", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <Avatar className="h-6 w-6">
+                        <AvatarImage
+                          src={`http://localhost:5000/uploads/avatars/${r.userAvatar}`}
+                        />
+
                         <AvatarFallback className="text-[10px]">
                           {r.userName.charAt(0)}
                         </AvatarFallback>
@@ -339,7 +329,7 @@ const AdminReviews = () => {
                       variant="ghost"
                       onClick={() => toggleHide(r)}
                     >
-                      {isHidden(r.id) ? (
+                      {isHidden(r) ? (
                         <>
                           <Eye size={14} className="mr-1" /> Unhide
                         </>
@@ -387,7 +377,12 @@ const AdminReviews = () => {
               <div className="flex items-center gap-2">
                 <StarRating value={viewing.rating} size={14} />
                 <span className="text-muted-foreground">
-                  by {viewing.userName} · {viewing.createdAt}
+                  by {viewing.userName} ·{" "}
+                  {new Date(viewing.created_at).toLocaleDateString("en-NG", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </span>
               </div>
               <p className="font-semibold">{viewing.title}</p>
@@ -397,11 +392,11 @@ const AdminReviews = () => {
                 Verified: {viewing.verified ? "Yes" : "No"} · Helpful:{" "}
                 {viewing.helpful}
               </p>
-              {viewing.reply && (
+              {viewing.replies?.[0]?.reply && (
                 <div className="rounded-lg bg-secondary/50 p-3">
                   <p className="text-xs font-medium">Vendor reply</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {viewing.reply.text}
+                    {viewing.replies[0].reply}
                   </p>
                 </div>
               )}
@@ -426,10 +421,13 @@ const AdminReviews = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this review?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Delete review by {deleting?.userName || "this customer"}?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently removes the review from the marketplace. This
-              cannot be undone.
+              This permanently removes the review for{" "}
+              {productMap[String(deleting?.productId)]?.name || "this product"}.
+              This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -438,7 +436,7 @@ const AdminReviews = () => {
               onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground"
             >
-              Delete
+              Delete review
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

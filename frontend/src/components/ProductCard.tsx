@@ -2,17 +2,15 @@ import { Heart, ShoppingBag, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
-
-const formatPrice = (price) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(price);
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { siteDetails } = useSiteDetails();
+  const symbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${symbol}${Number(price || 0).toLocaleString()}`;
   const wished = isWishlisted(product.id);
 
   return (

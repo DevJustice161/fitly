@@ -57,9 +57,29 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
 
     const validPassword = await bcrypt.compare(password, user[0].password);
+    if (user[0].status !== "active") {
+      return res.status(403).json({ message: "User account is not active" });
+    }
+
+    if (user[0].role === "vendor") {
+      const [vendor] = await db.query(
+        "SELECT * FROM vendors WHERE user_id = ?",
+        [user[0].id],
+      );
+
+      if (vendor.length === 0) {
+        return res.status(403).json({ message: "Vendor profile not found" });
+      }
+
+      if (vendor[0].v_status !== "Active") {
+        return res
+          .status(403)
+          .json({ message: "Vendor account is not active" });
+      }
+    }
 
     if (!validPassword)
-      return res.status(400).json({ message: "Invalid password" });
+      return res.status(400).json({ message: "Incorrect password" });
 
     const token = jwt.sign(
       {
@@ -78,6 +98,7 @@ exports.loginUser = async (req, res) => {
       user: user[0],
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json(error);
   }
 };

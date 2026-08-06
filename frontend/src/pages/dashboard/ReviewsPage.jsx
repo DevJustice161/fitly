@@ -136,16 +136,30 @@ const ReviewsPage = () => {
                             <StarRating
                               value={r.rating}
                               size={14}
-                              className="mt-1"
+                              className="mt-1 ml-2"
                             />
+                            {r.visibility == 0 && (
+                              <span className="text-sm text-destructive font-semibold ml-2">
+                                Hidden by admin
+                              </span>
+                            )}
                           </div>
+
                           <span className="text-xs text-muted-foreground">
-                            {r.created_at}
+                            {new Date(r.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              },
+                            )}
                           </span>
                         </div>
                         {r.title && (
                           <p className="text-sm font-semibold">{r.title}</p>
                         )}
+
                         <p className="text-sm text-muted-foreground">
                           {r.review}
                         </p>

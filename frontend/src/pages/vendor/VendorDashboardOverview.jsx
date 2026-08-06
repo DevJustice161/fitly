@@ -22,9 +22,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VendorDashboardOverview = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatCurrency = (value) =>
+    `${currencySymbol}${Number(value || 0).toLocaleString()}`;
   const [vendorDashboard, setVendorDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -68,13 +73,13 @@ const VendorDashboardOverview = () => {
     },
     {
       label: "Total Sales",
-      value: `₦${(vendorDashboard?.stats.totalSales / 1000000).toFixed(1)}M`,
+      value: `${currencySymbol}${Number((vendorDashboard?.stats.totalSales / 1000).toFixed(1))}K`,
       icon: DollarSign,
       color: "text-green-600",
     },
     {
       label: "Pending Withdrawal",
-      value: `₦${vendorDashboard?.stats.totalPendingWithdrawals.toLocaleString()}`,
+      value: formatCurrency(vendorDashboard?.stats.totalPendingWithdrawals),
       icon: Wallet,
       color: "text-orange-500",
     },
@@ -83,12 +88,27 @@ const VendorDashboardOverview = () => {
   const statusNameChange = (status) => {
     const map = {
       pending_payment: "Pending",
+      pending: "Pending",
       processing: "Processing",
       paid: "Processing",
       shipped: "Shipped",
       delivered: "Delivered",
       cancelled: "Cancelled",
       failed: "Failed",
+    };
+    return map[status] || status;
+  };
+
+  const statusColorChange = (status) => {
+    const map = {
+      pending_payment: "bg-yellow-100 text-yellow-800",
+      pending: "bg-yellow-100 text-yellow-800",
+      processing: "bg-blue-100 text-blue-800",
+      paid: "bg-blue-100 text-blue-800",
+      shipped: "bg-purple-100 text-purple-800",
+      delivered: "bg-green-100 text-green-800",
+      cancelled: "bg-red-100 text-red-800",
+      failed: "bg-red-100 text-red-800",
     };
     return map[status] || status;
   };
@@ -183,9 +203,14 @@ const VendorDashboardOverview = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `₦${v / 1000}k`}
+                tickFormatter={(v) => `${currencySymbol}${v / 1000}k`}
               />
-              <Tooltip formatter={(v) => [`₦${v.toLocaleString()}`, "Sales"]} />
+              <Tooltip
+                formatter={(v) => [
+                  `${currencySymbol}${v.toLocaleString()}`,
+                  "Sales",
+                ]}
+              />
               <Bar
                 dataKey="sales"
                 fill="hsl(43, 72%, 52%)"
@@ -289,9 +314,7 @@ const VendorDashboardOverview = () => {
                       </div>
 
                       <Badge
-                        variant={
-                          order.status === "delivered" ? "default" : "secondary"
-                        }
+                        className={`text-xs ${statusColorChange(order.status)}`}
                       >
                         {statusNameChange(order.status)}
                       </Badge>
@@ -301,7 +324,7 @@ const VendorDashboardOverview = () => {
                       <span>Qty: {order.quantity}</span>
 
                       <span className="font-semibold">
-                        ₦{Number(order.price).toLocaleString()}
+                        {formatCurrency(order.price)}
                       </span>
                     </div>
                   </div>
@@ -351,7 +374,7 @@ const VendorDashboardOverview = () => {
 
                   <div className="text-right">
                     <p className="font-semibold">
-                      ₦{Number(product.revenue).toLocaleString()}
+                      {formatCurrency(product.revenue)}
                     </p>
 
                     <p className="text-xs text-muted-foreground">Revenue</p>

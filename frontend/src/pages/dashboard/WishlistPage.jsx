@@ -4,15 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
-
-const formatPrice = (p) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(p);
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const WishlistPage = () => {
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (p) =>
+    `${currencySymbol}${Number(p || 0).toLocaleString()}`;
   const { items, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
 

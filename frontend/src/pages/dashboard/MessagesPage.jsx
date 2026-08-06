@@ -180,7 +180,11 @@ const MessagesPage = () => {
                         <span className="text-xs text-muted-foreground">
                           {new Date(
                             conversation.last_message_at,
-                          ).toLocaleDateString("en-NG")}
+                          ).toLocaleDateString("en-NG", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </span>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

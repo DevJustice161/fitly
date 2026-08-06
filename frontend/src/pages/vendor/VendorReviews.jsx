@@ -216,9 +216,14 @@ const VendorReviews = () => {
                     )}
                     <div className="flex-1 min-w-0">
                       {product && (
-                        <p className="text-xs font-semibold text-primary">
+                        <span className="text-xs font-semibold text-primary">
                           {product.name}
-                        </p>
+                        </span>
+                      )}
+                      {r.visibility == 0 && (
+                        <span className="text-sm text-destructive font-semibold ml-2">
+                          Hidden by admin
+                        </span>
                       )}
                       <div className="flex flex-wrap items-center gap-2 mt-0.5">
                         <Avatar className="h-6 w-6">

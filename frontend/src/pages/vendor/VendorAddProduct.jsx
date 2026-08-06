@@ -14,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -78,6 +78,10 @@ const VendorAddProduct = () => {
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const fetchCategories = async () => {
     try {
@@ -325,7 +329,7 @@ const VendorAddProduct = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Price (₦)</Label>
+                <Label>Price ({currencySymbol})</Label>
 
                 <Input
                   type="number"

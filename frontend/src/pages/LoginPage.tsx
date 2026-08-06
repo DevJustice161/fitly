@@ -28,7 +28,7 @@ const LoginPage = () => {
           navigate("/dashboard");
         }
       } else {
-        toast.info("Wrong email or password");
+        toast.info(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error(error);

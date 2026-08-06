@@ -3,6 +3,14 @@ const createNotification = require("../utils/createNotification");
 const { calculateCommission } = require("../services/commissionService");
 const { conversionRateCalculation } = require("../services/conversionRate");
 
+const getCurrencySymbol = async () => {
+  const [settingsRows] = await db.query(
+    "SELECT currency_symbol FROM settings LIMIT 1",
+  );
+
+  return settingsRows[0]?.currency_symbol || "₦";
+};
+
 exports.getWithdrawals = async (req, res) => {
   try {
     const { vendorId } = req.params;
@@ -66,6 +74,7 @@ exports.initiateWithdrawal = async (req, res) => {
   try {
     const { vendorId, amount, method, bank, accountNumber, accountName } =
       req.body;
+    const currencySymbol = await getCurrencySymbol();
 
     const [vendor] = await db.query(
       `SELECT is_premium
@@ -127,7 +136,7 @@ exports.initiateWithdrawal = async (req, res) => {
       userId: vendorId,
       type: "withdrawal",
       title: "Withdrawal Initiated",
-      message: `Your withdrawal of ₦${amount} has been initiated and is pending approval.`,
+      message: `Your withdrawal of ${currencySymbol}${amount} has been initiated and is pending approval.`,
       referenceId: withdrawalResult.insertId,
     });
 
@@ -150,6 +159,7 @@ exports.approveWithdrawal = async (req, res) => {
   try {
     await connection.beginTransaction();
 
+    const currencySymbol = await getCurrencySymbol();
     const { id } = req.params;
 
     const [withdrawals] = await connection.query(
@@ -274,7 +284,7 @@ exports.approveWithdrawal = async (req, res) => {
       userId: withdrawal.vendor_id,
       type: "withdrawal",
       title: "Withdrawal Approved",
-      message: `Your withdrawal of ₦${Number(withdrawal.amount).toLocaleString()} has been approved.`,
+      message: `Your withdrawal of ${currencySymbol}${Number(withdrawal.amount).toLocaleString()} has been approved.`,
       referenceId: id,
     });
 
@@ -300,6 +310,7 @@ exports.approveWithdrawal = async (req, res) => {
 exports.rejectWithdrawal = async (req, res) => {
   try {
     const { id } = req.params;
+    const currencySymbol = await getCurrencySymbol();
 
     const [withdrawals] = await db.query(
       "SELECT * FROM withdrawals WHERE id = ?",
@@ -333,7 +344,7 @@ exports.rejectWithdrawal = async (req, res) => {
       userId: withdrawals[0].vendor_id,
       type: "withdrawal",
       title: "Withdrawal Rejected",
-      message: `Your withdrawal request of ₦${Number(withdrawals[0].amount).toLocaleString()} was rejected.`,
+      message: `Your withdrawal request of ${currencySymbol}${Number(withdrawals[0].amount).toLocaleString()} was rejected.`,
       referenceId: id,
     });
 

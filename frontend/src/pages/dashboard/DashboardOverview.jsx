@@ -15,9 +15,14 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const DashboardOverview = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
@@ -80,7 +85,7 @@ const DashboardOverview = () => {
     if (user?.id) {
       fetchDashboard();
     }
-  }, [user?.id]);
+  }, [user?.id, token]);
 
   const statusNameChange = (status) => {
     const map = {
@@ -174,7 +179,7 @@ const DashboardOverview = () => {
         <div className="space-y-3">
           {orders.map((order) => (
             <Link
-              to={`/dashboard/orders/${order.order_id}`}
+              to={`/dashboard/orders/`}
               key={order.order_id}
               className="block"
             >
@@ -194,12 +199,16 @@ const DashboardOverview = () => {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {order.order_id} •{" "}
-                      {new Date(order.created_at).toLocaleDateString("en-NG")}
+                      {new Date(order.created_at).toLocaleDateString("en-NG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-heading font-semibold text-foreground">
-                      ₦{Number(order.total).toLocaleString()}
+                      {formatPrice(order.total)}
                     </p>
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full ${
@@ -256,7 +265,7 @@ const DashboardOverview = () => {
 
                 <p className="text-xs text-muted-foreground">{item.vendor}</p>
                 <p className="font-heading font-semibold text-sm text-foreground mt-1">
-                  ₦{Number(item.price).toLocaleString()}
+                  {formatPrice(item.price)}
                 </p>
               </CardContent>
             </Card>

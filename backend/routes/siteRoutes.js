@@ -16,7 +16,7 @@ const {
 const { verifyToken } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadSiteLogoMiddleware");
 
-router.get("/", verifyToken, getSettings);
+router.get("/", getSettings);
 
 router.put("/site", verifyToken, updateSiteSettings);
 router.put("/site/logo", verifyToken, upload.single("logo"), updateSiteLogo);

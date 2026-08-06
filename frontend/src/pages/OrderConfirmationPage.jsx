@@ -16,17 +16,15 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-
-const formatPrice = (price) =>
-  new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-  }).format(Number(price || 0));
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const API_URL = "http://localhost:5000/api/orders";
 
 const OrderConfirmationPage = () => {
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   const { token } = useAuth();
   const { state } = useLocation();
 

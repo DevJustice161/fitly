@@ -5,8 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VendorStorePage = () => {
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -94,11 +99,11 @@ const VendorStorePage = () => {
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <p className="font-heading font-semibold text-foreground">
-                        ₦{product.price.toLocaleString()}
+                        {formatPrice(product.price)}
                       </p>
                       {product.discountPrice && (
                         <p className="text-xs text-muted-foreground line-through">
-                          ₦{product.discountPrice.toLocaleString()}
+                          {formatPrice(product.discountPrice)}
                         </p>
                       )}
                     </div>

@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const statusColors = {
   Active: "bg-green-100 text-green-700",
@@ -41,6 +42,8 @@ const statusColors = {
 const AdminVendors = () => {
   const API_URL = "http://localhost:5000/api";
   const { token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [vendors, setVendors] = useState([]);
   const [search, setSearch] = useState("");
@@ -228,7 +231,8 @@ const AdminVendors = () => {
                         {v.totalProducts <= 1 ? "product" : "products"}
                       </span>
                       <span>
-                        ₦{Number(v.totalSales).toLocaleString()} sales
+                        {currencySymbol}
+                        {Number(v.totalSales).toLocaleString()} sales
                       </span>
                       <span className="flex items-center gap-1">
                         <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
@@ -310,7 +314,11 @@ const AdminVendors = () => {
                 <div>
                   <p className="text-muted-foreground text-xs">Joined</p>
                   <p className="font-medium">
-                    {new Date(view.created_at).toLocaleDateString("en-NG")}
+                    {new Date(view.created_at).toLocaleDateString("en-NG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </p>
                 </div>
                 <div>
@@ -324,7 +332,8 @@ const AdminVendors = () => {
                     Average Order Value
                   </p>
                   <p className="font-medium">
-                    ₦{Number(view.averageOrderValue).toLocaleString()}
+                    {currencySymbol}
+                    {Number(view.averageOrderValue).toLocaleString()}
                   </p>
                 </div>
                 <div>
@@ -332,13 +341,15 @@ const AdminVendors = () => {
                     Wallet Balance
                   </p>
                   <p className="font-medium">
-                    ₦{Number(view.balance).toLocaleString()}
+                    {currencySymbol}
+                    {Number(view.balance).toLocaleString()}
                   </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs">Total Earned</p>
                   <p className="font-medium">
-                    ₦{Number(view.total_earned).toLocaleString()}
+                    {currencySymbol}
+                    {Number(view.total_earned).toLocaleString()}
                   </p>
                 </div>
                 <div>
@@ -346,7 +357,8 @@ const AdminVendors = () => {
                     Total Withdrawn
                   </p>
                   <p className="font-medium">
-                    ₦{Number(view.total_withdrawn).toLocaleString()}
+                    {currencySymbol}
+                    {Number(view.total_withdrawn).toLocaleString()}
                   </p>
                 </div>
               </div>
@@ -392,7 +404,8 @@ const AdminVendors = () => {
 
                           <div className="text-right">
                             <p className="font-semibold text-lg">
-                              ₦{Number(t.amount).toLocaleString()}
+                              {currencySymbol}
+                              {Number(t.amount).toLocaleString()}
                             </p>
 
                             <span
@@ -429,7 +442,8 @@ const AdminVendors = () => {
                 </div>
                 <div className="text-center">
                   <p className="font-heading text-lg font-bold">
-                    ₦{Number(view.totalSales).toLocaleString()}
+                    {currencySymbol}
+                    {Number(view.totalSales).toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">Total Sales</p>
                 </div>

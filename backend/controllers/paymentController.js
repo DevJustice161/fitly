@@ -7,6 +7,49 @@ const {
   buildPremiumPaymentCallbackUrl,
 } = require("../utils/premiumUtils");
 
+const getPrimaryVendorId = (orderItems = []) =>
+  orderItems.find((item) => item.vendor_id)?.vendor_id ?? null;
+
+const recordVoucherUsage = async (orderId, userId, orderItems = []) => {
+  const voucherIds = [
+    ...new Set(
+      orderItems
+        .map((item) => item.voucher_id || item.applied_vendor_coupon)
+        .filter(Boolean),
+    ),
+  ];
+
+  for (const voucherIdentifier of voucherIds) {
+    const voucherId = Number(voucherIdentifier);
+
+    if (!voucherId || Number.isNaN(voucherId)) {
+      continue;
+    }
+
+    await db.query(
+      `
+        INSERT INTO voucher_usage (voucher_id, user_id, order_id)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE order_id = VALUES(order_id)
+      `,
+      [voucherId, userId, orderId],
+    );
+
+    await db.query(
+      `
+        UPDATE vouchers
+        SET used_count = used_count + 1,
+            is_active = CASE
+              WHEN usage_limit > 0 AND (used_count + 1) >= usage_limit THEN 0
+              ELSE is_active
+            END
+        WHERE id = ?
+      `,
+      [voucherId],
+    );
+  }
+};
+
 exports.initializeFlutterwave = async (req, res) => {
   try {
     const { tx_ref, email, amount, name, phone } = req.body.payload;
@@ -54,10 +97,20 @@ exports.initializeFlutterwave = async (req, res) => {
       },
     );
 
+    const vendorId = getPrimaryVendorId(order_items);
+
+    if (!vendorId) {
+      return res.status(400).json({
+        success: false,
+        message: "Order items must include a valid vendor reference.",
+      });
+    }
+
     const [orderQuery] = await db.query(
       `
           INSERT INTO orders(
             user_id,
+            vendor_id,
             order_id,
             status,
             subtotal,
@@ -67,10 +120,11 @@ exports.initializeFlutterwave = async (req, res) => {
             payment_method,
             payment_reference
           )
-          VALUES(?, ?, ?, ?, ?, ?, ? , ? ,? )
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         user_id,
+        vendorId,
         tx_ref,
         status,
         subtotal,
@@ -99,8 +153,8 @@ exports.initializeFlutterwave = async (req, res) => {
             `;
 
     await db.query(sql, [insertOrderItemsDetails]);
+    await recordVoucherUsage(orderQuery.insertId, user_id, order_items);
 
-    const vendorId = order_items.find((item) => item.vendor_id)?.vendor_id;
     await createNotification({
       userId: user_id,
       type: "order",
@@ -199,10 +253,20 @@ exports.initializePaystack = async (req, res) => {
       },
     );
 
+    const vendorId = getPrimaryVendorId(order_items);
+
+    if (!vendorId) {
+      return res.status(400).json({
+        success: false,
+        message: "Order items must include a valid vendor reference.",
+      });
+    }
+
     const [orderQuery] = await db.query(
       `
           INSERT INTO orders(
             user_id,
+            vendor_id,
             order_id,
             status,
             subtotal,
@@ -211,10 +275,11 @@ exports.initializePaystack = async (req, res) => {
             payment_method,
             payment_reference
           )
-          VALUES(?, ?, ?, ?, ?, ? , ? ,? )
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         user_id,
+        vendorId,
         tx_ref,
         status,
         subtotal,
@@ -241,7 +306,6 @@ exports.initializePaystack = async (req, res) => {
             `;
 
     await db.query(sql, [insertOrderItemsDetails]);
-    const vendorId = order_items.find((item) => item.vendor_id)?.vendor_id;
     await createNotification({
       userId: user_id,
       type: "order",
@@ -323,10 +387,20 @@ exports.initializeTransfer = async (req, res) => {
       order_items,
     } = req.body.order;
 
+    const vendorId = getPrimaryVendorId(order_items);
+
+    if (!vendorId) {
+      return res.status(400).json({
+        success: false,
+        message: "Order items must include a valid vendor reference.",
+      });
+    }
+
     const [orderQuery] = await db.query(
       `
           INSERT INTO orders(
             user_id,
+            vendor_id,
             order_id,
             status,
             subtotal,
@@ -335,10 +409,11 @@ exports.initializeTransfer = async (req, res) => {
             payment_method,
             payment_reference
           )
-          VALUES(?, ?, ?, ?, ?, ? , ? ,? )
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         user_id,
+        vendorId,
         tx_ref,
         status,
         subtotal,
@@ -365,7 +440,6 @@ exports.initializeTransfer = async (req, res) => {
             `;
 
     await db.query(sql, [insertOrderItemsDetails]);
-    const vendorId = order_items.find((item) => item.vendor_id)?.vendor_id;
     await createNotification({
       userId: user_id,
       type: "order",

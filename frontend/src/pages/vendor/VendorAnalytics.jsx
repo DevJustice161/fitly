@@ -12,6 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const COLORS = [
   "hsl(43, 72%, 52%)",
@@ -22,6 +23,10 @@ const COLORS = [
 
 const VendorAnalytics = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   const [vendorDashboard, setVendorDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -102,7 +107,7 @@ const VendorAnalytics = () => {
           },
           {
             label: "Avg Order Value",
-            value: `₦${Math.round(vendorDashboard?.stats.totalSales / vendorDashboard?.stats.totalOrders).toLocaleString()}`,
+            value: `${formatPrice(Math.round(vendorDashboard?.stats.totalSales / vendorDashboard?.stats.totalOrders))}`,
           },
         ].map((stat) => (
           <Card key={stat.label} className="border border-border shadow-sm">
@@ -129,11 +134,9 @@ const VendorAnalytics = () => {
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis
                   tick={{ fontSize: 12 }}
-                  tickFormatter={(v) => `₦${v / 1000}k`}
+                  tickFormatter={(v) => `${formatPrice(v / 1000)}k`}
                 />
-                <Tooltip
-                  formatter={(v) => [`₦${v.toLocaleString()}`, "Sales"]}
-                />
+                <Tooltip formatter={(v) => [`${formatPrice(v)}`, "Sales"]} />
                 <Bar
                   dataKey="sales"
                   fill="hsl(43, 72%, 52%)"

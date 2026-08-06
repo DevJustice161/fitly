@@ -6,9 +6,12 @@ import { Label } from "@/components/ui/label";
 import { commissionSettings } from "@/data/vendorData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const AdminCommission = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const [settings, setSettings] = useState(commissionSettings);
   const [defaultCommission, setDefaultCommission] = useState(null);
@@ -145,7 +148,9 @@ const AdminCommission = () => {
                 />
               </div>
               <div>
-                <Label>Premium Vendors Subscription Price (₦)</Label>
+                <Label>
+                  Premium Vendors Subscription Price ({currencySymbol})
+                </Label>
                 <Input
                   value={premiumSubPrice}
                   onChange={(e) => setPremiumSubPrice(e.target.value)}
@@ -161,9 +166,10 @@ const AdminCommission = () => {
           Commission Example
         </p>
         <p className="text-xs text-muted-foreground">
-          Product price: ₦10,000 → Platform commission ({defaultCommission}
-          %): ₦{((10000 * Number(defaultCommission)) / 100).toLocaleString()} →
-          Vendor receives: ₦
+          Product price: {currencySymbol}10,000 → Platform commission (
+          {defaultCommission}%): {currencySymbol}
+          {((10000 * Number(defaultCommission)) / 100).toLocaleString()} →
+          Vendor receives: {currencySymbol}
           {(10000 - (10000 * Number(defaultCommission)) / 100).toLocaleString()}
         </p>
       </div>

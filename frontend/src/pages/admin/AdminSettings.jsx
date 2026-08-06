@@ -43,9 +43,12 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const AdminSettings = () => {
   const { user, token } = useAuth();
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const API_URL = "http://localhost:5000/api";
   const [site, setSite] = useState({
@@ -58,6 +61,7 @@ const AdminSettings = () => {
     currency: "NGN",
     currencySymbol: "₦",
     minWithdrawal: 5000,
+    news_tip: "Get the latest fashion tips and news from Fitly.ng.",
   });
   const [tax, setTax] = useState({
     vatEnabled: true,
@@ -112,6 +116,7 @@ const AdminSettings = () => {
       currency: data.currency,
       currencySymbol: data.currency_symbol,
       minWithdrawal: data.minimum_withdrawal,
+      news_tip: data.news_tip || "",
     });
 
     setTax({
@@ -390,7 +395,7 @@ const AdminSettings = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Min. Withdrawal (₦)</Label>
+              <Label>Min. Withdrawal ({currencySymbol})</Label>
               <Input
                 type="number"
                 value={site.minWithdrawal}
@@ -454,6 +459,14 @@ const AdminSettings = () => {
               onChange={(e) =>
                 setSite({ ...site, description: e.target.value })
               }
+              rows={3}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>News & Tips</Label>
+            <Textarea
+              value={site.news_tip}
+              onChange={(e) => setSite({ ...site, news_tip: e.target.value })}
               rows={3}
             />
           </div>
@@ -539,7 +552,7 @@ const AdminSettings = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Base Delivery Fee (₦)</Label>
+              <Label>Base Delivery Fee ({currencySymbol})</Label>
               <Input
                 type="number"
                 value={shipping.baseFee}
@@ -549,7 +562,7 @@ const AdminSettings = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Interstate Fee (₦)</Label>
+              <Label>Interstate Fee ({currencySymbol})</Label>
               <Input
                 type="number"
                 value={shipping.interstateFee}
@@ -562,7 +575,7 @@ const AdminSettings = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Free Shipping Threshold (₦)</Label>
+              <Label>Free Shipping Threshold ({currencySymbol})</Label>
               <Input
                 type="number"
                 disabled={!shipping.freeShippingEnabled}

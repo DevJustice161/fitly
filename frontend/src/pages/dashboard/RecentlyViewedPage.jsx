@@ -5,8 +5,13 @@ import { Link } from "react-router-dom";
 import { useRecentlyViewed } from "@/contexts/RecentlyViewedContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const RecentlyViewedPage = () => {
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
   const { recentlyViewed } = useRecentlyViewed();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { addToCart } = useCart();
@@ -38,7 +43,7 @@ const RecentlyViewedPage = () => {
 
               <p className="text-xs text-muted-foreground">{item.vendor}</p>
               <p className="font-heading font-semibold text-sm text-foreground mt-1">
-                ₦{item.price.toLocaleString()}
+                {formatPrice(item.price)}
               </p>
               <div className="flex gap-1 mt-2">
                 <Button

@@ -119,7 +119,11 @@ const DashboardSidebar = () => {
               <p className="text-xs text-muted-foreground">
                 Member since{" "}
                 {user.created_at
-                  ? new Date(user.created_at).toLocaleDateString("en-NG")
+                  ? new Date(user.created_at).toLocaleDateString("en-NG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })
                   : "N/A"}
               </p>
               {userDetails && userDetails.is_premium && (

@@ -34,6 +34,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const API_URL = "http://localhost:5000/api/products";
 const API_URL_CAT = "http://localhost:5000/api";
@@ -70,6 +71,7 @@ const statuses = ["Active", "Inactive", "Out of Stock"];
 
 const VendorProducts = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
   const { toast } = useToast();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -451,11 +453,13 @@ const VendorProducts = () => {
                 </div>
                 <div className="flex items-center gap-3 mt-2">
                   <p className="font-heading font-semibold text-foreground">
-                    ₦{product.price.toLocaleString()}
+                    {siteDetails?.currencySymbol || "₦"}
+                    {Number(product.price).toLocaleString()}
                   </p>
                   {product.discount_price && (
                     <p className="text-sm text-muted-foreground line-through">
-                      ₦{product.discount_price.toLocaleString()}
+                      {siteDetails?.currencySymbol || "₦"}
+                      {Number(product.discount_price).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -500,8 +504,8 @@ const VendorProducts = () => {
         onOpenChange={closeEditDialog}
         onClose={closeEditDialog}
       >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-          <div className="flex flex-col max-h-[90vh]">
+        <DialogContent className="max-w-4xl">
+          <div className="flex flex-col max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Product</DialogTitle>
               <DialogDescription>
@@ -509,7 +513,7 @@ const VendorProducts = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <div className="flex-1  px-6 pb-6">
               <div className="space-y-2">
                 <Label>Product Name</Label>
                 <Input
@@ -565,11 +569,11 @@ const VendorProducts = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Price (₦)</Label>
+                  <Label>Price ({siteDetails?.currencySymbol || "₦"})</Label>
 
                   <Input
                     type="number"
-                    value={form.price}
+                    value={Number(form.price) || ""}
                     onChange={(e) =>
                       setForm({
                         ...form,
@@ -580,11 +584,13 @@ const VendorProducts = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Discount Price (₦)</Label>
+                  <Label>
+                    Discount Price ({siteDetails?.currencySymbol || "₦"})
+                  </Label>
 
                   <Input
                     type="number"
-                    value={form.discount_price}
+                    value={Number(form.discount_price) || ""}
                     onChange={(e) =>
                       setForm({
                         ...form,

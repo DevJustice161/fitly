@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { Copy, Ticket, Check } from "lucide-react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VouchersPage = () => {
   const { user, token } = useAuth();
-
   const [vouchers, setVouchers] = useState([]);
   const [copied, setCopied] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const formatPrice = (price) =>
+    `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const fetchVouchers = async () => {
     try {
@@ -62,10 +65,10 @@ const VouchersPage = () => {
 
   const getDiscountText = (voucher) => {
     if (voucher.discount_type === "percentage") {
-      return `${voucher.discount_value}% OFF`;
+      return `${Number(voucher.discount_value)}% OFF`;
     }
 
-    return `₦${Number(voucher.discount_value).toLocaleString()} OFF`;
+    return `${formatPrice(voucher.discount_value)} OFF`;
   };
 
   return (
@@ -121,8 +124,7 @@ const VouchersPage = () => {
 
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <p>
-                      Min. order: ₦
-                      {Number(voucher.min_order_amount || 0).toLocaleString()}
+                      Min. order: {formatPrice(voucher.min_order_amount || 0)}
                     </p>
 
                     {voucher.expires_at && (
@@ -130,6 +132,11 @@ const VouchersPage = () => {
                         Expires:{" "}
                         {new Date(voucher.expires_at).toLocaleDateString(
                           "en-NG",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
                         )}
                       </p>
                     )}

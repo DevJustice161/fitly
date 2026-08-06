@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../../contexts/AuthContext";
+import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -31,6 +32,9 @@ import {
 
 const AdminRevenue = () => {
   const { user, token } = useAuth();
+  const { siteDetails } = useSiteDetails();
+  const currencySymbol = siteDetails?.currencySymbol || "₦";
+  const naira = (v) => `${currencySymbol}${Number(v || 0).toLocaleString()}`;
   const [adminStats, setAdminStats] = useState(null);
   const [monthlySalesData, setMonthlySalesData] = useState(null);
   const [reports, setReports] = useState({
@@ -69,25 +73,25 @@ const AdminRevenue = () => {
   const stats = [
     {
       label: "Gross Revenue",
-      value: `₦${adminStats?.totalRevenue / 1000}K`,
+      value: `${currencySymbol}${adminStats?.totalRevenue / 1000}K`,
       icon: DollarSign,
       color: "text-green-600",
     },
     {
       label: "Commission Earned",
-      value: `₦${adminStats?.commissionEarned / 1000}K`,
+      value: `${currencySymbol}${adminStats?.commissionEarned / 1000}K`,
       icon: TrendingUp,
       color: "text-primary",
     },
     {
       label: "Premium Subs",
-      value: `₦${adminStats?.totalPremiumSubscriptions / 1000}K`,
+      value: `${currencySymbol}${adminStats?.totalPremiumSubscriptions / 1000}K`,
       icon: Crown,
       color: "text-yellow-500",
     },
     {
       label: "Net Payout to Vendors",
-      value: `₦${adminStats?.netPayoutToVendors / 1000}K`,
+      value: `${currencySymbol}${adminStats?.netPayoutToVendors / 1000}K`,
       icon: Wallet,
       color: "text-blue-500",
     },
@@ -129,8 +133,6 @@ const AdminRevenue = () => {
     amount: Number(b.amount),
     pct: Number(b.pct),
   }));
-
-  const naira = (v) => `₦${Number(v).toLocaleString()}`;
 
   const ChartCard = ({ title, children }) => (
     <Card className="border border-border shadow-sm">
@@ -193,7 +195,7 @@ const AdminRevenue = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `₦${v / 1000}k`}
+                tickFormatter={(v) => `${currencySymbol}${v / 1000}k`}
               />
               <Tooltip formatter={(v) => naira(v)} />
               <Area
@@ -214,7 +216,7 @@ const AdminRevenue = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12 }} />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `₦${v / 1000}k`}
+                tickFormatter={(v) => `${currencySymbol}${v / 1000}k`}
               />
               <Tooltip formatter={(v) => naira(v)} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
