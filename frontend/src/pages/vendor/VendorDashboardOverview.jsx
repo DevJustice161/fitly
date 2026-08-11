@@ -21,6 +21,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 

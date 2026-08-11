@@ -205,25 +205,28 @@ const CheckoutPage = () => {
 
   if (!items.length) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
+      <>
+        <SEO title="Checkout - Fitly Marketplace" noIndex />
+        <div className="min-h-screen bg-background">
+          <Header />
 
-        <div className="section-padding py-20 text-center">
-          <h1 className="font-heading text-2xl font-bold text-foreground mb-3">
-            No items to checkout
-          </h1>
+          <div className="section-padding py-20 text-center">
+            <h1 className="font-heading text-2xl font-bold text-foreground mb-3">
+              No items to checkout
+            </h1>
 
-          <p className="font-body text-muted-foreground mb-6">
-            Add items to your cart first
-          </p>
+            <p className="font-body text-muted-foreground mb-6">
+              Add items to your cart first
+            </p>
 
-          <Link to="/" className="btn-gold">
-            Continue Shopping
-          </Link>
+            <Link to="/" className="btn-gold">
+              Continue Shopping
+            </Link>
+          </div>
+
+          <Footer />
         </div>
-
-        <Footer />
-      </div>
+      </>
     );
   }
 

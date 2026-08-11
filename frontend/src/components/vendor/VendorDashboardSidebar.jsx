@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import SEO from "@/components/SEO";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { useMessages } from "@/contexts/MessagesContext";
@@ -126,143 +127,152 @@ const VendorDashboardSidebar = () => {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarHeader className="p-4 border-b border-border">
-        {!collapsed && (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12 border-2 border-primary">
-              <AvatarImage
-                src={`http://localhost:5000/uploads/logos/${vendorProfile.store_logo || user?.store_logo || user?.avatar || ""}`}
-              />
-              <AvatarFallback className="bg-secondary text-secondary-foreground font-heading text-lg">
-                {vendorProfile?.store_name
-                  ? vendorProfile.store_name.split(" ")
-                  : [].map((n) => n[0]).join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1">
-                <p className="font-heading font-semibold text-foreground truncate">
-                  {vendorProfile.store_name}
+    <>
+      <SEO
+        title={`${vendorProfile?.store_name} — Fashion Store`}
+        description={`Shop fashion from ${vendorProfile?.store_name} on Fitly.ng. Discover clothing, shoes, accessories and more.`}
+        image={`http://localhost:5000/uploads/logos/${vendorProfile?.store_logo || user?.store_logo || user?.avatar || ""}`}
+        url={`/vendors/${vendorProfile?.id}`}
+        noIndex
+      />
+      <Sidebar collapsible="icon" className="border-r border-border">
+        <SidebarHeader className="p-4 border-b border-border">
+          {!collapsed && (
+            <div className="flex items-center gap-3">
+              <Avatar className="h-12 w-12 border-2 border-primary">
+                <AvatarImage
+                  src={`http://localhost:5000/uploads/logos/${vendorProfile.store_logo || user?.store_logo || user?.avatar || ""}`}
+                />
+                <AvatarFallback className="bg-secondary text-secondary-foreground font-heading text-lg">
+                  {vendorProfile?.store_name
+                    ? vendorProfile.store_name.split(" ")
+                    : [].map((n) => n[0]).join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1">
+                  <p className="font-heading font-semibold text-foreground truncate">
+                    {vendorProfile.store_name}
+                  </p>
+                  {vendorProfile.is_verified === 1 && (
+                    <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Vendor since{" "}
+                  {vendorProfile.created_at &&
+                    new Date(vendorProfile.created_at).toLocaleDateString(
+                      "en-NG",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}
                 </p>
-                {vendorProfile.is_verified === 1 && (
-                  <BadgeCheck className="h-4 w-4 text-primary flex-shrink-0" />
+                {vendorProfile.is_premium === 1 && (
+                  <Badge className="mt-1 bg-primary text-primary-foreground text-[10px] px-2 py-0">
+                    <Crown className="h-3 w-3 mr-1" /> Premium Vendor
+                  </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Vendor since{" "}
-                {vendorProfile.created_at &&
-                  new Date(vendorProfile.created_at).toLocaleDateString(
-                    "en-NG",
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    },
-                  )}
-              </p>
-              {vendorProfile.is_premium === 1 && (
-                <Badge className="mt-1 bg-primary text-primary-foreground text-[10px] px-2 py-0">
-                  <Crown className="h-3 w-3 mr-1" /> Premium Vendor
-                </Badge>
-              )}
             </div>
-          </div>
-        )}
-        {collapsed && (
-          <div className="flex justify-center">
-            <Avatar className="h-8 w-8 border-2 border-primary">
-              <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                {vendorProfile.store_name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        )}
-      </SidebarHeader>
+          )}
+          {collapsed && (
+            <div className="flex justify-center">
+              <Avatar className="h-8 w-8 border-2 border-primary">
+                <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                  {vendorProfile.store_name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          )}
+        </SidebarHeader>
 
-      <SidebarContent className="py-2">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/vendor"}
-                      className="hover:bg-accent/50 transition-colors"
-                      activeClassName="bg-accent text-primary font-medium"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                      {item.title == "Notifications" && unreadCount > 0 && (
-                        <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {unreadCount}
-                        </span>
-                      )}
-                      {item.title == "Messages" && unreadMsgCount > 0 && (
-                        <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                          {unreadMsgCount}
-                        </span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        <SidebarContent className="py-2">
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <NavLink
+                        to={item.url}
+                        end={item.url === "/vendor"}
+                        className="hover:bg-accent/50 transition-colors"
+                        activeClassName="bg-accent text-primary font-medium"
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                        {item.title == "Notifications" && unreadCount > 0 && (
+                          <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            {unreadCount}
+                          </span>
+                        )}
+                        {item.title == "Messages" && unreadMsgCount > 0 && (
+                          <span className="absolute  bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            {unreadMsgCount}
+                          </span>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-      <SidebarFooter className="border-t border-border p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Back to Shopping"
-              onClick={() => navigate("/")}
-              className="text-muted-foreground hover:text-primary"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              {!collapsed && <span>Back to Shop</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Logout"
-              onClick={() => setOpenLogoutDialog(true)}
-              className="text-destructive hover:bg-destructive/10"
-            >
-              <LogOut className="h-4 w-4" />
-              {!collapsed && <span>Logout</span>}
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-      <AlertDialog open={openLogoutDialog} onOpenChange={setOpenLogoutDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to logout?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setOpenLogoutDialog(false)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleLogout}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Logout
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </Sidebar>
+        <SidebarFooter className="border-t border-border p-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Back to Shopping"
+                onClick={() => navigate("/")}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                {!collapsed && <span>Back to Shop</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Logout"
+                onClick={() => setOpenLogoutDialog(true)}
+                className="text-destructive hover:bg-destructive/10"
+              >
+                <LogOut className="h-4 w-4" />
+                {!collapsed && <span>Logout</span>}
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        <AlertDialog open={openLogoutDialog} onOpenChange={setOpenLogoutDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to logout?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setOpenLogoutDialog(false)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleLogout}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Logout
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Sidebar>
+    </>
   );
 };
 
