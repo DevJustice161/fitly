@@ -50,7 +50,8 @@ const AdminSettings = () => {
   const { siteDetails, domain, brand, extension } = useSiteDetails();
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const [site, setSite] = useState({
     name: "Fitly.ng",
     logo: "/placeholder.svg",
@@ -353,7 +354,7 @@ const AdminSettings = () => {
             <div className="h-16 w-16 rounded-xl border border-border bg-secondary/40 flex items-center justify-center overflow-hidden">
               {site.logo ? (
                 <img
-                  src={`http://localhost:5000/uploads/site/${site.logo}`}
+                  src={`${BACKEND_URL}/uploads/site/${site.logo}`}
                   alt="Site logo"
                   className="h-full w-full object-contain"
                 />

@@ -18,7 +18,7 @@ const AdminCommission = () => {
   const [premiumCommission, setPremiumCommission] = useState(null);
   const [defaultMinProducts, setDefaultMinProducts] = useState(null);
   const [premiumSubPrice, setPremiumSubPrice] = useState(null);
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchCommissions = async () => {
     try {

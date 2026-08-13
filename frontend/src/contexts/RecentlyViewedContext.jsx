@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 const RecentlyViewedContext = createContext();
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
+const API_URL = import.meta.env.API_URL || "http://localhost:5000/api";
 
 export const RecentlyViewedProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -16,12 +18,9 @@ export const RecentlyViewedProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `http://localhost:5000/api/recently-viewed/${user.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/recently-viewed/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 
@@ -45,7 +44,7 @@ export const RecentlyViewedProvider = ({ children }) => {
     if (!user?.id || !productId) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/recently-viewed", {
+      const res = await fetch(`${API_URL}/recently-viewed`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,13 +72,10 @@ export const RecentlyViewedProvider = ({ children }) => {
 
   const removeRecentlyViewed = async (id) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/recently-viewed/item/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/recently-viewed/item/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 
@@ -101,13 +97,10 @@ export const RecentlyViewedProvider = ({ children }) => {
     if (!user?.id) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/recently-viewed/clear/${user.id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/recently-viewed/clear/${user.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 

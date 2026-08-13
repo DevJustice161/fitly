@@ -33,12 +33,14 @@ const VendorDashboardOverview = () => {
     `${currencySymbol}${Number(value || 0).toLocaleString()}`;
   const [vendorDashboard, setVendorDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/vendors/dashboard/${user.id}`,
+          `${API_URL}/vendors/dashboard/${user.id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -251,7 +253,7 @@ const VendorDashboardOverview = () => {
               <Card key={product.id} className="border-orange-200">
                 <CardContent className="p-3 flex gap-3">
                   <img
-                    src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                     className="w-14 h-14 rounded-lg object-cover"
                   />
 
@@ -300,7 +302,7 @@ const VendorDashboardOverview = () => {
               >
                 <CardContent className="p-3 flex gap-3">
                   <img
-                    src={`http://localhost:5000/uploads/products/${order.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${order.thumbnail}`}
                     className="w-14 h-14 rounded-lg object-cover"
                   />
 
@@ -359,7 +361,7 @@ const VendorDashboardOverview = () => {
                   </div>
 
                   <img
-                    src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                     className="w-14 h-14 rounded-lg object-cover"
                   />
 

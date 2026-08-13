@@ -31,6 +31,7 @@ const WriteReviewModal = ({
   const [images, setImages] = useState([]);
   const [addedImages, setAddedImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     if (open) {
@@ -126,7 +127,7 @@ const WriteReviewModal = ({
             <DialogDescription className="flex items-center gap-3 pt-2">
               {product.thumbnail && (
                 <img
-                  src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                  src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                   alt={product.name}
                   className="w-12 h-12 rounded-md object-cover"
                 />
@@ -193,7 +194,7 @@ const WriteReviewModal = ({
                     src={
                       file instanceof File
                         ? URL.createObjectURL(file)
-                        : `http://localhost:5000/uploads/reviews/${file}`
+                        : `${BACKEND_URL}/uploads/reviews/${file}`
                     }
                     alt=""
                     className="w-full h-full object-cover"

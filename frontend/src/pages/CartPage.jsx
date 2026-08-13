@@ -40,6 +40,8 @@ const CartPage = () => {
   const [voucherInputs, setVoucherInputs] = useState({});
   const [appliedVouchers, setAppliedVouchers] = useState({});
   const [voucherLoading, setVoucherLoading] = useState({});
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchVariants = async () => {
@@ -49,7 +51,7 @@ const CartPage = () => {
         for (const item of items) {
           if (!map[item.product_id]) {
             const res = await fetch(
-              `http://localhost:5000/api/products/variants/${item.product_id}`,
+              `${API_URL}/products/variants/${item.product_id}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               },
@@ -179,21 +181,18 @@ const CartPage = () => {
     setVoucherLoading((prev) => ({ ...prev, [vendorId]: true }));
 
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/vouchers/validate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            code: normalizedCode,
-            subtotal: vendorSubtotal,
-            vendor_id: vendorId,
-          }),
+      const response = await fetch(`${API_URL}/vouchers/validate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({
+          code: normalizedCode,
+          subtotal: vendorSubtotal,
+          vendor_id: vendorId,
+        }),
+      });
 
       const data = await response.json();
 
@@ -272,7 +271,7 @@ const CartPage = () => {
                         {/* IMAGE */}
                         <div className="w-24 h-32 rounded-lg overflow-hidden">
                           <img
-                            src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                            src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />

@@ -11,12 +11,13 @@ const VendorCustomers = () => {
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const [search, setSearch] = useState("");
   const [customers, setCustomers] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/vendors/customers/${user.id}`,
+          `${API_URL}/vendors/customers/${user.id}`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
         const data = await response.json();

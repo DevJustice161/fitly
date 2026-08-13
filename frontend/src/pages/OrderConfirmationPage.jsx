@@ -18,7 +18,10 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
-const API_URL = "http://localhost:5000/api/orders";
+const VITE_API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
+const API_URL = `${VITE_API_URL}/orders`;
 
 const OrderConfirmationPage = () => {
   const { siteDetails } = useSiteDetails();
@@ -222,7 +225,7 @@ const OrderConfirmationPage = () => {
                 >
                   <div className="w-16 h-20 rounded-lg overflow-hidden bg-muted">
                     <img
-                      src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                      src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                       alt={item.product_name}
                       className="w-full h-full object-cover"
                     />

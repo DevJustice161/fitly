@@ -17,7 +17,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { useSiteDetails } from "../contexts/SiteContext.jsx";
 const Index = () => {
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const [categories, setCategories] = useState([]);
   const { user, token } = useAuth();
@@ -28,12 +29,9 @@ const Index = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/products/productsCard",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await fetch(`${API_URL}/products/productsCard`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         setProducts(data);
       } catch (error) {
@@ -42,12 +40,9 @@ const Index = () => {
     };
     const fetchVendors = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/vendors/vendors",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await fetch(`${API_URL}/vendors/vendors`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         setVendors(data);
       } catch (error) {
@@ -57,7 +52,7 @@ const Index = () => {
 
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/categories`, {
+        const response = await fetch(`${API_URL}/categories`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -91,7 +86,7 @@ const Index = () => {
     fetchProducts();
     fetchVendors();
     fetchCategories();
-  }, []);
+  }, [API_URL, token]);
   const trendingProducts = products.filter((p) => p.is_trending);
   const newProducts = products.filter((p) => p.is_new);
 
@@ -171,7 +166,7 @@ const Index = () => {
                 style={{ animationDelay: `${i * 100}ms` }}
               >
                 <img
-                  src={`http://localhost:5000/uploads/categories/${cat.image}`}
+                  src={`${BACKEND_URL}/uploads/categories/${cat.image}`}
                   alt={cat.name}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
@@ -248,7 +243,7 @@ const Index = () => {
                 <div key={vendor.id} className="card-premium p-6 text-center">
                   <div className="w-20 h-20 rounded-full overflow-hidden mx-auto mb-4 border-2 border-primary">
                     <img
-                      src={`http://localhost:5000/uploads/logos/${vendor.store_logo}`}
+                      src={`${BACKEND_URL}/uploads/logos/${vendor.store_logo}`}
                       alt={vendor.store_name}
                       className="w-full h-full object-cover"
                       loading="lazy"

@@ -60,6 +60,7 @@ const VendorMessages = () => {
 
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!selectedConversation) return;
@@ -113,7 +114,7 @@ const VendorMessages = () => {
 
   const deleteConversation = async () => {
     const res = await fetch(
-      `http://localhost:5000/api/messages/conversations/${selected.id}`,
+      `${API_URL}/messages/conversations/${selected.id}`,
       {
         method: "DELETE",
         headers: {
@@ -167,7 +168,7 @@ const VendorMessages = () => {
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={`http://localhost:5000/uploads/avatars/${conversation.otherUser.avatar}`}
+                      src={`${BACKEND_URL}/uploads/avatars/${conversation.otherUser.avatar}`}
                     />
                     <AvatarFallback>
                       {conversation.otherUser.name[0]}
@@ -245,7 +246,7 @@ const VendorMessages = () => {
 
                 <Avatar>
                   <AvatarImage
-                    src={`http://localhost:5000/uploads/avatars/${selectedConversation.otherUser.avatar}`}
+                    src={`${BACKEND_URL}/uploads/avatars/${selectedConversation.otherUser.avatar}`}
                   />
                   <AvatarFallback>
                     {selectedConversation.otherUser.name[0]}
@@ -312,7 +313,7 @@ const VendorMessages = () => {
                                 <DropdownMenuItem
                                   onClick={() =>
                                     window.open(
-                                      `http://localhost:5000/uploads/messages/${msg.image}`,
+                                      `${BACKEND_URL}/uploads/messages/${msg.image}`,
                                     )
                                   }
                                 >
@@ -326,7 +327,7 @@ const VendorMessages = () => {
 
                         {msg.image && (
                           <img
-                            src={`http://localhost:5000/uploads/messages/${msg.image}`}
+                            src={`${BACKEND_URL}/uploads/messages/${msg.image}`}
                             className="rounded-lg object-cover mb-2 max-h-[250px] max-w-[300px]"
                             style={{ width: "250px", height: "250px" }}
                           />

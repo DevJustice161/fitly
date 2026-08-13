@@ -23,7 +23,8 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const ReviewsPage = () => {
   const { user, token } = useAuth();
-  const API_URL = "http://localhost:5000/api/products/productsCard";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const [products, setProducts] = useState([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -32,7 +33,7 @@ const ReviewsPage = () => {
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const response = await fetch(`${API_URL}`, {
+        const response = await fetch(`${API_URL}/products/productsCard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -116,7 +117,7 @@ const ReviewsPage = () => {
                       {product && (
                         <Link to={`/product/${product.id}`}>
                           <img
-                            src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                            src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                             alt={product.name}
                             className="h-20 w-20 rounded-lg object-cover bg-muted flex-shrink-0"
                           />
@@ -168,7 +169,7 @@ const ReviewsPage = () => {
                             {r.images.map((src, i) => (
                               <img
                                 key={i}
-                                src={`http://localhost:5000/uploads/reviews/${src}`}
+                                src={`${BACKEND_URL}/uploads/reviews/${src}`}
                                 alt=""
                                 className="w-14 h-14 rounded-md object-cover border"
                               />
@@ -242,7 +243,7 @@ const ReviewsPage = () => {
                   <Card key={item.orderItemId} className="border border-border">
                     <CardContent className="p-4 flex items-center gap-4">
                       <img
-                        src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                        src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                         alt={product.name}
                         className="h-16 w-16 rounded-md object-cover flex-shrink-0"
                       />

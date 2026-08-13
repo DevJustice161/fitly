@@ -57,6 +57,7 @@ const ProductReviewsSection = ({ product }) => {
   const [selected, setSelected] = useState(null);
   const [editing, setEditing] = useState(null);
   const [lightbox, setLightbox] = useState({ open: false, images: [], idx: 0 });
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const all = getProductReviews(product.id);
   const stats = getProductStats(product.id);
@@ -193,7 +194,7 @@ const ProductReviewsSection = ({ product }) => {
                   className="w-20 h-20 rounded-lg overflow-hidden border shrink-0 hover:opacity-80 transition-opacity"
                 >
                   <img
-                    src={`http://localhost:5000/uploads/reviews/${src}`}
+                    src={`${BACKEND_URL}/uploads/reviews/${src}`}
                     alt=""
                     className="w-full h-full object-cover"
                   />
@@ -229,7 +230,7 @@ const ProductReviewsSection = ({ product }) => {
                   <div className="flex items-start gap-3">
                     <Avatar>
                       <img
-                        src={`http://localhost:5000/uploads/avatars/${r.userAvatar}`}
+                        src={`${BACKEND_URL}/uploads/avatars/${r.userAvatar}`}
                         alt=""
                         className="w-full h-full object-cover"
                       />
@@ -266,7 +267,7 @@ const ProductReviewsSection = ({ product }) => {
                               className="w-16 h-16 rounded-md overflow-hidden border hover:opacity-80 transition-opacity"
                             >
                               <img
-                                src={`http://localhost:5000/uploads/reviews/${src}`}
+                                src={`${BACKEND_URL}/uploads/reviews/${src}`}
                                 alt=""
                                 className="w-full h-full object-cover"
                               />

@@ -53,6 +53,8 @@ const VendorOrders = () => {
   const [selected, setSelected] = useState(null);
   const [message, setMessage] = useState("");
   const invoiceRef = useRef(null);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const currencySymbol = siteDetails?.currencySymbol || "₦";
 
   const filtered = orders.filter((order) => {
@@ -71,7 +73,7 @@ const VendorOrders = () => {
 
   const fetchCouriers = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/couriers`, {
+      const response = await fetch(`${API_URL}/couriers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -93,7 +95,7 @@ const VendorOrders = () => {
       setLoading(true);
 
       const res = await fetch(
-        `http://localhost:5000/api/vendors/orders/${user.id}`,
+        `${API_URL}/vendors/orders/${user.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -135,7 +137,7 @@ const VendorOrders = () => {
   const handleStatusChange = async (id, status, orderId) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/vendors/orders/status/${id}`,
+        `${API_URL}/vendors/orders/status/${id}`,
         {
           method: "PUT",
           headers: {
@@ -166,7 +168,7 @@ const VendorOrders = () => {
   const handleCourierChange = async (id, courier, orderId) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/couriers/item-change/${id}`,
+        `${API_URL}/couriers/item-change/${id}`,
         {
           method: "PUT",
           headers: {
@@ -267,7 +269,7 @@ const VendorOrders = () => {
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <img
-                  src={`http://localhost:5000/uploads/products/${order.thumbnail}`}
+                  src={`${BACKEND_URL}/uploads/products/${order.thumbnail}`}
                   alt={order.product_name}
                   className="h-20 w-20 rounded-lg object-cover bg-muted"
                 />

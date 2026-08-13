@@ -4,8 +4,10 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 import { toast } from "sonner";
 
 const NotificationContext = createContext();
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
 
-const socket = io("http://localhost:5000");
+const socket = io(`${BACKEND_URL}`);
 
 export const NotificationProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -68,12 +70,9 @@ export const NotificationProvider = ({ children }) => {
   const fetchNotifications = async () => {
     if (!user?.id) return;
 
-    const res = await fetch(
-      `http://localhost:5000/api/notification/${user.id}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    );
+    const res = await fetch(`${API_URL}/notification/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await res.json();
 
     if (res.ok) setNotifications(data);
@@ -104,13 +103,10 @@ export const NotificationProvider = ({ children }) => {
       return;
     }
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/notification/mark-as-read/${id}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/notification/mark-as-read/${id}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Notification marked as read");
       await fetchNotifications();
     } catch (error) {
@@ -126,13 +122,10 @@ export const NotificationProvider = ({ children }) => {
 
   const markAsUnread = async (id) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/notification/mark-as-unread/${id}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/notification/mark-as-unread/${id}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Notification marked as unread");
       fetchNotifications();
     } catch (error) {
@@ -153,7 +146,7 @@ export const NotificationProvider = ({ children }) => {
     }
     try {
       const res = await fetch(
-        `http://localhost:5000/api/notification/mark-all-read/${user.id}`,
+        `${API_URL}/notification/mark-all-read/${user.id}`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
@@ -174,13 +167,10 @@ export const NotificationProvider = ({ children }) => {
 
   const deleteOne = async (id) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/notification/delete-one/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/notification/delete-one/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Notification deleted");
       await fetchNotifications();
     } catch (error) {
@@ -196,13 +186,10 @@ export const NotificationProvider = ({ children }) => {
 
   const clearAll = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/notification/clear/${user.id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/notification/clear/${user.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("All Notifications deleted");
       await fetchNotifications();
     } catch (error) {

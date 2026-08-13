@@ -33,7 +33,7 @@ const Header = () => {
   const { totalWishlists } = useWishlist();
   const { user, token } = useAuth();
   const { siteDetails, domain, brand, extension } = useSiteDetails();
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchCategories = async () => {
     try {

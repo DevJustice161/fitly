@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const WishlistContext = createContext(undefined);
-const API_URL = "http://localhost:5000/api/wishlists";
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
 
 export const WishlistProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -22,7 +23,7 @@ export const WishlistProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/${user.id}`, {
+      const response = await fetch(`${API_URL}/wishlists/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -38,7 +39,7 @@ export const WishlistProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, token]);
 
   useEffect(() => {
     fetchWishlists();
@@ -58,7 +59,7 @@ export const WishlistProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(`${API_URL}/add`, {
+        const response = await fetch(`${API_URL}/wishlists/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -83,16 +84,19 @@ export const WishlistProvider = ({ children }) => {
         toast.error(error.message || "Failed to add to wishlists");
       }
     },
-    [user?.id, fetchWishlists],
+    [user?.id, fetchWishlists, token],
   );
 
   const removeFromWishlist = useCallback(
     async (wishlistItemId) => {
       try {
-        const response = await fetch(`${API_URL}/remove/${wishlistItemId}`, {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          `${API_URL}/wishlists/remove/${wishlistItemId}`,
+          {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
         const data = await response.json();
 
@@ -107,7 +111,7 @@ export const WishlistProvider = ({ children }) => {
         toast.error(error.message || "Failed to remove item");
       }
     },
-    [fetchWishlists],
+    [fetchWishlists, token],
   );
 
   const toggleWishlist = useCallback(
@@ -134,7 +138,7 @@ export const WishlistProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/clear/${user.id}`, {
+      const response = await fetch(`${API_URL}/wishlists/clear/${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,7 +157,7 @@ export const WishlistProvider = ({ children }) => {
       console.error("Clear wishlist error:", error);
       toast.error(error.message || "Failed to clear wishlist");
     }
-  }, [fetchWishlists, user?.id]);
+  }, [fetchWishlists, user?.id, token]);
 
   return (
     <WishlistContext.Provider

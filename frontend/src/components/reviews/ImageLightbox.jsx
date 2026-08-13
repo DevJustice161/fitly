@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+
 const ImageLightbox = ({ images = [], startIndex = 0, open, onOpenChange }) => {
   const [idx, setIdx] = useState(startIndex);
 
@@ -19,7 +21,7 @@ const ImageLightbox = ({ images = [], startIndex = 0, open, onOpenChange }) => {
       <DialogContent className="max-w-3xl p-0 bg-black border-0">
         <div className="relative aspect-square sm:aspect-video bg-black flex items-center justify-center">
           <img
-            src={`http://localhost:5000/uploads/reviews/${images[idx]}`}
+            src={`${BACKEND_URL}/uploads/reviews/${images[idx]}`}
             alt={`Review ${idx + 1}`}
             className="max-h-full max-w-full object-contain"
           />

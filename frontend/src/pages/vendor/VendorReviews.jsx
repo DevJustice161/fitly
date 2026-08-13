@@ -36,18 +36,17 @@ const VendorReviews = () => {
   const [replyTarget, setReplyTarget] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [lightbox, setLightbox] = useState({ open: false, images: [], idx: 0 });
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchVendorProfile = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/vendors/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(`${API_URL}/vendors/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
         const data = await response.json();
         setVendorProfile(data);
       } catch (error) {
@@ -56,7 +55,7 @@ const VendorReviews = () => {
     };
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/products`, {
+        const response = await fetch(`${API_URL}/products`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -209,7 +208,7 @@ const VendorReviews = () => {
                   <div className="flex items-start gap-3">
                     {product && (
                       <img
-                        src={`http://localhost:5000/uploads/products/${product?.thumbnail}`}
+                        src={`${BACKEND_URL}/uploads/products/${product?.thumbnail}`}
                         alt={product?.name}
                         className="w-14 h-14 rounded-md object-cover shrink-0"
                       />
@@ -228,7 +227,7 @@ const VendorReviews = () => {
                       <div className="flex flex-wrap items-center gap-2 mt-0.5">
                         <Avatar className="h-6 w-6">
                           <AvatarImage
-                            src={`http://localhost:5000/uploads/avatars/${r.userAvatar}`}
+                            src={`${BACKEND_URL}/uploads/avatars/${r.userAvatar}`}
                           />
                           <AvatarFallback className="text-[10px]">
                             {r.userName.charAt(0)}
@@ -275,7 +274,7 @@ const VendorReviews = () => {
                               className="w-14 h-14 rounded-md overflow-hidden border hover:opacity-80"
                             >
                               <img
-                                src={`http://localhost:5000/uploads/reviews/${src}`}
+                                src={`${BACKEND_URL}/uploads/reviews/${src}`}
                                 alt=""
                                 className="w-full h-full object-cover"
                               />

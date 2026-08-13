@@ -34,6 +34,8 @@ const DashboardOverview = () => {
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const statCards = [
     {
@@ -61,12 +63,9 @@ const DashboardOverview = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/dashboard/${user.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await fetch(`${API_URL}/dashboard/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         const data = await response.json();
 
@@ -189,7 +188,7 @@ const DashboardOverview = () => {
               >
                 <CardContent className="p-4 flex items-center gap-4">
                   <img
-                    src={`http://localhost:5000/uploads/products/${order.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${order.thumbnail}`}
                     alt={order.product_name}
                     className="h-14 w-14 rounded-lg object-cover bg-muted"
                   />
@@ -252,7 +251,7 @@ const DashboardOverview = () => {
               <CardContent className="p-3">
                 <Link to={`/product/${item.slug}`}>
                   <img
-                    src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                     alt={item.name}
                     className="w-full aspect-square rounded-lg object-cover bg-muted mb-2"
                   />

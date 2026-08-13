@@ -46,7 +46,8 @@ const statusColors = {
 };
 
 const AdminVendorApplications = () => {
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { toast } = useToast();
   const { user, token } = useAuth();
   const [apps, setApps] = useState([]);
@@ -384,7 +385,7 @@ const AdminVendorApplications = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <bold>Government ID</bold>
                   <img
-                    src={`http://localhost:5000/uploads/ids/${viewApp.government_id}`}
+                    src={`${BACKEND_URL}/uploads/ids/${viewApp.government_id}`}
                     alt="Government ID"
                     className="w-20 h-20 object-cover rounded cursor-pointer border"
                     onClick={() => setPreviewImage(viewApp.government_id)}
@@ -393,7 +394,7 @@ const AdminVendorApplications = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <bold>Business Logo</bold>
                   <img
-                    src={`http://localhost:5000/uploads/logos/${viewApp.store_logo}`}
+                    src={`${BACKEND_URL}/uploads/logos/${viewApp.store_logo}`}
                     alt="Business Logo"
                     className="h-20 w-20 object-cover rounded-md border"
                   />
@@ -498,7 +499,7 @@ const AdminVendorApplications = () => {
 
           {previewImage && (
             <img
-              src={`http://localhost:5000/uploads/ids/${previewImage}`}
+              src={`${BACKEND_URL}/uploads/ids/${previewImage}`}
               alt="Preview"
               className="w-full h-auto rounded"
             />

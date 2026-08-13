@@ -4,8 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const MessagesContext = createContext();
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-const socket = io("http://localhost:5000");
+const socket = io(`${BACKEND_URL}`);
 
 export const MessagesProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -19,12 +21,9 @@ export const MessagesProvider = ({ children }) => {
     if (!user?.id) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/messages/conversations/${user.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/messages/conversations/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 
@@ -40,12 +39,9 @@ export const MessagesProvider = ({ children }) => {
 
   const fetchAllMessages = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/messages/all/${user?.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/messages/all/${user?.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setAllMessages(data);
     } catch (err) {
@@ -55,12 +51,9 @@ export const MessagesProvider = ({ children }) => {
 
   const fetchMessages = async (conversationId) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/messages/${conversationId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/messages/${conversationId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 
@@ -76,7 +69,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   const createNewConversation = async (convo) => {
-    const res = await fetch("http://localhost:5000/api/messages/conversation", {
+    const res = await fetch(`${API_URL}/messages/conversation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +82,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   const sendMessage = async (formData) => {
-    const res = await fetch("http://localhost:5000/api/messages", {
+    const res = await fetch(`${API_URL}/messages`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -116,7 +109,7 @@ export const MessagesProvider = ({ children }) => {
 
   const markConversationRead = async (conversationId, userId) => {
     try {
-      await fetch(`http://localhost:5000/api/messages/read/${conversationId}`, {
+      await fetch(`${API_URL}/messages/read/${conversationId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -136,7 +129,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   const updateMessage = async (id, message) => {
-    const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+    const res = await fetch(`${API_URL}/messages/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -153,7 +146,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   const deleteMessage = async (id) => {
-    const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+    const res = await fetch(`${API_URL}messages/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

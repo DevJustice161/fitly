@@ -5,6 +5,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const ProductCard = ({ product }) => {
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { siteDetails } = useSiteDetails();
@@ -17,7 +18,7 @@ const ProductCard = ({ product }) => {
     <div className="card-premium group">
       <div className="relative overflow-hidden aspect-[3/4]">
         <img
-          src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+          src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"

@@ -60,13 +60,15 @@ const PaymentsPage = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [deleteId, setDeleteId] = useState(null);
-  const API_URL = "http://localhost:5000/api/payments";
-
+  const API_URL = import.meta.env.VITE_API_URL;
   const getPaymentMethod = async () => {
     try {
-      const response = await fetch(`${API_URL}/get-methods/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${API_URL}/payments/get-methods/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch payment methods");
       }
@@ -151,7 +153,7 @@ const PaymentsPage = () => {
         details: form.email,
       };
     }
-    await fetch(`${API_URL}/method`, {
+    await fetch(`${API_URL}/payments/method`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -166,7 +168,7 @@ const PaymentsPage = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${API_URL}/method/${deleteId}`, {
+      const response = await fetch(`${API_URL}/payments/method/${deleteId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -180,7 +182,7 @@ const PaymentsPage = () => {
 
   const handleSetDefault = async (id) => {
     try {
-      const response = await fetch(`${API_URL}/method/${id}`, {
+      const response = await fetch(`${API_URL}/payments/method/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -29,7 +29,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSiteDetails } from "@/contexts/SiteContext";
 import { useMessages } from "@/contexts/MessagesContext";
 
-const API_URL = "http://localhost:5000/api/orders";
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
 
 const STATUS_STEPS = [
   {
@@ -323,7 +324,7 @@ const OrderTrackingPage = () => {
     const fetchOrderDetails = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/track/${id}`, {
+        const res = await fetch(`${API_URL}/orders/track/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -394,7 +395,7 @@ const OrderTrackingPage = () => {
         buyerId: user.id,
         vendorId: item.vendor_id,
         productId: item.product_id,
-        orderId: order.id, // numeric id from API
+        orderId: order.id,
       };
       const creating = await createNewConversation(convo);
 
@@ -532,7 +533,7 @@ const OrderTrackingPage = () => {
                   >
                     {item.thumbnail ? (
                       <img
-                        src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                        src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                         alt={item.product_name}
                         className="h-full w-full object-cover"
                       />

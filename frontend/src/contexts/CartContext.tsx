@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const CartContext = createContext(undefined);
 
-const API_URL = "http://localhost:5000/api/cart";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const CartProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -27,7 +27,7 @@ export const CartProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/${user.id}`, {
+      const response = await fetch(`${API_URL}/cart/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(`${API_URL}/add`, {
+        const response = await fetch(`${API_URL}/cart/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = useCallback(
     async (cartItemId) => {
       try {
-        const response = await fetch(`${API_URL}/remove/${cartItemId}`, {
+        const response = await fetch(`${API_URL}/cart/remove/${cartItemId}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -122,7 +122,7 @@ export const CartProvider = ({ children }) => {
           return;
         }
 
-        const response = await fetch(`${API_URL}/update/${cartItemId}`, {
+        const response = await fetch(`${API_URL}/cart/update/${cartItemId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export const CartProvider = ({ children }) => {
   const updateVariant = useCallback(
     async (cartItemId, size, color) => {
       try {
-        const response = await fetch(`${API_URL}/variant/${cartItemId}`, {
+        const response = await fetch(`${API_URL}/cart/variant/${cartItemId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -179,7 +179,7 @@ export const CartProvider = ({ children }) => {
     if (!user?.id) return;
 
     try {
-      const response = await fetch(`${API_URL}/clear/${user.id}`, {
+      const response = await fetch(`${API_URL}/cart/clear/${user.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

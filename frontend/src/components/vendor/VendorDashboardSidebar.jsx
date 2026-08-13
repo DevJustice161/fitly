@@ -69,7 +69,8 @@ const VendorDashboardSidebar = () => {
   const { unreadCount } = useNotifications();
   const { unreadMsgCount } = useMessages();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { state } = useSidebar();
   const [vendorProfile, setVendorProfile] = useState({});
   const collapsed = state === "collapsed";
@@ -131,7 +132,7 @@ const VendorDashboardSidebar = () => {
       <SEO
         title={`${vendorProfile?.store_name} — Fashion Store`}
         description={`Shop fashion from ${vendorProfile?.store_name} on Fitly.ng. Discover clothing, shoes, accessories and more.`}
-        image={`http://localhost:5000/uploads/logos/${vendorProfile?.store_logo || user?.store_logo || user?.avatar || ""}`}
+        image={`${BACKEND_URL}/uploads/logos/${vendorProfile?.store_logo || user?.store_logo || user?.avatar || ""}`}
         url={`/vendors/${vendorProfile?.id}`}
         noIndex
       />
@@ -141,7 +142,7 @@ const VendorDashboardSidebar = () => {
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 border-2 border-primary">
                 <AvatarImage
-                  src={`http://localhost:5000/uploads/logos/${vendorProfile.store_logo || user?.store_logo || user?.avatar || ""}`}
+                  src={`${BACKEND_URL}/uploads/logos/${vendorProfile.store_logo || user?.store_logo || user?.avatar || ""}`}
                 />
                 <AvatarFallback className="bg-secondary text-secondary-foreground font-heading text-lg">
                   {vendorProfile?.store_name

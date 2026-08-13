@@ -9,6 +9,7 @@ const VendorPaymentSuccess = () => {
   const navigate = useNavigate();
 
   const { user, token } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const verifyPayment = async () => {
     try {
@@ -33,7 +34,7 @@ const VendorPaymentSuccess = () => {
 
       if (provider === "flutterwave" && transaction_id) {
         const response = await fetch(
-          `http://localhost:5000/api/payments/flutterwave/premium/verify?transaction_id=${transaction_id}
+          `${API_URL}/payments/flutterwave/premium/verify?transaction_id=${transaction_id}
           &tx_ref=${tx_ref}&vendorId=${vendorId}&startedAt=${startedAt}&nextBillingAt=${nextBillingAt}&
           paymentReference=${paymentReference}&planId=${planId}&billingCycle=${billingCycle}&
           status=${premStatus}&autoRenew=${autoRenew}&amount=${amount}&method=${paymentMethod}`,
@@ -53,7 +54,7 @@ const VendorPaymentSuccess = () => {
 
       if (provider === "paystack" && reference) {
         const response = await fetch(
-          `http://localhost:5000/api/payments/paystack/premium/verify?reference=${reference}
+          `${API_URL}/payments/paystack/premium/verify?reference=${reference}
           &vendorId=${vendorId}&startedAt=${startedAt}&nextBillingAt=${nextBillingAt}&
           paymentReference=${paymentReference}&planId=${planId}&billingCycle=${billingCycle}&
           status='active'&autoRenew=${autoRenew}&amount=${amount}&method=${paymentMethod}`,

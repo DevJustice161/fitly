@@ -36,8 +36,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
-const API_URL = "http://localhost:5000/api/products";
-const API_URL_CAT = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
 const sizes = [
   "XS",
   "S",
@@ -104,7 +104,7 @@ const VendorProducts = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${API_URL_CAT}/categories`, {
+      const response = await fetch(`${API_URL}/categories`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -138,7 +138,7 @@ const VendorProducts = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_URL}/vendor/${user.id}`, {
+      const res = await fetch(`${API_URL}/products/vendor/${user.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -427,7 +427,7 @@ const VendorProducts = () => {
           >
             <CardContent className="p-4 flex gap-4">
               <img
-                src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                 alt={product.name}
                 className="h-20 w-20 rounded-lg object-cover bg-muted"
               />
@@ -722,7 +722,7 @@ const VendorProducts = () => {
                 ) : (
                   selected?.thumbnail && (
                     <img
-                      src={`http://localhost:5000/uploads/products/${selected.thumbnail}`}
+                      src={`${BACKEND_URL}/uploads/products/${selected.thumbnail}`}
                       className="h-20 w-20 object-cover rounded"
                       alt="Current Thumbnail"
                     />
@@ -749,7 +749,7 @@ const VendorProducts = () => {
                           className="relative rounded-xl overflow-hidden border"
                         >
                           <img
-                            src={`http://localhost:5000/uploads/products/${file}`}
+                            src={`${BACKEND_URL}/uploads/products/${file}`}
                             alt="Preview"
                             className="h-full w-20 rounded object-cover"
                           />

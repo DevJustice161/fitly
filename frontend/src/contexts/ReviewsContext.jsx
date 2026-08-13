@@ -14,19 +14,17 @@ export const ReviewsProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
-
   const [helpfulVotes, setHelpfulVotes] = useState({});
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const getProducts = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/products/productsCard",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/products/productsCard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -36,7 +34,7 @@ export const ReviewsProvider = ({ children }) => {
 
   const getOrders = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_URL}/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -50,7 +48,7 @@ export const ReviewsProvider = ({ children }) => {
 
   const getReviews = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/reviews", {
+      const response = await fetch(`${API_URL}/reviews`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -64,14 +62,11 @@ export const ReviewsProvider = ({ children }) => {
 
   const getHelpfulVotes = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/reviews/helpful/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/reviews/helpful/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       const votes = await response.json();
       const map = {};
 
@@ -106,7 +101,7 @@ export const ReviewsProvider = ({ children }) => {
       revData.images.forEach((file) => {
         formData.append("gallery", file);
       });
-      const response = await fetch(`http://localhost:5000/api/reviews/add`, {
+      const response = await fetch(`${API_URL}/reviews/add`, {
         method: "POST",
         body: formData,
         headers: {
@@ -138,16 +133,13 @@ export const ReviewsProvider = ({ children }) => {
       patch.newImages.forEach((file) => {
         formData.append("gallery", file);
       });
-      const response = await fetch(
-        `http://localhost:5000/api/reviews/update/${id}`,
-        {
-          method: "PUT",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/reviews/update/${id}`, {
+        method: "PUT",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
 
@@ -162,15 +154,12 @@ export const ReviewsProvider = ({ children }) => {
 
   const deleteReview = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/reviews/delete/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/reviews/delete/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -192,22 +181,19 @@ export const ReviewsProvider = ({ children }) => {
   };
 
   const toggleHelpful = async (id) => {
-    const response = await fetch(
-      `http://localhost:5000/api/reviews/helpful/${id}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+    const response = await fetch(`${API_URL}/reviews/helpful/${id}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-    );
+    });
   };
 
   const toggleVisibility = async (id, visibility) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/reviews/update-visibility/${id}`,
+        `${API_URL}/reviews/update-visibility/${id}`,
         {
           method: "PUT",
           headers: {
@@ -227,31 +213,25 @@ export const ReviewsProvider = ({ children }) => {
   const replyToReview = async (id, text, userId) => {
     const date = new Date().toISOString().slice(0, 10);
     const det = { vendorId: user.id, text: text, userId: userId };
-    const response = await fetch(
-      `http://localhost:5000/api/reviews/reply/${id}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(det),
+    const response = await fetch(`${API_URL}/reviews/reply/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-    );
+      body: JSON.stringify(det),
+    });
 
     await getReviews();
   };
 
   const deleteReply = async (id) => {
-    const response = await fetch(
-      `http://localhost:5000/api/reviews/reply/${id}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await fetch(`${API_URL}/reviews/reply/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
 
     await getReviews();
   };

@@ -55,7 +55,8 @@ const AdminCustomers = () => {
   const { user, token } = useAuth();
   const { siteDetails } = useSiteDetails();
   const currencySymbol = siteDetails?.currencySymbol || "₦";
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { toast } = useToast();
   const [customers, setCustomers] = useState(adminCustomers);
   const [query, setQuery] = useState("");
@@ -262,7 +263,7 @@ const AdminCustomers = () => {
                 <div className="flex items-start gap-3 min-w-0">
                   <Avatar className="h-10 w-10 border border-border shrink-0">
                     <AvatarImage
-                      src={`http://localhost:5000/uploads/avatars/${c.avatar}`}
+                      src={`${BACKEND_URL}/uploads/avatars/${c.avatar}`}
                       alt={`${c.avatar} logo`}
                     />
                     <AvatarFallback className="bg-secondary text-xs font-medium">

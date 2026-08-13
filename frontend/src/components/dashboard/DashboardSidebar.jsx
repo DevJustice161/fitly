@@ -66,11 +66,12 @@ const DashboardSidebar = () => {
 
   const { unreadCount } = useNotifications();
 
-  const API_URL = "http://localhost:5000/api/users";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   if (user.role === "vendor") {
     const fetchVendorDetails = async () => {
       try {
-        const response = await fetch(`${API_URL}/vendor/${user.id}`, {
+        const response = await fetch(`${API_URL}/users/vendor/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) {
@@ -102,7 +103,7 @@ const DashboardSidebar = () => {
       <SEO
         title={`${user?.name} — Fashion Store`}
         description={`${user?.name}'s account on Fitly.ng. Discover clothing, shoes, accessories and more.`}
-        image={`http://localhost:5000/uploads/avatars/${user?.avatar}`}
+        image={`${BACKEND_URL}/uploads/avatars/${user?.avatar}`}
         noIndex
       />
 
@@ -112,7 +113,7 @@ const DashboardSidebar = () => {
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12 border-2 border-primary">
                 <AvatarImage
-                  src={`http://localhost:5000/uploads/avatars/${user.avatar}`}
+                  src={`${BACKEND_URL}/uploads/avatars/${user.avatar}`}
                 />
                 <AvatarFallback className="bg-secondary text-secondary-foreground font-heading text-lg">
                   {user.name

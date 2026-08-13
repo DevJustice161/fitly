@@ -13,6 +13,7 @@ const WishlistPage = () => {
     `${currencySymbol}${Number(p || 0).toLocaleString()}`;
   const { items, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -51,7 +52,7 @@ const WishlistPage = () => {
                 <div className="relative">
                   <Link to={`/product/${item.slug}`}>
                     <img
-                      src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                      src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                       alt={item.name}
                       className="w-full aspect-[3/4] rounded-lg object-cover bg-muted"
                     />

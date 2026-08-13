@@ -68,7 +68,6 @@ const nigerianStates = [
 ];
 
 const VendorApplication = () => {
-  const API_URL = "http://localhost:5000/api";
   const { user, token } = useAuth();
   const [step, setStep] = useState(1);
   const [storeCategories, setStoreCategories] = useState([]);
@@ -88,6 +87,8 @@ const VendorApplication = () => {
   const [accountName, setAccountName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [agreed, setAgreed] = useState(false);
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
   const totalSteps = 4;
   const fetchCategories = async () => {
@@ -198,7 +199,7 @@ const VendorApplication = () => {
         formData.append("cac", cac);
       }
 
-      const response = await fetch("http://localhost:5000/api/vendors/apply", {
+      const response = await fetch(`${API_URL}/vendors/apply`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

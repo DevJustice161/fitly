@@ -18,16 +18,13 @@ const AdminWithdrawals = () => {
   const [requests, setRequests] = useState([]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All");
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/admin/withdrawals-requests",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await fetch(`${API_URL}/admin/withdrawals-requests`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (!response.ok)
         throw new Error(`Request failed with status ${response.status}`);

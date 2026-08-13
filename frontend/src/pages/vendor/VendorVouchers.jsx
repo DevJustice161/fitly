@@ -70,17 +70,16 @@ const VendorVouchers = () => {
   const [copied, setCopied] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [tab, setTab] = useState("all");
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const getVouchers = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/vouchers/vendor/${user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(`${API_URL}/vouchers/vendor/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch vouchers");
       }
@@ -145,17 +144,14 @@ const VendorVouchers = () => {
       };
 
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/vouchers/${editing.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newV),
+        const response = await fetch(`${API_URL}/vouchers/${editing.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
+          body: JSON.stringify(newV),
+        });
       } catch (error) {
         console.error(error);
         toast.error("Failed to update voucher");
@@ -179,7 +175,7 @@ const VendorVouchers = () => {
       };
 
       try {
-        const response = await fetch(`http://localhost:5000/api/vouchers/`, {
+        const response = await fetch(`${API_URL}/vouchers/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -200,13 +196,10 @@ const VendorVouchers = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/vouchers/${deleteId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await fetch(`${API_URL}/vouchers/${deleteId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete voucher");
@@ -218,13 +211,10 @@ const VendorVouchers = () => {
 
   const toggleActive = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/vouchers/toggle/${id}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await fetch(`${API_URL}/vouchers/toggle/${id}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete voucher");

@@ -44,7 +44,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
-const API_URL = "http://localhost:5000/api/admin";
+const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.BACKEND_URL;
 
 const capitalizeWord = (str) => {
   if (!str) return "";
@@ -140,7 +141,7 @@ const AdminOverview = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/${user.id}`, {
+      const res = await fetch(`${API_URL}/admin/${user.id}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -161,14 +162,13 @@ const AdminOverview = () => {
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
-  const API_URL_ACTION = "http://localhost:5000/api";
 
   const handleApplicationAction = async (app, action) => {
     try {
       const endpoint =
         action === "approve"
-          ? `${API_URL_ACTION}/vendors/approve/${app.id}`
-          : `${API_URL_ACTION}/vendors/reject/${app.id}`;
+          ? `${API_URL}/vendors/approve/${app.id}`
+          : `${API_URL}/vendors/reject/${app.id}`;
 
       const response = await fetch(endpoint, {
         method: "PUT",
@@ -217,8 +217,8 @@ const AdminOverview = () => {
     try {
       const endpoint =
         action === "approve"
-          ? `${API_URL_ACTION}/withdrawals/approve/${w.id}`
-          : `${API_URL_ACTION}/withdrawals/reject/${w.id}`;
+          ? `${API_URL}/withdrawals/approve/${w.id}`
+          : `${API_URL}/withdrawals/reject/${w.id}`;
 
       const response = await fetch(endpoint, {
         method: "PUT",
@@ -449,7 +449,7 @@ const AdminOverview = () => {
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <Avatar className="h-10 w-10 border border-border">
                         <AvatarImage
-                          src={`http://localhost:5000/uploads/logos/${app.logo}`}
+                          src={`${BACKEND_URL}/uploads/logos/${app.logo}`}
                           alt={`${app.storeName} logo`}
                         />
                         <AvatarFallback className="bg-secondary text-xs font-heading">
@@ -643,7 +643,7 @@ const AdminOverview = () => {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border border-border">
                         <AvatarImage
-                          src={`http://localhost:5000/uploads/logos/${v.logo}`}
+                          src={`${BACKEND_URL}/uploads/logos/${v.logo}`}
                           alt={`${v.storeName} logo`}
                         />
                         <AvatarFallback className="bg-secondary text-xs font-heading">
@@ -701,7 +701,7 @@ const AdminOverview = () => {
                     <div className="h-12 w-12 rounded-xl bg-secondary/60 overflow-hidden flex items-center justify-center shrink-0">
                       {p.image ? (
                         <img
-                          src={`http://localhost:5000/uploads/products/${p.image}`}
+                          src={`${BACKEND_URL}/uploads/products/${p.image}`}
                           alt={p.name}
                           loading="lazy"
                           className="h-full w-full object-cover"

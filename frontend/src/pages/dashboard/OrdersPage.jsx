@@ -306,13 +306,14 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const API_URL = "http://localhost:5000/api/orders";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/user/${user.id}`, {
+        const res = await fetch(`${API_URL}/orders/user/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -338,7 +339,7 @@ const OrdersPage = () => {
   const fetchOrderItems = async (orderId) => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/order-items/${orderId}`, {
+      const res = await fetch(`${API_URL}/orders/order-items/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -488,7 +489,7 @@ const OrdersPage = () => {
               <CardContent className="p-4">
                 <div className="flex gap-4">
                   <img
-                    src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                    src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                     className=" rounded-lg object-cover"
                     style={{ width: "450px", height: "400px" }}
                   />

@@ -19,16 +19,14 @@ const SearchPage = () => {
   const { user, token } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [params] = useSearchParams();
+  const API_URL = import.meta.env.VITE_API_URL;
   const query = (params.get("q") || "").trim();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/products/productsCard",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await fetch(`${API_URL}/products/productsCard`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         setProducts(data as Product[]);
       } catch (error) {

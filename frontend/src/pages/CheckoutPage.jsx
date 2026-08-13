@@ -141,8 +141,10 @@ const CheckoutPage = () => {
 
   const effectiveSubtotal = Number(discountedCartTotal || totalPrice || 0);
   const total = effectiveSubtotal + deliveryFee;
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
-  const API_URL = "http://localhost:5000/api/users";
+  const API_URL = `${VITE_API_URL}/users`;
 
   const closeTransferModal = () => {
     setShowTransferModal(false);
@@ -183,12 +185,9 @@ const CheckoutPage = () => {
 
   const fetchCourier = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/couriers/default`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await fetch(`${API_URL}/couriers/default`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await response.json();
 
@@ -304,18 +303,15 @@ const CheckoutPage = () => {
       };
 
       if (selectedPayment === "flutterwave") {
-        const response = await fetch(
-          "http://localhost:5000/api/payments/flutterwave",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-
-            body: JSON.stringify({ payload: payload, order: order }),
+        const response = await fetch(`${API_URL}/payments/flutterwave`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
+
+          body: JSON.stringify({ payload: payload, order: order }),
+        });
 
         const data = await response.json();
 
@@ -329,18 +325,15 @@ const CheckoutPage = () => {
       }
 
       if (selectedPayment === "paystack") {
-        const response = await fetch(
-          "http://localhost:5000/api/payments/paystack",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-
-            body: JSON.stringify({ payload: payload, order: order }),
+        const response = await fetch(`${API_URL}/payments/paystack`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-        );
+
+          body: JSON.stringify({ payload: payload, order: order }),
+        });
 
         const data = await response.json();
 
@@ -404,17 +397,14 @@ const CheckoutPage = () => {
         order_items: orderItems,
       };
 
-      const response = await fetch(
-        "http://localhost:5000/api/payments/transfer",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ payload: payload, order: order }),
+      const response = await fetch(`${API_URL}/payments/transfer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ payload: payload, order: order }),
+      });
 
       const data = await response.json();
 
@@ -725,7 +715,7 @@ const CheckoutPage = () => {
                       <div key={item.cart_id} className="flex gap-3">
                         <div className="w-14 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                           <img
-                            src={`http://localhost:5000/uploads/products/${item.thumbnail}`}
+                            src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />

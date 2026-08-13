@@ -40,7 +40,8 @@ const statusColors = {
 };
 
 const AdminVendors = () => {
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { token } = useAuth();
   const { siteDetails } = useSiteDetails();
   const currencySymbol = siteDetails?.currencySymbol || "₦";
@@ -198,7 +199,7 @@ const AdminVendors = () => {
                   <Avatar className="h-12 w-12 border">
                     {v.store_logo ? (
                       <img
-                        src={`http://localhost:5000/uploads/logos/${v.store_logo}`}
+                        src={`${BACKEND_URL}/uploads/logos/${v.store_logo}`}
                         alt={v.store_name}
                         className="h-full w-full object-cover"
                       />

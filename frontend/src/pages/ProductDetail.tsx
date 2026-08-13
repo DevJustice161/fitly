@@ -48,14 +48,14 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [categorySlug, setCategorySlug] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     try {
       setLoading(true);
       const fetchProductDetails = async () => {
-        const response = await fetch(
-          `http://localhost:5000/api/products/details/${slug}`,
-        );
+        const response = await fetch(`${API_URL}/products/details/${slug}`);
         if (!response.ok) {
           throw new Error("Failed to fetch product details");
         }
@@ -68,9 +68,7 @@ const ProductDetail = () => {
         setCategorySlug(data.category_slug);
       };
       const fetchProducts = async () => {
-        const response = await fetch(
-          "http://localhost:5000/api/products/productsCard",
-        );
+        const response = await fetch(`${API_URL}/products/productsCard`);
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
@@ -84,7 +82,7 @@ const ProductDetail = () => {
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, API_URL]);
 
   const { addRecentlyViewed } = useRecentlyViewed();
 
@@ -144,7 +142,7 @@ const ProductDetail = () => {
           `Shop ${product.name} from ${product.vendor_name} on Fitly.ng.`
         }
         image={{
-          url: `http://localhost:5000/uploads/products/${product.thumbnail}`,
+          url: `${BACKEND_URL}/uploads/products/${product.thumbnail}`,
         }}
         url={`/product/${product.slug}`}
         type="product"
@@ -178,7 +176,7 @@ const ProductDetail = () => {
                   <img
                     alt="images"
                     key={index}
-                    src={`http://localhost:5000/uploads/products/${img}`}
+                    src={`${BACKEND_URL}/uploads/products/${img}`}
                     onClick={() => setSelectedImage(img)}
                     className={`w-20 h-20 rounded-lg object-cover cursor-pointer border-2 ${
                       selectedImage === img ? "border-primary" : "border-border"
@@ -190,7 +188,7 @@ const ProductDetail = () => {
               {selectedImage ? (
                 <div className="flex-1 bg-muted rounded-xl overflow-hidden">
                   <img
-                    src={`http://localhost:5000/uploads/products/${selectedImage}`}
+                    src={`${BACKEND_URL}/uploads/products/${selectedImage}`}
                     alt=""
                     className="w-full h-full object-cover hover:scale-110 cursor-pointer transition duration-300"
                   />

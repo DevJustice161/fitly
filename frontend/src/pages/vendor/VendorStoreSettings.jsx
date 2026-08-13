@@ -18,12 +18,14 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 const VendorStoreSettings = () => {
   const { toast } = useToast();
   const { user, updateUser, token } = useAuth();
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
   const [vendorDetails, setVendorDetails] = useState({});
   const [categories, setCategories] = useState([]);
   const [couriers, setCouriers] = useState([]);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const fetchVendorDetails = async () => {
     if (!user?.id) return;
@@ -343,7 +345,7 @@ const VendorStoreSettings = () => {
                 {vendorDetails.store_logo && (
                   <div className="mt-3">
                     <img
-                      src={`http://localhost:5000/uploads/logos/${vendorDetails.store_logo}`}
+                      src={`${BACKEND_URL}/uploads/logos/${vendorDetails.store_logo}`}
                       alt="Store logo"
                       className="h-20 w-20 rounded-lg object-cover border border-border"
                     />

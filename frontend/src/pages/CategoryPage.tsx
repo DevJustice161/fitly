@@ -15,12 +15,14 @@ const CategoryPage = () => {
   const [sortBy, setSortBy] = useState("popular");
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/products/productsCard",
+          `${API_URL}/products/productsCard`,
         );
         const data = await response.json();
         setProducts(data);
@@ -30,7 +32,7 @@ const CategoryPage = () => {
     };
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/categories`);
+        const response = await fetch(`${API_URL}/categories`);
         const data = await response.json();
 
         if (!response.ok) {
@@ -60,7 +62,7 @@ const CategoryPage = () => {
 
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [API_URL]);
 
   const categoryName = slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "";
 

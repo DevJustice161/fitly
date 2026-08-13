@@ -31,7 +31,8 @@ const emptyForm = { name: "", slug: "", subcategories: "" };
 
 const AdminCategories = () => {
   const { user, token } = useAuth();
-  const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   const { toast } = useToast();
   const [categories, setCategories] = useState(adminCategories);
   const [query, setQuery] = useState("");
@@ -338,7 +339,7 @@ const AdminCategories = () => {
                 </div>
                 <div className="relative w-40 h-28 rounded-xl overflow-hidden border border-border group shadow-sm">
                   <img
-                    src={`http://localhost:5000/uploads/categories/${c.image}`}
+                    src={`${BACKEND_URL}/uploads/categories/${c.image}`}
                     alt={c.name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />

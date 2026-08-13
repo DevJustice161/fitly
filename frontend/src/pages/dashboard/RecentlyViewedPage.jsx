@@ -15,6 +15,7 @@ const RecentlyViewedPage = () => {
   const { recentlyViewed } = useRecentlyViewed();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { addToCart } = useCart();
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
   return (
     <div className="space-y-6 max-w-5xl">
       <h1 className="font-heading text-2xl font-bold mb-4 text-foreground flex items-center gap-2">
@@ -30,7 +31,7 @@ const RecentlyViewedPage = () => {
             <CardContent className="p-3">
               <Link to={`/product/${item.slug}`}>
                 <img
-                  src={`http://localhost:5000/uploads/products/${item.image}`}
+                  src={`${BACKEND_URL}/uploads/products/${item.image}`}
                   alt={item.name}
                   className="w-full aspect-square rounded-lg object-cover bg-muted mb-2"
                 />

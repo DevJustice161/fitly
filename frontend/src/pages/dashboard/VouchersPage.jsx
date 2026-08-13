@@ -12,18 +12,16 @@ const VouchersPage = () => {
   const [copied, setCopied] = useState(null);
   const [loading, setLoading] = useState(true);
   const { siteDetails, domain, brand, extension } = useSiteDetails();
+  const API_URL = import.meta.env.VITE_API_URL;
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const formatPrice = (price) =>
     `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   const fetchVouchers = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/vouchers/user/${user.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const res = await fetch(`${API_URL}/vouchers/user/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 

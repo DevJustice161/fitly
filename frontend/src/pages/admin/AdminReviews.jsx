@@ -69,6 +69,7 @@ const AdminReviews = () => {
   const [dismissedReports, setDismissedReports] = useState({});
   const [viewing, setViewing] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const productMap = useMemo(() => {
     const m = {};
@@ -251,7 +252,7 @@ const AdminReviews = () => {
                 <CardContent className="p-4 flex flex-col sm:flex-row gap-3">
                   {product && (
                     <img
-                      src={`http://localhost:5000/uploads/products/${product.thumbnail}`}
+                      src={`${BACKEND_URL}/uploads/products/${product.thumbnail}`}
                       alt={product.name}
                       className="w-14 h-14 rounded-md object-cover"
                     />
@@ -293,7 +294,7 @@ const AdminReviews = () => {
                     <div className="flex items-center gap-2 mt-1">
                       <Avatar className="h-6 w-6">
                         <AvatarImage
-                          src={`http://localhost:5000/uploads/avatars/${r.userAvatar}`}
+                          src={`${BACKEND_URL}/uploads/avatars/${r.userAvatar}`}
                         />
 
                         <AvatarFallback className="text-[10px]">

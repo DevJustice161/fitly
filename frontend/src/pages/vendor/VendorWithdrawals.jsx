@@ -23,6 +23,8 @@ const VendorWithdrawals = () => {
   const [withdrawals, setWithdrawals] = useState([]);
   const [vendorProfile, setVendorProfile] = useState({});
   const [amount, setAmount] = useState("");
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const capitalizeWord = (str) => {
     if (!str) return "";
@@ -56,14 +58,11 @@ const VendorWithdrawals = () => {
   useEffect(() => {
     const fetchWithdrawals = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/withdrawals/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(`${API_URL}/withdrawals/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch withdrawals");
         }
@@ -76,14 +75,11 @@ const VendorWithdrawals = () => {
 
     const fetchVendorProfile = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/vendors/profile/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(`${API_URL}/vendors/profile/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch vendor profile");
         }
@@ -126,7 +122,7 @@ const VendorWithdrawals = () => {
         });
         return;
       }
-      const response = await fetch(`http://localhost:5000/api/withdrawals/`, {
+      const response = await fetch(`${API_URL}/withdrawals/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

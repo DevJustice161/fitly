@@ -51,7 +51,8 @@ const SettingsPage = () => {
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [promoNotifs, setPromoNotifs] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const API_URL = "http://localhost:5000/api/users";
+  const API_URL = import.meta.env.VITE_API_URL;
+  const BACKEND_URL = import.meta.env.BACKEND_URL;
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -74,7 +75,7 @@ const SettingsPage = () => {
       if (avatarFile) {
         formData.append("avatar", avatarFile);
       }
-      const response = await fetch(`${API_URL}/update/${user.id}`, {
+      const response = await fetch(`${API_URL}/users/update/${user.id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -113,7 +114,7 @@ const SettingsPage = () => {
         return;
       }
 
-      await fetch(`${API_URL}/update-password/${user.id}`, {
+      await fetch(`${API_URL}/users/update-password/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -151,7 +152,7 @@ const SettingsPage = () => {
   const handleDeleteAccount = () => {
     try {
       setLoading(true);
-      fetch(`${API_URL}/delete/${user.id}`, {
+      fetch(`${API_URL}/users/delete/${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -206,7 +207,7 @@ const SettingsPage = () => {
                     />
                   ) : user.avatar ? (
                     <img
-                      src={`http://localhost:5000/uploads/avatars/${user.avatar}`}
+                      src={`${BACKEND_URL}/uploads/avatars/${user.avatar}`}
                       alt={user.name}
                       className="h-full w-full object-cover"
                     />

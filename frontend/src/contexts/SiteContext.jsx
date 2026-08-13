@@ -8,11 +8,12 @@ const SiteContext = createContext();
 export const SiteProvider = ({ children }) => {
   const { user, token } = useAuth();
   const [siteDetails, setSiteDetails] = useState([]);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchSiteDetails = async () => {
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
-    const res = await fetch(`http://localhost:5000/api/settings/`, {
+    const res = await fetch(`${API_URL}/settings/`, {
       headers,
     });
     const data = await res.json();

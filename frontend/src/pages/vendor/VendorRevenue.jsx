@@ -20,12 +20,13 @@ const VendorRevenue = () => {
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const [vendorDashboard, setVendorDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/vendors/dashboard/${user.id}`,
+          `${API_URL}/vendors/dashboard/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

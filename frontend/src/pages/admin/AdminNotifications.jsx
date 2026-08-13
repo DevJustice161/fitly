@@ -31,7 +31,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:5000");
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+export const socket = io(`${BACKEND_URL}`);
 
 const iconMap = {
   order: Package,
