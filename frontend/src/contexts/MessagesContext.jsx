@@ -7,7 +7,7 @@ const MessagesContext = createContext();
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const API_URL = import.meta.env.VITE_API_URL;
 
-const socket = io(`${BACKEND_URL}`);
+const socket = io(BACKEND_URL);
 
 export const MessagesProvider = ({ children }) => {
   const { user, token } = useAuth();
