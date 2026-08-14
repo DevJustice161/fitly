@@ -49,7 +49,7 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const [categorySlug, setCategorySlug] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     try {

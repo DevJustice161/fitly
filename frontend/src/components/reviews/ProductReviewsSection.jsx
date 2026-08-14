@@ -57,7 +57,7 @@ const ProductReviewsSection = ({ product }) => {
   const [selected, setSelected] = useState(null);
   const [editing, setEditing] = useState(null);
   const [lightbox, setLightbox] = useState({ open: false, images: [], idx: 0 });
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const all = getProductReviews(product.id);
   const stats = getProductStats(product.id);

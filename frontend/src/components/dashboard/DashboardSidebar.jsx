@@ -67,7 +67,7 @@ const DashboardSidebar = () => {
   const { unreadCount } = useNotifications();
 
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   if (user.role === "vendor") {
     const fetchVendorDetails = async () => {
       try {

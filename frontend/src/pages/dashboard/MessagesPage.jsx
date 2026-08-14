@@ -60,7 +60,7 @@ const MessagesPage = () => {
   const [file, setFile] = useState(null);
   const [image, setImage] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (!selectedConversation) return;

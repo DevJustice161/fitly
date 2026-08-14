@@ -13,7 +13,7 @@ const WishlistPage = () => {
     `${currencySymbol}${Number(p || 0).toLocaleString()}`;
   const { items, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   return (
     <div className="space-y-6 max-w-5xl">

@@ -41,7 +41,7 @@ const CartPage = () => {
   const [appliedVouchers, setAppliedVouchers] = useState({});
   const [voucherLoading, setVoucherLoading] = useState({});
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchVariants = async () => {

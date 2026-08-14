@@ -4,7 +4,7 @@ import { useSiteDetails } from "../contexts/SiteContext";
 const { siteDetails, domain } = useSiteDetails();
 
 const SITE_NAME = domain;
-const SITE_URL = import.meta.env.SITE_URL;
+const SITE_URL = import.meta.env.VITE_SITE_URL;
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 const SEO = ({

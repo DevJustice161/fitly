@@ -24,7 +24,7 @@ const VendorWithdrawals = () => {
   const [vendorProfile, setVendorProfile] = useState({});
   const [amount, setAmount] = useState("");
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const capitalizeWord = (str) => {
     if (!str) return "";

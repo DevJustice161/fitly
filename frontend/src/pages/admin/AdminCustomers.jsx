@@ -56,7 +56,7 @@ const AdminCustomers = () => {
   const { siteDetails } = useSiteDetails();
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const { toast } = useToast();
   const [customers, setCustomers] = useState(adminCustomers);
   const [query, setQuery] = useState("");

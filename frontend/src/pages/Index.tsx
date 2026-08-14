@@ -18,7 +18,7 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 import { useSiteDetails } from "../contexts/SiteContext.jsx";
 const Index = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const [categories, setCategories] = useState([]);
   const { user, token } = useAuth();

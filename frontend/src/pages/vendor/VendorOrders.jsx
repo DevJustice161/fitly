@@ -54,7 +54,7 @@ const VendorOrders = () => {
   const [message, setMessage] = useState("");
   const invoiceRef = useRef(null);
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const currencySymbol = siteDetails?.currencySymbol || "₦";
 
   const filtered = orders.filter((order) => {
@@ -94,14 +94,11 @@ const VendorOrders = () => {
     try {
       setLoading(true);
 
-      const res = await fetch(
-        `${API_URL}/vendors/orders/${user.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await fetch(`${API_URL}/vendors/orders/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await res.json();
 
@@ -136,17 +133,14 @@ const VendorOrders = () => {
 
   const handleStatusChange = async (id, status, orderId) => {
     try {
-      const res = await fetch(
-        `${API_URL}/vendors/orders/status/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status, orderId }),
+      const res = await fetch(`${API_URL}/vendors/orders/status/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ status, orderId }),
+      });
 
       if (!res.ok) throw new Error();
 
@@ -167,17 +161,14 @@ const VendorOrders = () => {
 
   const handleCourierChange = async (id, courier, orderId) => {
     try {
-      const res = await fetch(
-        `${API_URL}/couriers/item-change/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ courier, orderId }),
+      const res = await fetch(`${API_URL}/couriers/item-change/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ courier, orderId }),
+      });
 
       if (!res.ok) throw new Error();
 

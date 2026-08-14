@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const ImageLightbox = ({ images = [], startIndex = 0, open, onOpenChange }) => {
   const [idx, setIdx] = useState(startIndex);

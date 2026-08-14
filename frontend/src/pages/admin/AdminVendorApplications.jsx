@@ -47,7 +47,7 @@ const statusColors = {
 
 const AdminVendorApplications = () => {
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const { toast } = useToast();
   const { user, token } = useAuth();
   const [apps, setApps] = useState([]);

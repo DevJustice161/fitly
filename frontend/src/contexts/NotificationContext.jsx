@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 const NotificationContext = createContext();
 const API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const socket = io(`${BACKEND_URL}`);
 

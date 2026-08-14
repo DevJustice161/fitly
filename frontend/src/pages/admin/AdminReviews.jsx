@@ -69,7 +69,7 @@ const AdminReviews = () => {
   const [dismissedReports, setDismissedReports] = useState({});
   const [viewing, setViewing] = useState(null);
   const [deleting, setDeleting] = useState(null);
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const productMap = useMemo(() => {
     const m = {};

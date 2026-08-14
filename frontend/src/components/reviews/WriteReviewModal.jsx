@@ -31,7 +31,7 @@ const WriteReviewModal = ({
   const [images, setImages] = useState([]);
   const [addedImages, setAddedImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (open) {

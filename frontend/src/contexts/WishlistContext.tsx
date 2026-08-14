@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 
 const WishlistContext = createContext(undefined);
 const API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const WishlistProvider = ({ children }) => {
   const { user, token } = useAuth();

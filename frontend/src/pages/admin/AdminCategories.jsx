@@ -32,7 +32,7 @@ const emptyForm = { name: "", slug: "", subcategories: "" };
 const AdminCategories = () => {
   const { user, token } = useAuth();
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const { toast } = useToast();
   const [categories, setCategories] = useState(adminCategories);
   const [query, setQuery] = useState("");

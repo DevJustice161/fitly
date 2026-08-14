@@ -52,7 +52,7 @@ const SettingsPage = () => {
   const [promoNotifs, setPromoNotifs] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];

@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const VITE_API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const API_URL = `${VITE_API_URL}/orders`;
 

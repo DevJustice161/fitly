@@ -51,7 +51,7 @@ const AdminSettings = () => {
   const currencySymbol = siteDetails?.currencySymbol || "₦";
   const { toast } = useToast();
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [site, setSite] = useState({
     name: "Fitly.ng",
     logo: "/placeholder.svg",

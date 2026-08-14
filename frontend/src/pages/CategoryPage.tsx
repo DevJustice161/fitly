@@ -16,14 +16,12 @@ const CategoryPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState([]);
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(
-          `${API_URL}/products/productsCard`,
-        );
+        const response = await fetch(`${API_URL}/products/productsCard`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {

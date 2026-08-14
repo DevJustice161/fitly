@@ -30,7 +30,7 @@ import { useSiteDetails } from "@/contexts/SiteContext";
 import { useMessages } from "@/contexts/MessagesContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const STATUS_STEPS = [
   {

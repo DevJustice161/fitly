@@ -35,7 +35,7 @@ const DashboardOverview = () => {
 
   const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const statCards = [
     {

@@ -5,7 +5,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const ProductCard = ({ product }) => {
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { siteDetails } = useSiteDetails();

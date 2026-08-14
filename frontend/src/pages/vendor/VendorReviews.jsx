@@ -37,7 +37,7 @@ const VendorReviews = () => {
   const [replyText, setReplyText] = useState("");
   const [lightbox, setLightbox] = useState({ open: false, images: [], idx: 0 });
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchVendorProfile = async () => {

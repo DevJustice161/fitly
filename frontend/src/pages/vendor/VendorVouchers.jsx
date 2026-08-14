@@ -71,7 +71,7 @@ const VendorVouchers = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [tab, setTab] = useState("all");
   const API_URL = import.meta.env.VITE_API_URL;
-  const BACKEND_URL = import.meta.env.BACKEND_URL;
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const getVouchers = async () => {
     try {
