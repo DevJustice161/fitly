@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 const RecentlyViewedContext = createContext();
-const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:5000";
-const API_URL = import.meta.env.API_URL || "http://localhost:5000/api";
+const BACKEND_URL = import.meta.env.BACKEND_URL;
+const API_URL = import.meta.env.API_URL;
 
 export const RecentlyViewedProvider = ({ children }) => {
   const { user, token } = useAuth();
