@@ -18,7 +18,6 @@ import { useAuth } from "@/contexts/AuthContext.jsx";
 const VendorStoreSettings = () => {
   const { toast } = useToast();
   const { user, updateUser, token } = useAuth();
-  const API_URL = import.meta.env.VITE_API_URL;
   const [vendorDetails, setVendorDetails] = useState({});
   const [categories, setCategories] = useState([]);
   const [couriers, setCouriers] = useState([]);
