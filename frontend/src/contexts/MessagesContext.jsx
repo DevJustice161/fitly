@@ -7,7 +7,9 @@ const MessagesContext = createContext();
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const API_URL = import.meta.env.VITE_API_URL;
 
-const socket = io(BACKEND_URL);
+const socket = io(BACKEND_URL, {
+  autoConnect: false,
+});
 
 export const MessagesProvider = ({ children }) => {
   const { user, token } = useAuth();
@@ -146,7 +148,7 @@ export const MessagesProvider = ({ children }) => {
   };
 
   const deleteMessage = async (id) => {
-    const res = await fetch(`${API_URL}messages/${id}`, {
+    const res = await fetch(`${API_URL}/messages/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
