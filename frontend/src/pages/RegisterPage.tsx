@@ -52,7 +52,6 @@ const RegisterPage = () => {
       const data = await registerUser(form);
 
       if (data.token) {
-        // auto login
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 

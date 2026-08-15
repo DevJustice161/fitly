@@ -41,6 +41,7 @@ exports.registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("Error in registerUser:", error);
     res.status(500).json(error);
   }
 };
