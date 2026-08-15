@@ -116,8 +116,8 @@ exports.getCategories = async (req, res) => {
 
           for (const subCategory of defaultSubCategories) {
             await db.query(
-              `INSERT INTO sub_categories (category_id, name, slug) VALUES (?, ?, ?)`,
-              [category.id, subCategory.name, subCategory.slug],
+              `INSERT INTO sub_categories (category_id, name) VALUES (?, ?)`,
+              [category.id, subCategory.name],
             );
           }
 
