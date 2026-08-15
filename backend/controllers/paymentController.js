@@ -6,6 +6,9 @@ const {
   buildSubscriptionPayload,
   buildPremiumPaymentCallbackUrl,
 } = require("../utils/premiumUtils");
+require("dotenv").config();
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const getPrimaryVendorId = (orderItems = []) =>
   orderItems.find((item) => item.vendor_id)?.vendor_id ?? null;
@@ -74,8 +77,7 @@ exports.initializeFlutterwave = async (req, res) => {
 
         currency: "NGN",
 
-        redirect_url:
-          "http://localhost:8080/payment-success?provider=flutterwave",
+        redirect_url: `${FRONTEND_URL}/payment-success?provider=flutterwave`,
 
         customer: {
           email,
@@ -242,7 +244,7 @@ exports.initializePaystack = async (req, res) => {
         email,
         amount: amount * 100,
         reference: tx_ref,
-        callback_url: "http://localhost:8080/payment-success?provider=paystack",
+        callback_url: `${FRONTEND_URL}/payment-success?provider=paystack`,
       },
 
       {
