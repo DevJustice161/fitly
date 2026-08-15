@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const RecentlyViewedContext = createContext();
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const API_URL = import.meta.env.API_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const RecentlyViewedProvider = ({ children }) => {
   const { user, token } = useAuth();
