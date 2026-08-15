@@ -4,9 +4,11 @@ import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { registerUser } from "../services/auth";
+import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 
 const RegisterPage = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -39,10 +41,12 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
+
     if (!agreed) {
       toast.error("Please accept the terms & conditions");
       return;
@@ -51,19 +55,26 @@ const RegisterPage = () => {
     try {
       const data = await registerUser(form);
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+      if (data.token && data.user) {
+        login(data.user, data.token);
 
-        navigate("/dashboard");
+        toast.success("Registration successful!");
+
+        if (data.user.role === "admin") {
+          navigate("/admin");
+        } else if (data.user.role === "vendor") {
+          navigate("/vendor");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
-        toast.error("Registration Failed!");
+        toast.error(data.message || "Registration Failed!");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Registration error:", error);
+      toast.error("Registration failed. Please try again.");
     }
   };
-
   const fields = [
     {
       key: "name",
