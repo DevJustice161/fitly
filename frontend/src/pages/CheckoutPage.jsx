@@ -185,7 +185,7 @@ const CheckoutPage = () => {
 
   const fetchCourier = async () => {
     try {
-      const response = await fetch(`${API_URL}/couriers/default`, {
+      const response = await fetch(`${VITE_API_URL}/couriers/default`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -303,7 +303,7 @@ const CheckoutPage = () => {
       };
 
       if (selectedPayment === "flutterwave") {
-        const response = await fetch(`${API_URL}/payments/flutterwave`, {
+        const response = await fetch(`${VITE_API_URL}/payments/flutterwave`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -325,7 +325,7 @@ const CheckoutPage = () => {
       }
 
       if (selectedPayment === "paystack") {
-        const response = await fetch(`${API_URL}/payments/paystack`, {
+        const response = await fetch(`${VITE_API_URL}/payments/paystack`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -397,7 +397,7 @@ const CheckoutPage = () => {
         order_items: orderItems,
       };
 
-      const response = await fetch(`${API_URL}/payments/transfer`, {
+      const response = await fetch(`${VITE_API_URL}/payments/transfer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
