@@ -1,20 +1,23 @@
 import { Helmet } from "react-helmet-async";
 import { useSiteDetails } from "../contexts/SiteContext";
 
-const { siteDetails, domain } = useSiteDetails();
-
-const SITE_NAME = domain;
-const SITE_URL = import.meta.env.VITE_SITE_URL;
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
-
 const SEO = ({
   title,
   description,
-  image = DEFAULT_IMAGE,
+  image,
   url,
   type = "website",
   noIndex = false,
 }) => {
+  const { domain } = useSiteDetails();
+
+  const SITE_NAME = domain || "Fitly.ng";
+  const SITE_URL = import.meta.env.VITE_SITE_URL;
+
+  const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
+
+  const finalImage = image || DEFAULT_IMAGE;
+
   const pageTitle = title
     ? `${title} | ${SITE_NAME}`
     : "Fitly.ng — Nigeria's Fashion Marketplace";
@@ -54,7 +57,7 @@ const SEO = ({
         }
       />
 
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={finalImage} />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:locale" content="en_NG" />
 
@@ -69,7 +72,7 @@ const SEO = ({
         }
       />
 
-      <meta name="twitter:image" content={image} />
+      <meta name="twitter:image" content={finalImage} />
     </Helmet>
   );
 };
