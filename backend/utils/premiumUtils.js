@@ -1,4 +1,7 @@
 const db = require("../config/db");
+require("dotenv").config();
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const getProductLimitForVendor = async (isPremium) => {
   const [defLim] = await db.query(
@@ -49,9 +52,7 @@ const buildPremiumPaymentCallbackUrl = ({
   paymentMethod,
   autoRenew,
 }) => {
-  const url = new URL(
-    baseUrl || "http://localhost:8080/vendor/premium-payment",
-  );
+  const url = new URL(baseUrl || `${FRONTEND_URL}/vendor/premium-payment`);
   url.searchParams.set("provider", provider);
   url.searchParams.set("purpose", "premium");
   url.searchParams.set("vendorId", vendorId);

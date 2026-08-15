@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const db = require("../config/db");
+require("dotenv").config();
 const createNotification = require("../utils/createNotification");
 const { calculateCommission } = require("../services/commissionService");
 const { conversionRateCalculation } = require("../services/conversionRate");
@@ -10,6 +11,8 @@ const {
   buildPremiumPaymentCallbackUrl,
 } = require("../utils/premiumUtils");
 const { sendEmail } = require("../utils/emailService");
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const ensurePremiumTables = async () => {
   await db.query(`
@@ -515,7 +518,7 @@ exports.updateVendorPremium = async (req, res) => {
       const callbackUrl = buildPremiumPaymentCallbackUrl({
         baseUrl:
           process.env.PREMIUM_CALLBACK_URL ||
-          "http://localhost:8080/vendor/premium-payment",
+          `${FRONTEND_URL}/vendor/premium-payment`,
         provider,
         vendorId: id,
         planId,
