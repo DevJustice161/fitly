@@ -70,9 +70,9 @@ const VendorReviews = () => {
     fetchVendorProfile();
   }, [user.id]);
 
-  console.log(vendorProfile);
-
   const all = getVendorReviews(vendorProfile?.store_name);
+
+  console.log(all);
 
   const productMap = useMemo(() => {
     const m = {};
