@@ -70,6 +70,8 @@ const VendorReviews = () => {
     fetchVendorProfile();
   }, [user.id]);
 
+  console.log(vendorProfile);
+
   const all = getVendorReviews(vendorProfile?.store_name);
 
   const productMap = useMemo(() => {
@@ -98,8 +100,6 @@ const VendorReviews = () => {
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [all, search, ratingFilter, productMap]);
-
-  console.log("filtered", filtered);
 
   const avg = all.length
     ? all.reduce((s, r) => s + r.rating, 0) / all.length

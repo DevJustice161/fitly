@@ -845,7 +845,7 @@ exports.getVendorProfile = async (req, res) => {
       `
       SELECT users.name AS owner, users.address, users.email, vendors.*,
       vendor_applications.full_name, vendor_applications.phone , vendor_applications.city , vendor_applications.state ,
-      vendor_applications.country, vendor_applications.category ,vendor_applications.government_id ,vendor_applications.cac ,vendor_applications.category ,vendor_applications.business_address,
+      vendor_applications.country, vendor_applications.category ,vendor_applications.government_id ,vendor_applications.cac ,vendor_applications.business_address,
       vendor_applications.bank_name ,vendor_applications.account_name ,vendor_applications.account_number ,vendor_applications.status ,vendor_applications.created_at AS date_applied 
       FROM vendors
       JOIN users ON vendors.user_id = users.id
