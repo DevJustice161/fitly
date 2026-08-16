@@ -70,7 +70,7 @@ const VendorReviews = () => {
     fetchVendorProfile();
   }, [user.id]);
 
-  console.log(vendorProfile);
+  console.log("Profile", vendorProfile);
 
   const all = getVendorReviews(vendorProfile?.store_name);
 
