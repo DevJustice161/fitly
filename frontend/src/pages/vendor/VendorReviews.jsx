@@ -42,7 +42,7 @@ const VendorReviews = () => {
   useEffect(() => {
     const fetchVendorProfile = async () => {
       try {
-        const response = await fetch(`${API_URL}/vendors/profile/${user.id}`, {
+        const response = await fetch(`${API_URL}/vendors/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
