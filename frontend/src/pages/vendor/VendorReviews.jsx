@@ -40,19 +40,19 @@ const VendorReviews = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
-    const fetchVendorProfile = async () => {
-      try {
-        const response = await fetch(`${API_URL}/vendors/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        setVendorProfile(data);
-      } catch (error) {
-        console.error("Error fetching vendor profile:", error);
-      }
-    };
+    // const fetchVendorProfile = async () => {
+    //   try {
+    //     const response = await fetch(`${API_URL}/vendors/${user.id}`, {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+    //     const data = await response.json();
+    //     setVendorProfile(data);
+    //   } catch (error) {
+    //     console.error("Error fetching vendor profile:", error);
+    //   }
+    // };
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${API_URL}/products`, {
