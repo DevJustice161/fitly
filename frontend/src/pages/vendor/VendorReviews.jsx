@@ -42,7 +42,7 @@ const VendorReviews = () => {
   useEffect(() => {
     const fetchVendorProfile = async () => {
       try {
-        const response = await fetch(`${API_URL}/vendors/${user.id}`, {
+        const response = await fetch(`${API_URL}/vendors/profile/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -98,8 +98,6 @@ const VendorReviews = () => {
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [all, search, ratingFilter, productMap]);
-
-  console.log("filtered", filtered);
 
   const avg = all.length
     ? all.reduce((s, r) => s + r.rating, 0) / all.length

@@ -306,11 +306,14 @@ const VendorProducts = () => {
       formData.append("existingImages", JSON.stringify(dataImages));
       uploadFiles.forEach((file) => formData.append("gallery", file));
 
-      const response = await fetch(`${API_URL}/update/${selected.id}`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
+      const response = await fetch(
+        `${API_URL}/products/update/${selected.id}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        },
+      );
 
       const data = await response.json();
 
@@ -344,10 +347,13 @@ const VendorProducts = () => {
   const handleDelete = async () => {
     setProducts(products.filter((p) => p.id !== selected.id));
     try {
-      const response = await fetch(`${API_URL}/delete/${selected.id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${API_URL}/products/delete/${selected.id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
       if (!response.ok) {
         const data = await response.json();
