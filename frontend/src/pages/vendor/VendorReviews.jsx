@@ -67,7 +67,7 @@ const VendorReviews = () => {
       }
     };
     fetchProducts();
-    fetchVendorProfile();
+    //fetchVendorProfile();
   }, [user.id]);
 
   console.log("Profile", vendorProfile);
