@@ -31,7 +31,15 @@ exports.findVendor = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, phone, address, city, state, country } = req.body;
+    const {
+      name = "",
+      email = "",
+      phone = "",
+      address = "",
+      city = "",
+      state = "",
+      country = "",
+    } = req.body;
     const avatar = req.file ? req.file.filename : null;
 
     const updateData = { name, email, phone, address, city, state, country };
