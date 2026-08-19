@@ -115,7 +115,7 @@ exports.updateUserPassword = async (req, res) => {
 
       await db.query("UPDATE users SET password = ? WHERE id = ?", [
         hashedPassword,
-        userId,
+        id,
       ]);
 
       return res.status(200).json({
