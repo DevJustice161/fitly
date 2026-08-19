@@ -395,6 +395,7 @@ const CheckoutPage = () => {
         payment_method: selectedPayment,
         payment_reference: "",
         order_items: orderItems,
+        courier_id: courier.id,
       };
 
       const response = await fetch(`${VITE_API_URL}/payments/transfer`, {
