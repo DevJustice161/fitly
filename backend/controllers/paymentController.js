@@ -415,7 +415,7 @@ exports.initializeTransfer = async (req, res) => {
             courier_id,
             total,
             payment_method,
-            payment_reference,
+            payment_reference
           )
           VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,

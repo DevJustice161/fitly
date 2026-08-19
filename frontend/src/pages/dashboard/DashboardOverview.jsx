@@ -7,6 +7,7 @@ import {
   Clock,
   Heart,
   Hand,
+  Sparkles,
   Ticket,
   ArrowRight,
   Package,
@@ -108,7 +109,7 @@ const DashboardOverview = () => {
       <div className="bg-gradient-to-r from-secondary to-card rounded-2xl p-6 md:p-8 shadow-sm border border-border mb-10">
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
           Welcome back, {user.name.split(" ")[0]}{" "}
-          <Hand className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+          <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-primary" />
         </h1>
         <p className="text-muted-foreground mt-1">
           Here's what's happening with your account today.
