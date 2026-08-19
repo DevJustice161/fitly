@@ -31,7 +31,7 @@ const GoogleAuthButton = ({ mode = "signin" }) => {
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         theme: "outline",
         size: "large",
-        width: 400,
+        width: "100%",
         text: mode === "signup" ? "signup_with" : "signin_with",
         shape: "rectangular",
         logo_alignment: "left",

@@ -166,6 +166,12 @@ exports.googleAuth = async (req, res) => {
         [name, email, "", "", "", "", "", null, "customer", googleId],
       );
       const userId = result.insertId;
+      const [userAfterInsertion] = await db.query(
+        `SELECT * FROM users WHERE id = ?`,
+        [userId],
+      );
+
+      const regUser = userAfterInsertion[0];
       const token = jwt.sign(
         {
           id: userId,
@@ -179,12 +185,7 @@ exports.googleAuth = async (req, res) => {
       return res.status(201).json({
         message: "Google signup successful",
         token,
-        user: {
-          id: userId,
-          name,
-          email,
-          role: "customer",
-        },
+        user: regUser,
       });
     }
 

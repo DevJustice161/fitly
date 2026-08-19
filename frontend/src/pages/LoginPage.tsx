@@ -141,7 +141,7 @@ const LoginPage = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-border bg-background font-body text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                <div className="mt-4 w-full overflow-hidden rounded-xl">
                   <GoogleAuthButton mode="signin" />
                 </div>
               </div>
