@@ -380,19 +380,23 @@ const CheckoutPage = () => {
       const orderItems = items.map((item) => ({
         product_id: item.product_id,
         vendor_id: item.vendor_id,
+        default_courier: item.default_courier,
         quantity: item.quantity,
         size: item.size,
         color: item.color,
         price: getDisplayUnitPrice(item),
         voucher_id: appliedVouchers[item.vendor_id]?.id || null,
+        applied_vendor_coupon: appliedVouchers[item.vendor_id]?.code || null,
+        coupon_discount: appliedVouchers[item.vendor_id]?.discount || 0,
       }));
 
       const order = {
         user_id: user.id,
         status: "pending_payment",
-        subtotal: total,
+        subtotal: effectiveSubtotal,
         delivery_fee: deliveryFee,
         total: total,
+        voucher_discount: voucherDiscountTotal,
         payment_method: selectedPayment,
         payment_reference: "",
         order_items: orderItems,
