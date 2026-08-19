@@ -108,8 +108,8 @@ const DashboardOverview = () => {
     <div className="space-y-6 max-w-5xl">
       <div className="bg-gradient-to-r from-secondary to-card rounded-2xl p-6 md:p-8 shadow-sm border border-border mb-10">
         <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
+          Welcome back, {user.name.split(" ")[0]}{" "}
           <span>
-            Welcome back, {user.name.split(" ")[0]}{" "}
             <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-primary" />
           </span>
         </h1>
