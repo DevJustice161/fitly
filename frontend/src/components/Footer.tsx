@@ -19,39 +19,38 @@ const Footer = () => {
   const [categories, setCategories] = useState([]);
   const [email, setEmail] = useState("");
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${API_URL}/categories`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to load categories");
-      }
-
-      const normalizedCategories = Array.isArray(data)
-        ? data.map((category) => {
-            if (typeof category === "string") {
-              return { name: category, slug: category };
-            }
-
-            return {
-              name: category.name || category.slug || "Unnamed category",
-              slug: category.slug || category.name || "",
-            };
-          })
-        : [];
-
-      setCategories(normalizedCategories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${API_URL}/categories`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load categories");
+        }
+
+        const normalizedCategories = Array.isArray(data)
+          ? data.map((category) => {
+              if (typeof category === "string") {
+                return { name: category, slug: category };
+              }
+
+              return {
+                name: category.name || category.slug || "Unnamed category",
+                slug: category.slug || category.name || "",
+              };
+            })
+          : [];
+
+        setCategories(normalizedCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
     fetchCategories();
-  }, [user?.id]);
+  }, [user?.id, API_URL, token]);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -80,19 +79,21 @@ const Footer = () => {
             onSubmit={handleSubscribe}
             className="flex max-w-md mx-auto gap-2"
           >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg bg-primary-foreground text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-foreground text-primary-foreground rounded-lg font-body font-medium text-sm hover:opacity-90 transition-opacity"
-            >
-              Subscribe
-            </button>
+            <div className="w-full flex items-center gap-2 bg-primary-foreground rounded-lg overflow-hidden">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 rounded-lg bg-primary-foreground text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-foreground text-primary-foreground rounded-lg font-body font-medium text-sm hover:opacity-90 transition-opacity"
+              >
+                Subscribe
+              </button>
+            </div>
           </form>
         </div>
       </div>
