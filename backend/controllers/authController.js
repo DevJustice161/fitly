@@ -73,6 +73,15 @@ exports.loginUser = async (req, res) => {
     if (user.length === 0)
       return res.status(400).json({ message: "User not found" });
 
+    if (user[0].password == null) {
+      return res
+        .status(403)
+        .json({
+          message:
+            "You signed up with Google, use the Google Sign in button to login",
+        });
+    }
+
     const validPassword = await bcrypt.compare(password, user[0].password);
     if (user[0].status !== "active") {
       return res.status(403).json({ message: "User account is not active" });

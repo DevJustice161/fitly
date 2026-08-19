@@ -582,10 +582,10 @@ const CheckoutPage = () => {
                         <label className="text-sm mb-1 block">Country</label>
 
                         <input
-                          disabled
                           name="country"
                           value={shipping.country}
                           className={inputClass}
+                          onChange={handleShippingChange}
                         />
                       </div>
                     </div>

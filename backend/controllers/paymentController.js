@@ -236,6 +236,7 @@ exports.initializePaystack = async (req, res) => {
       payment_method,
       payment_reference,
       order_items,
+      courier_id,
     } = req.body.order;
 
     const response = await axios.post(
@@ -273,11 +274,12 @@ exports.initializePaystack = async (req, res) => {
             status,
             subtotal,
             delivery_fee,
+            courier_id,
             total,
             payment_method,
             payment_reference
           )
-          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         user_id,
@@ -286,6 +288,7 @@ exports.initializePaystack = async (req, res) => {
         status,
         subtotal,
         delivery_fee,
+        courier_id,
         total,
         payment_method,
         payment_reference,
@@ -388,6 +391,7 @@ exports.initializeTransfer = async (req, res) => {
       payment_method,
       payment_reference,
       order_items,
+      courier_id,
     } = req.body.order;
 
     const vendorId = getPrimaryVendorId(order_items);
@@ -408,11 +412,12 @@ exports.initializeTransfer = async (req, res) => {
             status,
             subtotal,
             delivery_fee,
+            courier_id,
             total,
             payment_method,
-            payment_reference
+            payment_reference,
           )
-          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `,
       [
         user_id,
@@ -421,6 +426,7 @@ exports.initializeTransfer = async (req, res) => {
         status,
         subtotal,
         delivery_fee,
+        courier_id,
         total,
         payment_method,
         payment_reference,
