@@ -199,6 +199,7 @@ exports.deleteUser = async (req, res) => {
     await db.query("DELETE FROM vouchers WHERE user_id = ?", [id]);
     await db.query("DELETE FROM wishlists WHERE user_id = ?", [id]);
     await db.query("DELETE FROM coupon_usages WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM carts WHERE user_id = ?", [id]);
     await db.query("DELETE FROM users WHERE id = ?", [id]);
 
     res.json({
