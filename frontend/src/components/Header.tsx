@@ -162,30 +162,34 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link
-              to="/dashboard/wishlist"
-              className="relative text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Wishlists"
-            >
-              <Heart size={20} />
-              {totalWishlists > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalWishlists}
-                </span>
-              )}
-            </Link>
-            <Link
-              to="/cart"
-              className="relative text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Cart"
-            >
-              <ShoppingBag size={20} />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {user && (
+              <>
+                <Link
+                  to="/dashboard/wishlist"
+                  className="relative text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Wishlists"
+                >
+                  <Heart size={20} />
+                  {totalWishlists > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalWishlists}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  to="/cart"
+                  className="relative text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Cart"
+                >
+                  <ShoppingBag size={20} />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
