@@ -187,16 +187,16 @@ exports.deleteUser = async (req, res) => {
       [id, id],
     );
     await db.query("DELETE FROM notifications WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM orders WHERE user_id = ?", [id]);
     await db.query("DELETE FROM order_items WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM orders WHERE user_id = ?", [id]);
     await db.query("DELETE FROM payment_methods WHERE user_id = ?", [id]);
     await db.query("DELETE FROM recently_viewed WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM reviews WHERE user_id = ?", [id]);
     await db.query("DELETE FROM review_images WHERE user_id = ?", [id]);
     await db.query("DELETE FROM review_replies WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM reviews WHERE user_id = ?", [id]);
     await db.query("DELETE FROM vendor_applications WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM vouchers WHERE user_id = ?", [id]);
     await db.query("DELETE FROM voucher_usage WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM vouchers WHERE user_id = ?", [id]);
     await db.query("DELETE FROM wishlists WHERE user_id = ?", [id]);
     await db.query("DELETE FROM coupon_usages WHERE user_id = ?", [id]);
     await db.query("DELETE FROM users WHERE id = ?", [id]);
