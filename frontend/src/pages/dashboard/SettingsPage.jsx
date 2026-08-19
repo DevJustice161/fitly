@@ -103,10 +103,18 @@ const SettingsPage = () => {
   const handleUpdatePassword = async () => {
     try {
       setLoading(true);
-      if (!currentPassword || !newPassword || !confirmPassword) {
-        toast.error("Please fill in all password fields.");
-        return;
+      if (user.password != null) {
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          toast.error("Please fill in all password fields.");
+          return;
+        }
+      } else {
+        if (!newPassword || !confirmPassword) {
+          toast.error("Please fill in all password fields.");
+          return;
+        }
       }
+
       if (newPassword.length < 6) {
         toast.error("New password must be at least 6 characters long.");
         return;

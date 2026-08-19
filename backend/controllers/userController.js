@@ -83,7 +83,7 @@ exports.updateUserPassword = async (req, res) => {
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
 
-    if (!currentPassword || !newPassword) {
+    if (!newPassword) {
       return res.status(400).json({
         success: false,
         message: "Current password and new password are required.",
