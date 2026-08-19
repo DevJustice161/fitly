@@ -23,6 +23,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import SEO from "@/components/SEO";
 import { toast } from "sonner";
 
 import Header from "@/components/Header";
