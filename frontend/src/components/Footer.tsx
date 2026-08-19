@@ -79,7 +79,7 @@ const Footer = () => {
             onSubmit={handleSubscribe}
             className="flex max-w-md mx-auto gap-2"
           >
-            <div className="w-full flex items-center gap-2 bg-primary-foreground rounded-lg overflow-hidden">
+            <div className="w-full flex flex-wrap items-center gap-2 bg-primary-foreground rounded-lg overflow-hidden">
               <input
                 type="email"
                 value={email}
