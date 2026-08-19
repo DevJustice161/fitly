@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { registerUser } from "../services/auth";
+import GoogleButton from "@/components/auth/GoogleButton";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
+import { registerUser, googleSignup } from "../services/auth";
 import { useAuth } from "../contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -12,17 +14,49 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const handleGoogleSignup = () => {
-    setGoogleLoading(true);
-    toast.loading("Connecting to Google...", { id: "google-signup" });
-    setTimeout(() => {
-      toast.success("Signed up with Google!", {
+  // const handleGoogleSignup = () => {
+  //   setGoogleLoading(true);
+  //   toast.loading("Connecting to Google...", { id: "google-signup" });
+  //   setTimeout(() => {
+  //     toast.success("Signed up with Google!", {
+  //       id: "google-signup",
+  //       description: "Welcome to Fitly.ng",
+  //     });
+  //     setGoogleLoading(false);
+  //     navigate("/dashboard");
+  //   }, 1200);
+  // };
+
+  const handleGoogleSuccess = async (response) => {
+    try {
+      setGoogleLoading(true);
+
+      toast.loading("Creating your Fitly account...", {
         id: "google-signup",
-        description: "Welcome to Fitly.ng",
       });
-      setGoogleLoading(false);
+
+      const result = await googleSignup(response.credential);
+
+      if (!result.token) {
+        throw new Error(result.message || "Google signup failed");
+      }
+
+      login(result.user, result.token);
+
+      toast.success("Welcome to Fitly.ng!", {
+        id: "google-signup",
+      });
+
       navigate("/dashboard");
-    }, 1200);
+    } catch (error) {
+      console.error("Google signup error:", error);
+
+      toast.error(error.message || "Google signup failed", {
+        id: "google-signup",
+      });
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   const [form, setForm] = useState({
@@ -232,7 +266,11 @@ const RegisterPage = () => {
                 </div>
               </div>
 
-              <button
+              <div className="mt-4">
+                <GoogleAuthButton mode="signup" />
+              </div>
+
+              {/* <button
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={googleLoading}
@@ -257,7 +295,7 @@ const RegisterPage = () => {
                   />
                 </svg>
                 {googleLoading ? "Connecting…" : "Sign up with Google"}
-              </button>
+              </button> */}
             </div>
 
             <p className="mt-6 text-center font-body text-sm text-muted-foreground">

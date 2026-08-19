@@ -17,6 +17,8 @@ import ProductDetail from "./pages/ProductDetail.tsx";
 import CartPage from "./pages/CartPage.jsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
@@ -111,6 +113,14 @@ const App = () => (
                         />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
+                        <Route
+                          path="/forgot-password"
+                          element={<ForgotPasswordPage />}
+                        />
+                        <Route
+                          path="/reset-password"
+                          element={<ResetPasswordPage />}
+                        />
                         <Route path="/about" element={<AboutPage />} />
                         <Route path="/search" element={<SearchPage />} />
                         <Route
