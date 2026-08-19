@@ -154,28 +154,28 @@ const SettingsPage = () => {
   const handleDeleteAccount = async () => {
     try {
       setLoading(true);
-      fetch(`${API_URL}/users/delete/${user.id}`, {
+
+      const res = await fetch(`${API_URL}/users/delete/${user.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            toast.success("Your account has been deleted.");
-            await logout();
-            navigate("/");
-          } else {
-            toast.error(data.message || "Failed to delete account.");
-          }
-        })
-        .catch((error) => {
-          console.error("Error deleting account:", error);
-          toast.error("An error occurred while deleting account.");
-        });
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Your account has been deleted.");
+
+        await logout();
+
+        navigate("/");
+      } else {
+        toast.error(data.message || "Failed to delete account.");
+      }
     } catch (error) {
       console.error("Error deleting account:", error);
+      toast.error("An error occurred while deleting account.");
     } finally {
       setLoading(false);
     }
@@ -322,34 +322,33 @@ const SettingsPage = () => {
         <CardContent className="space-y-4">
           {user.password != null && (
             <div>
-            <Label className="text-xs text-muted-foreground">
-              Current Password
-            </Label>
+              <Label className="text-xs text-muted-foreground">
+                Current Password
+              </Label>
 
-            <div className="relative mt-1">
-              <Input
-                type={showCurrentPassword ? "text" : "password"}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="border-border pr-10"
-              />
+              <div className="relative mt-1">
+                <Input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="border-border pr-10"
+                />
 
-              <button
-                type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showCurrentPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-
           )}
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-xs text-muted-foreground">
