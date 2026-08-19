@@ -266,10 +266,10 @@ const CartPage = () => {
                     return (
                       <div
                         key={item.cart_id}
-                        className="bg-card rounded-xl p-4 flex gap-4 border"
+                        className="bg-card rounded-xl p-3 sm:p-4 flex gap-3 sm:gap-4 border min-w-0"
                       >
                         {/* IMAGE */}
-                        <div className="w-24 h-32 rounded-lg overflow-hidden">
+                        <div className="w-20 h-28 sm:w-24 sm:h-32 rounded-lg overflow-hidden shrink-0">
                           <img
                             src={`${BACKEND_URL}/uploads/products/${item.thumbnail}`}
                             alt={item.name}
@@ -278,17 +278,20 @@ const CartPage = () => {
                         </div>
 
                         {/* DETAILS */}
-                        <div className="flex-1">
-                          <div className="flex justify-between">
-                            <div>
-                              <p className="text-xs text-muted-foreground uppercase">
+                        <div className="flex-1 min-w-0">
+                          {/* HEADER */}
+                          <div className="flex items-start justify-between gap-2 min-w-0">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs text-muted-foreground uppercase truncate">
                                 {item.vendor_name}
                               </p>
 
-                              <h3 className="font-semibold">{item.name}</h3>
+                              <h3 className="font-semibold text-sm sm:text-base break-words">
+                                {item.name}
+                              </h3>
 
                               {/* VARIANTS */}
-                              <div className="flex gap-2 mt-2">
+                              <div className="flex flex-wrap gap-2 mt-2">
                                 {/* SIZE */}
                                 <select
                                   value={item.size || ""}
@@ -299,7 +302,7 @@ const CartPage = () => {
                                       item.color,
                                     )
                                   }
-                                  className="border rounded px-2 py-1 text-xs"
+                                  className="max-w-full border rounded px-2 py-1 text-xs bg-background"
                                 >
                                   <option value="">Size</option>
                                   {uniqueSizes.map((size) => (
@@ -319,7 +322,7 @@ const CartPage = () => {
                                       e.target.value,
                                     )
                                   }
-                                  className="border rounded px-2 py-1 text-xs"
+                                  className="max-w-full border rounded px-2 py-1 text-xs bg-background"
                                 >
                                   <option value="">Color</option>
                                   {uniqueColors.map((color) => (
@@ -335,24 +338,29 @@ const CartPage = () => {
                                   Select size & color
                                 </p>
                               ) : (
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <p className="text-xs text-muted-foreground mt-1 break-words">
                                   {item.size} | {item.color}
                                 </p>
                               )}
                             </div>
 
+                            {/* REMOVE BUTTON */}
                             <button
+                              type="button"
                               onClick={() => removeFromCart(item.cart_id)}
-                              className="text-muted-foreground hover:text-red-500"
+                              className="shrink-0 p-1 text-muted-foreground hover:text-red-500 transition-colors"
+                              aria-label="Remove item"
                             >
                               <X size={18} />
                             </button>
                           </div>
 
                           {/* QUANTITY + PRICE */}
-                          <div className="flex justify-between mt-4">
-                            <div className="flex items-center border rounded-lg">
+                          <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3 mt-4">
+                            {/* QUANTITY */}
+                            <div className="flex items-center border rounded-lg w-fit shrink-0">
                               <button
+                                type="button"
                                 onClick={() =>
                                   updateQuantity(
                                     item.cart_id,
@@ -364,9 +372,12 @@ const CartPage = () => {
                                 <Minus size={14} />
                               </button>
 
-                              <span className="px-3">{item.quantity}</span>
+                              <span className="px-3 text-sm">
+                                {item.quantity}
+                              </span>
 
                               <button
+                                type="button"
                                 onClick={() =>
                                   item.quantity < item.stock_quantity &&
                                   updateQuantity(
@@ -380,12 +391,14 @@ const CartPage = () => {
                               </button>
                             </div>
 
-                            <div className="text-right">
-                              <div className="font-semibold">
+                            {/* PRICE */}
+                            <div className="text-left xs:text-right min-w-0">
+                              <div className="font-semibold text-sm sm:text-base break-words">
                                 {formatPrice(displayUnitPrice * item.quantity)}
                               </div>
+
                               {appliedVouchers[item.vendor_id] && (
-                                <p className="text-[11px] text-green-600 mt-1">
+                                <p className="text-[11px] text-green-600 mt-1 break-words">
                                   Coupon applied:{" "}
                                   {appliedVouchers[item.vendor_id].code}
                                 </p>
@@ -394,7 +407,7 @@ const CartPage = () => {
                           </div>
 
                           {/* COUPON */}
-                          <div className="flex items-center justify-center mt-3 gap-2">
+                          <div className="flex flex-col sm:flex-row mt-3 gap-2 w-full min-w-0">
                             <input
                               type="text"
                               value={voucherInputs[item.vendor_id] || ""}
@@ -405,8 +418,9 @@ const CartPage = () => {
                                 }))
                               }
                               placeholder="Apply vendor voucher"
-                              className="flex-1 px-3 py-2 rounded-lg border border-border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                              className="w-full min-w-0 flex-1 px-3 py-2 rounded-lg border border-border bg-background font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                             />
+
                             <button
                               type="button"
                               onClick={() =>
@@ -416,9 +430,10 @@ const CartPage = () => {
                                 )
                               }
                               disabled={voucherLoading[item.vendor_id]}
-                              className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground"
+                              className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-1 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground whitespace-nowrap"
                             >
                               <Ticket size={14} />
+
                               {voucherLoading[item.vendor_id]
                                 ? "Applying..."
                                 : "Apply"}
@@ -429,7 +444,6 @@ const CartPage = () => {
                     );
                   })}
                 </div>
-
                 <div className="bg-card p-6 rounded-xl border h-fit sticky top-28">
                   <h3 className="font-bold text-xl mb-4">Order Summary</h3>
 
