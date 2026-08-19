@@ -419,6 +419,7 @@ const CheckoutPage = () => {
       }
 
       closeTransferModal();
+      clearCart();
 
       toast.success("Order placed. Awaiting payment verification by admin.");
 
