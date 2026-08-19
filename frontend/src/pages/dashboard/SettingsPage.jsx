@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   User,
   Mail,
@@ -32,7 +33,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const SettingsPage = () => {
-  const { user, setUser, token } = useAuth();
+  const navigate = useNavigate();
+  const { user, setUser, token, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [fullName, setFullName] = useState(user.name);
@@ -149,7 +151,7 @@ const SettingsPage = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     try {
       setLoading(true);
       fetch(`${API_URL}/users/delete/${user.id}`, {
@@ -160,12 +162,10 @@ const SettingsPage = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data.message === "User deleted successfully") {
+          if (data.success) {
             toast.success("Your account has been deleted.");
-            // Perform logout or redirect to homepage
-            setUser(null);
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
+            await logout();
+            navigate("/");
           } else {
             toast.error(data.message || "Failed to delete account.");
           }
@@ -320,7 +320,8 @@ const SettingsPage = () => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div>
+          {user.password != null && (
+            <div>
             <Label className="text-xs text-muted-foreground">
               Current Password
             </Label>
@@ -347,6 +348,8 @@ const SettingsPage = () => {
             </div>
           </div>
 
+          )}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label className="text-xs text-muted-foreground">

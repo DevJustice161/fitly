@@ -44,15 +44,17 @@ exports.registerUser = async (req, res) => {
       { expiresIn: "7d" },
     );
 
+    const [userAfterInsertion] = await db.query(
+      `SELECT * FROM users WHERE id = ?`,
+      [result.insertId],
+    );
+
+    const regUser = userAfterInsertion[0];
+
     res.json({
       message: "Registration successful",
       token,
-      user: {
-        id: result.insertId,
-        name,
-        email,
-        role: "customer",
-      },
+      user: regUser,
     });
   } catch (error) {
     console.log("Error in registerUser:", error);

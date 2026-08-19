@@ -103,6 +103,26 @@ exports.updateUserPassword = async (req, res) => {
 
     const user = users[0];
 
+    // Google-only account: no existing password
+    if (!user.password) {
+      if (!newPassword) {
+        return res.status(400).json({
+          message: "New password is required",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await db.query("UPDATE users SET password = ? WHERE id = ?", [
+        hashedPassword,
+        userId,
+      ]);
+
+      return res.status(200).json({
+        message: "Password created successfully",
+      });
+    }
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
 
     if (!isMatch) {
@@ -169,7 +189,7 @@ exports.deleteUser = async (req, res) => {
     await db.query("DELETE FROM notifications WHERE user_id = ?", [id]);
     await db.query("DELETE FROM orders WHERE user_id = ?", [id]);
     await db.query("DELETE FROM order_items WHERE user_id = ?", [id]);
-    await db.query("DELETE FROM payment_method WHERE user_id = ?", [id]);
+    await db.query("DELETE FROM payment_methods WHERE user_id = ?", [id]);
     await db.query("DELETE FROM recently_viewed WHERE user_id = ?", [id]);
     await db.query("DELETE FROM reviews WHERE user_id = ?", [id]);
     await db.query("DELETE FROM review_images WHERE user_id = ?", [id]);

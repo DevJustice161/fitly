@@ -14,19 +14,6 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // const handleGoogleSignup = () => {
-  //   setGoogleLoading(true);
-  //   toast.loading("Connecting to Google...", { id: "google-signup" });
-  //   setTimeout(() => {
-  //     toast.success("Signed up with Google!", {
-  //       id: "google-signup",
-  //       description: "Welcome to Fitly.ng",
-  //     });
-  //     setGoogleLoading(false);
-  //     navigate("/dashboard");
-  //   }, 1200);
-  // };
-
   const handleGoogleSuccess = async (response) => {
     try {
       setGoogleLoading(true);
@@ -266,7 +253,7 @@ const RegisterPage = () => {
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-border bg-background font-body text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                 <GoogleAuthButton mode="signup" />
               </div>
 
