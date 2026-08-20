@@ -4,6 +4,19 @@ exports.addToCart = async (req, res) => {
   try {
     const { user_id, product_id, quantity, size, color } = req.body;
 
+    const [userRow] = await db.query(`SELECT * FROM users WHERE id = ?`, [
+      user_id,
+    ]);
+
+    const user = userRow[0];
+
+    if (user.role !== "customer") {
+      return res.status(403).json({
+        success: false,
+        message: "Only customers can add items to the cart",
+      });
+    }
+
     const [existing] = await db.query(
       `
       SELECT * FROM carts

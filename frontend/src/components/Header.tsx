@@ -162,7 +162,7 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {user && (
+            {user && user.role === "customer" && (
               <>
                 <Link
                   to="/dashboard/wishlist"
