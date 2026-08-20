@@ -1,5 +1,17 @@
 const db = require("../config/db");
 
+const formatMySQLDateTime = (date) => {
+  if (!date) return null;
+
+  const parsedDate = new Date(date);
+
+  if (isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate.toISOString().slice(0, 19).replace("T", " ");
+};
+
 exports.createVoucher = async (req, res) => {
   try {
     const {
@@ -49,7 +61,7 @@ exports.createVoucher = async (req, res) => {
         discount_type,
         discount_value,
         min_order_amount,
-        expires_at,
+        formatMySQLDateTime(expires_at),
         usage_limit,
         user_id || null,
         vendor_id,
@@ -195,7 +207,7 @@ exports.updateVoucher = async (req, res) => {
         discount_type,
         discount_value,
         min_order_amount,
-        expires_at,
+        formatMySQLDateTime(expires_at),
         usage_limit,
         is_active,
         description,
