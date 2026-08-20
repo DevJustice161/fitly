@@ -507,7 +507,7 @@ const AdminVouchers = () => {
                 <Label>Expiry</Label>
                 <Input
                   type="date"
-                  value={form.expires_at}
+                  value={new Date(form.expires_at).toLocaleDateString("en-CA")}
                   onChange={(e) =>
                     setForm({ ...form, expires_at: e.target.value })
                   }
