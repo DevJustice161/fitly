@@ -484,7 +484,6 @@ const AdminVouchers = () => {
               <div className="space-y-1.5">
                 <Label>Min. Order ({currencySymbol})</Label>
                 <Input
-                  type="number"
                   value={form.minOrder}
                   onChange={(e) =>
                     setForm({ ...form, minOrder: e.target.value })
@@ -494,7 +493,6 @@ const AdminVouchers = () => {
               <div className="space-y-1.5">
                 <Label>Max Uses</Label>
                 <Input
-                  type="number"
                   value={form.maxUses}
                   onChange={(e) =>
                     setForm({ ...form, maxUses: e.target.value })
