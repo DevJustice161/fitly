@@ -243,7 +243,7 @@ exports.approveWithdrawal = async (req, res) => {
 
     const newTransaction = {
       id: `TXN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      date: new Date().toISOString().slice(0, 19).replace("T", " "),
+      date: new Date().toISOString(),
       amount: withdrawal.amount.toString(),
       title: "Withdrawal",
       status: "successful",

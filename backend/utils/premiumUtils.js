@@ -13,6 +13,18 @@ const getProductLimitForVendor = async (isPremium) => {
   return isPremium ? Infinity : defaultLimit;
 };
 
+const formatMySQLDateTime = (date) => {
+  if (!date) return null;
+
+  const parsedDate = new Date(date);
+
+  if (isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate.toISOString().slice(0, 19).replace("T", " ");
+};
+
 const buildSubscriptionPayload = ({
   vendorId,
   planId,
@@ -34,8 +46,8 @@ const buildSubscriptionPayload = ({
   amount,
   payment_method: JSON.stringify(paymentMethod || {}),
   history: JSON.stringify(history || []),
-  started_at: startedAt || null,
-  next_billing_at: nextBillingAt || null,
+  started_at: formatMySQLDateTime(startedAt),
+  next_billing_at: formatMySQLDateTime(nextBillingAt),
   last_payment_reference: paymentReference || null,
 });
 
@@ -58,8 +70,8 @@ const buildPremiumPaymentCallbackUrl = ({
   url.searchParams.set("vendorId", vendorId);
   url.searchParams.set("planId", planId || "premium");
   url.searchParams.set("billingCycle", billingCycle || "monthly");
-  url.searchParams.set("startedAt", startedAt);
-  url.searchParams.set("nextBillingAt", nextBillingAt);
+  url.searchParams.set("startedAt", formatMySQLDateTime(startedAt));
+  url.searchParams.set("nextBillingAt", formatMySQLDateTime(nextBillingAt));
   url.searchParams.set("paymentReference", paymentReference);
   url.searchParams.set("amount", amount || 0);
   url.searchParams.set("paymentMethod", paymentMethod || "");
