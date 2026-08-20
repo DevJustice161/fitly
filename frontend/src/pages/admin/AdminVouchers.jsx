@@ -47,12 +47,12 @@ import { useSiteDetails } from "@/contexts/SiteContext.jsx";
 
 const emptyForm = {
   code: "",
-  type: "percentage",
-  discount: 10,
-  minOrder: 0,
-  maxUses: 100,
-  expiry: "",
-  active: true,
+  discount_type: "percentage",
+  discount_value: 10,
+  min_order_amount: 0,
+  usage_limit: 100,
+  expires_at: "",
+  is_active: true,
   description: "",
 };
 
@@ -128,13 +128,13 @@ const AdminVouchers = () => {
     try {
       const payload = {
         code: form.code.toUpperCase().trim(),
-        discount_type: form.type,
-        discount_value: Number(form.discount),
-        min_order_amount: Number(form.minOrder),
-        usage_limit: Number(form.maxUses),
-        expires_at: form.expiry,
+        discount_type: form.discount_type,
+        discount_value: Number(form.discount_value),
+        min_order_amount: Number(form.min_order_amount),
+        usage_limit: Number(form.usage_limit),
+        expires_at: form.expires_at,
         description: form.description,
-        is_active: form.active,
+        is_active: form.is_active,
         vendor_id: null,
         user_id: null,
       };
@@ -453,8 +453,10 @@ const AdminVouchers = () => {
               <div className="space-y-1.5">
                 <Label>Type</Label>
                 <Select
-                  value={form.type}
-                  onValueChange={(val) => setForm({ ...form, type: val })}
+                  value={form.discount_type}
+                  onValueChange={(val) =>
+                    setForm({ ...form, discount_type: val })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -468,34 +470,36 @@ const AdminVouchers = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>
-                  {form.type === "percentage"
+                  {form.discount_type === "percentage"
                     ? "Discount (%)"
                     : `Discount (${currencySymbol})`}
                 </Label>
                 <Input
                   type="number"
-                  disabled={form.type === "shipping"}
-                  value={form.discount}
+                  disabled={form.discount_type === "shipping"}
+                  value={form.discount_value}
                   onChange={(e) =>
-                    setForm({ ...form, discount: e.target.value })
+                    setForm({ ...form, discount_value: e.target.value })
                   }
                 />
               </div>
               <div className="space-y-1.5">
                 <Label>Min. Order ({currencySymbol})</Label>
                 <Input
-                  value={form.minOrder}
+                  type="number"
+                  value={form.min_order_amount}
                   onChange={(e) =>
-                    setForm({ ...form, minOrder: e.target.value })
+                    setForm({ ...form, min_order_amount: e.target.value })
                   }
                 />
               </div>
               <div className="space-y-1.5">
                 <Label>Max Uses</Label>
                 <Input
-                  value={form.maxUses}
+                  type="number"
+                  value={form.usage_limit}
                   onChange={(e) =>
-                    setForm({ ...form, maxUses: e.target.value })
+                    setForm({ ...form, usage_limit: e.target.value })
                   }
                 />
               </div>
@@ -503,8 +507,10 @@ const AdminVouchers = () => {
                 <Label>Expiry</Label>
                 <Input
                   type="date"
-                  value={form.expiry}
-                  onChange={(e) => setForm({ ...form, expiry: e.target.value })}
+                  value={form.expires_at}
+                  onChange={(e) =>
+                    setForm({ ...form, expires_at: e.target.value })
+                  }
                 />
               </div>
             </div>
@@ -521,8 +527,8 @@ const AdminVouchers = () => {
             <div className="flex items-center justify-between pt-1">
               <Label>Active</Label>
               <Switch
-                checked={form.active}
-                onCheckedChange={(val) => setForm({ ...form, active: val })}
+                checked={form.is_active}
+                onCheckedChange={(val) => setForm({ ...form, is_active: val })}
               />
             </div>
           </div>
