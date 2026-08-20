@@ -59,6 +59,7 @@ const AdminOrders = () => {
 
   const capitalizeWord = (str) => {
     if (!str) return "";
+    if (str === "pending_payment") return "Pending Payment";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
