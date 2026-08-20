@@ -525,7 +525,7 @@ exports.verifyPremiumFlutterwave = async (req, res) => {
       const history = JSON.parse(vendorSub.history);
       const latestHistory = {
         id: `INV-${Date.now()}`,
-        date: now.toISOString(),
+        date: now.toISOString().slice(0, 19).replace("T", " "),
         amount,
         plan: "Premium Vendor",
         status: "Paid",
@@ -721,7 +721,7 @@ exports.verifyPremiumPaystack = async (req, res) => {
       const history = JSON.parse(vendorSub.history);
       const latestHistory = {
         id: `INV-${Date.now()}`,
-        date: now.toISOString(),
+        date: now.toISOString().slice(0, 19).replace("T", " "),
         amount,
         plan: "Premium Vendor",
         status: "Paid",

@@ -266,7 +266,7 @@ const VendorPremium = () => {
           history: [
             {
               id: `INV-${Date.now()}`,
-              date: now.toISOString(),
+              date: now.toISOString().slice(0, 19).replace("T", " "),
               amount,
               plan: plan.name,
               status: "Pending",
@@ -274,8 +274,8 @@ const VendorPremium = () => {
             },
             ...state.history,
           ],
-          startedAt: now.toISOString(),
-          nextBillingAt: next.toISOString(),
+          startedAt: now.toISOString().slice(0, 19).replace("T", " "),
+          nextBillingAt: next.toISOString().slice(0, 19).replace("T", " "),
           paymentReference: `TX-${Date.now()}`,
           status: "pending",
           provider: payForm.method === "card" ? "flutterwave" : payForm.method,
@@ -300,13 +300,13 @@ const VendorPremium = () => {
         planId: plan.id,
         billingCycle: cycle,
         autoRenew: true,
-        startedAt: now.toISOString(),
-        nextBillingAt: next.toISOString(),
+        startedAt: now.toISOString().slice(0, 19).replace("T", " "),
+        nextBillingAt: next.toISOString().slice(0, 19).replace("T", " "),
         paymentMethod: method,
         history: [
           {
             id: `INV-${Date.now()}`,
-            date: now.toISOString(),
+            date: now.toISOString().slice(0, 19).replace("T", " "),
             amount,
             plan: plan.name,
             status: data.redirect_url ? "Pending" : "Paid",
