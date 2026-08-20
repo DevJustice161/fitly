@@ -1,6 +1,6 @@
 const STATUS_STYLES = {
   pending: "bg-yellow-100 text-yellow-700",
-  pending_payment: "bg-yellow-100 text-yellow-700",
+  "pending payment": "bg-yellow-100 text-yellow-700",
   "under review": "bg-blue-100 text-blue-600",
   processing: "bg-blue-100 text-blue-600",
   shipped: "bg-purple-100 text-purple-600",
